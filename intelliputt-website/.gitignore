@@ -1,0 +1,6 @@
+# BEGIN: React
+/node_modules
+/build
+/.cache
+/public
+# END: React
