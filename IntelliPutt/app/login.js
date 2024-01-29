@@ -1,10 +1,11 @@
-import { Text, View } from 'react-native';
+import { ImageBackground, Text, View } from 'react-native';
+import { Link } from 'expo-router';
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import auth from '../config/firebase';
-import { TextInput, Button } from 'react-native';
-import { Link } from 'expo-router';
-import COLOURS from '../static/design_constants';
+import { TextInput } from 'react-native';
+import Button from '../components/Button';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -28,25 +29,48 @@ export default function Login() {
     };
 
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>
-                sign in or <Link href="/register" style={{ color: COLOURS.DARK_GREEN, fontWeight: 'bold' }}>register</Link> to continue.
-            </Text>
-            <TextInput
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
-            />
-            <TextInput
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
-            />
-            
-            <Button title="log in" onPress={handleLogin} />
+        <View className="bg-white flex-1 flex-col">
+            <ImageBackground
+                resizeMode="cover"
+                source={require('../static/images/background.png')}
+                className="flex-1">
+            </ImageBackground>
+            <SafeAreaView className="bg-stone-50 items-center justify-center flex-1/2 rounded-lg">
+                <View className="mb-10">
+                    <Text className="fixed top-0 left-0 [font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-[32px] tracking-[0] leading-[normal]">
+                        Welcome back!
+                    </Text>
+                    <Text className="mt-2 fixed h-[24px] top-0 left-0 [font-family:'Poppins-Regular',Helvetica] font-normal text-[#093923] text-[16px] tracking-[0] leading-[normal]">
+                        We're happy to see you again.
+                    </Text>
+                </View>
+                
+                <View className="w-3/4 gap-[12px] px-[12px] py-[10px] rounded">
+                    <TextInput
+                        className="bg-lime-950 w-full rounded-lg border-2 border-lime-950 p-4 text-stone-50 text-base"
+                        placeholderTextColor="#f5f5f4"
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}  
+                    />
+                    <TextInput
+                        className="bg-lime-950 w-full rounded-lg border-2 border-lime-950 p-4 text-stone-50 text-base"
+                        placeholderTextColor="#f5f5f4"
+                        placeholder="Password"
+                        value={password}
+                        onChangeText={setPassword}  
+                        style="font-size: 20px"
+                    />
+                    <Text className="mb-8">
+                        <Link className="font-bold" href="./register"> Forgot your password? </Link>    
+                    </Text> 
+
+                    <Button text="Log in" goTo="./home" onPress={handleLogin} /> 
+                    <Text className="mb-10">
+                        Don't have an account? <Link className="font-bold" href="./register"> Register. </Link>    
+                    </Text>      
+                </View>
+            </SafeAreaView>
         </View>
     );
 }
