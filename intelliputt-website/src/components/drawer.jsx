@@ -56,15 +56,15 @@ const Drawer = (props) => {
                 <motion.div 
                     animate={{
                         scale: drawerStatus ? 1:0,
-                        y: drawerStatus ? 0:-1000,
+                        x: drawerStatus ? 0:-1000,
                         //y: [100, 0],
                         //y: drawerStatus ? 0:0,
                         
                         //width: drawerStatus ? 400 : 400
                         }} 
                      transition={{type: "spring"}}
-                     initial={{scale:[0,1]}}
-                     exit={{scale:[1,0]}}
+                     initial={{scale:[0,1], x:[1000, 0]}}
+                     exit={{scale:[1,0], x:[0,1000]}}
                 >
                     <Typography sx={{color:'white'}}>{text}</Typography>
                 </motion.div>
