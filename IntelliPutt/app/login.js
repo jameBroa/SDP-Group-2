@@ -1,5 +1,5 @@
-import { ImageBackground, Text, View } from 'react-native';
-import { Link } from 'expo-router';
+import { ImageBackground, Text, View, StyleSheet } from 'react-native';
+import { Link, Redirect } from 'expo-router';
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import auth from '../config/firebase';
@@ -34,6 +34,9 @@ export default function Login() {
                 resizeMode="cover"
                 source={require('../static/images/background.png')}
                 className="flex-1">
+                <Link href="./index" style={ styles.button } >
+                    <Text style={ styles.text }>  &lt;</Text>
+                </Link>
             </ImageBackground>
             <SafeAreaView className="bg-stone-50 items-center justify-center flex-1/2 rounded-lg">
                 <View className="mb-10">
@@ -73,4 +76,24 @@ export default function Login() {
             </SafeAreaView>
         </View>
     );
-}
+};
+
+const styles = StyleSheet.create({
+    button:{
+      width:45,
+      height:45,
+      backgroundColor:'white',
+      alignItems:'center',
+      justifyContent:'center',
+      overflow:'hidden',
+      borderRadius:20,
+      position:'absolute',
+      left:40,
+      top:40
+    },
+    text:{
+      fontSize:32,
+      color:'black',
+      lineHeight:42,
+    }
+  });

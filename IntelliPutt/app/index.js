@@ -1,10 +1,9 @@
-import { Link, Stack, useRouter } from 'expo-router';
 import { SafeAreaView, ImageBackground, Image, Text, View } from 'react-native';
 import React from 'react';
 import "../static/styles/index.css";
 import Button from '../components/Button';
 
-export default function Home() {
+export default function Index() {
   return (
     <View className="bg-white flex flex-row justify-center w-full" >
       <ImageBackground
