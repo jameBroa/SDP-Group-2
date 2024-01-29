@@ -1,11 +1,12 @@
-import { ImageBackground, Text, View, StyleSheet } from 'react-native';
-import { Link, Redirect } from 'expo-router';
+import { ImageBackground, Text, View } from 'react-native';
+import { Link } from 'expo-router';
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import auth from '../config/firebase';
-import { TextInput } from 'react-native';
 import Button from '../components/Button';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import TextField from '../components/TextField';
+import BackButton from '../components/BackButton';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -34,9 +35,7 @@ export default function Login() {
                 resizeMode="cover"
                 source={require('../static/images/background.png')}
                 className="flex-1">
-                <Link href="./index" style={ styles.button } >
-                    <Text style={ styles.text }>  &lt;</Text>
-                </Link>
+                <BackButton href="./" />
             </ImageBackground>
             <SafeAreaView className="bg-stone-50 items-center justify-center flex-1/2 rounded-lg">
                 <View className="mb-10">
@@ -49,21 +48,9 @@ export default function Login() {
                 </View>
                 
                 <View className="w-3/4 gap-[12px] px-[12px] py-[10px] rounded">
-                    <TextInput
-                        className="bg-lime-950 w-full rounded-lg border-2 border-lime-950 p-4 text-stone-50 text-base"
-                        placeholderTextColor="#f5f5f4"
-                        placeholder="Email"
-                        value={email}
-                        onChangeText={setEmail}  
-                    />
-                    <TextInput
-                        className="bg-lime-950 w-full rounded-lg border-2 border-lime-950 p-4 text-stone-50 text-base"
-                        placeholderTextColor="#f5f5f4"
-                        placeholder="Password"
-                        value={password}
-                        onChangeText={setPassword}  
-                        style="font-size: 20px"
-                    />
+                    <TextField placeholder="Email" value={email} onChangeText={setEmail} />
+                    <TextField placeholder="Password" value={password} onChangeText={setPassword} />
+        
                     <Text className="mb-8">
                         <Link className="font-bold" href="./register"> Forgot your password? </Link>    
                     </Text> 
@@ -78,22 +65,3 @@ export default function Login() {
     );
 };
 
-const styles = StyleSheet.create({
-    button:{
-      width:45,
-      height:45,
-      backgroundColor:'white',
-      alignItems:'center',
-      justifyContent:'center',
-      overflow:'hidden',
-      borderRadius:20,
-      position:'absolute',
-      left:40,
-      top:40
-    },
-    text:{
-      fontSize:32,
-      color:'black',
-      lineHeight:42,
-    }
-  });

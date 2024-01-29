@@ -1,13 +1,14 @@
-import { Text, View } from 'react-native';
+import { SafeAreaView, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, set } from 'firebase/database';
 import auth from '../config/authentication';
 import db from '../config/database';
-import { TextInput, Button } from 'react-native';
+import Button from '../components/Button';
 import { Picker } from '@react-native-picker/picker';
 import { Link } from 'expo-router';
-import COLOURS from '../static/design_constants';
+import TextField from '../components/TextField';
+import BackButton from '../components/BackButton';
 
 export default function Register() {
     const [name, setName] = useState('');
@@ -53,39 +54,36 @@ export default function Register() {
     };
 
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>
-                sign up or <Link href="/login" style={{ color: COLOURS.DARK_GREEN, fontWeight: 'bold' }}>log in</Link> to continue.
-            </Text>
-            <TextInput
-                placeholder='Name'
-                value={name}
-                onChangeText={setName}
-                style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
-            />
-            <Picker
-                selectedValue={experienceLevel}
-                onValueChange={(itemValue) => setExperienceLevel(itemValue)}
-                style={{ width: 200 }}>
-                <Picker.Item label="Beginner" value="Beginner" />
-                <Picker.Item label="Intermediate" value="Intermediate" />
-                <Picker.Item label="Advanced" value="Advanced" />
-            </Picker>
-            <TextInput
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
-            />
-            <TextInput
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
-            />
+        <SafeAreaView className="flex flex-col items-center justify-center h-full">
+            <BackButton href="./" />
+            <View className="mb-10 items-center">
+                <Text className="fixed top-0 left-0 [font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-[32px] tracking-[0] leading-[normal]">
+                    Hi!
+                </Text>
+                <Text className="mt-2 fixed h-[24px] top-0 left-0 [font-family:'Poppins-Regular',Helvetica] font-normal text-[#093923] text-[16px] tracking-[0] leading-[normal]">
+                    Create an account to get started.
+                </Text>
+            </View>
+
+            <View className="w-3/4">
+                <TextField placeholder="Name" value={name} onChangeText={setName} />
+                <TextField placeholder="Email" value={email} onChangeText={setEmail} />
+                <TextField placeholder="Password" value={password} onChangeText={setPassword} />
+
+                <Picker
+                    selectedValue={experienceLevel}
+                    onValueChange={(itemValue) => setExperienceLevel(itemValue)}
+                    >
+                    <Picker.Item label="Beginner" value="Beginner" />
+                    <Picker.Item label="Intermediate" value="Intermediate" />
+                    <Picker.Item label="Advanced" value="Advanced" />
+                </Picker>
             
-            <Button title="register" onPress={handleRegister} />
-        </View>
+                <Button text="Register" onPress={handleRegister} goTo="./home" />
+            </View>
+            
+
+            
+        </SafeAreaView>
     );
 }
