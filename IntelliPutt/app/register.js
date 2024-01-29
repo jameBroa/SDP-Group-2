@@ -1,19 +1,22 @@
-import { Text, View } from 'react-native';
+import { SafeAreaView, Text, View, Image } from 'react-native';
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, set } from 'firebase/database';
 import auth from '../config/authentication';
 import db from '../config/database';
-import { TextInput, Button } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import Button from '../components/Button';
+import Chip from '../components/Chip';
 import { Link } from 'expo-router';
-import COLOURS from '../static/design_constants';
+import TextField from '../components/TextField';
+import BackButton from '../components/BackButton';
 
 export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [experienceLevel, setExperienceLevel] = useState('');
+    const tabs = ["Beginner", "Intermediate", "Advanced"];
+    const [selected, setSelected] = useState(tabs[0]);
 
     const handleRegister = () => {
         createUserWithEmailAndPassword(auth, email, password)
@@ -53,39 +56,50 @@ export default function Register() {
     };
 
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>
-                sign up or <Link href="/login" style={{ color: COLOURS.DARK_GREEN, fontWeight: 'bold' }}>log in</Link> to continue.
-            </Text>
-            <TextInput
-                placeholder='Name'
-                value={name}
-                onChangeText={setName}
-                style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
-            />
-            <Picker
-                selectedValue={experienceLevel}
-                onValueChange={(itemValue) => setExperienceLevel(itemValue)}
-                style={{ width: 200 }}>
-                <Picker.Item label="Beginner" value="Beginner" />
-                <Picker.Item label="Intermediate" value="Intermediate" />
-                <Picker.Item label="Advanced" value="Advanced" />
-            </Picker>
-            <TextInput
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
-            />
-            <TextInput
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
+        <SafeAreaView className="bg-stone-100 flex flex-col items-center justify-center h-full">
+            <BackButton href="./" />
+            <Image
+                style={{ width: 50, height: 50 }}
+                source={require('../static/images/logo_transparent.png')}
+                className="absolute top-[50px] right-[50px]"
             />
             
-            <Button title="register" onPress={handleRegister} />
-        </View>
+            <View className="mb-10 items-center">
+                <Text className="fixed top-0 left-0 [font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-[32px] tracking-[0] leading-[normal]">
+                    Hi!
+                </Text>
+                <Text className="mt-2 fixed h-[24px] top-0 left-0 [font-family:'Poppins-Regular',Helvetica] font-normal text-[#093923] text-[16px] tracking-[0] leading-[normal]">
+                    Create an account to get started.
+                </Text>
+            </View>
+
+            <View className="w-4/5">
+                <TextField placeholder="Name" value={name} onChangeText={setName} />
+                <TextField placeholder="Email" value={email} onChangeText={setEmail} />
+                <TextField placeholder="Password" value={password} onChangeText={setPassword} />
+                
+                <View className="flex-row mt-5 pt-4 my-4 justify-between">
+                    <Text className="font-bold"> Skill level: </Text>
+                    <Link className="font-bold" href="./register"> What's this? </Link>
+                </View>
+                
+                <View className="flex-row flex items-center flex-wrap gap-2 justify-center mb-5">
+                    {tabs.map((tab) => (
+                        <Chip
+                            text={tab}
+                            selected={selected === tab}
+                            setSelected={setSelected}
+                            key={tab}
+                        />
+                    ))}
+                </View>
+
+                <Button text="Register" onPress={handleRegister} goTo="./home" />
+                <Text className="mb-10 mt-2 text-stone-900 font-medium">
+                    Already have an account? <Link className="font-bold" href="./login">Login. </Link>    
+                </Text>
+            </View>
+
+        </SafeAreaView>
     );
 }

@@ -3,6 +3,7 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: ["expo-router/babel"],
-    plugins: ['@babel/plugin-transform-unicode-property-regex']
+    plugins: ['@babel/plugin-transform-unicode-property-regex'],
+    plugins: ["nativewind/babel"],
   };
 };
