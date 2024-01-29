@@ -1,7 +1,15 @@
+{/* 
+    INDEX PAGE
+    This is the first page that the user sees when they open the app.
+
+    Links to
+      - Login page
+      - Register page
+*/}
+
 import { SafeAreaView, ImageBackground, Image, Text, View } from 'react-native';
 import React from 'react';
-import "../static/styles/index.css";
-import Button from '../components/Button';
+import CustomButton from '../components/CustomButton';
 
 export default function Index() {
   return (
@@ -24,8 +32,8 @@ export default function Index() {
           </View>
           
           <View className="inline-flex flex-col items-center justify-center h-1/3 w-2/3">
-            <Button text="Login" goTo="./login" />
-            <Button text="Create an account" goTo="./register" />
+            <CustomButton text="Login" goTo="./login" />
+            <CustomButton text="Create an account" goTo="./register" />
           </View>
         </SafeAreaView>
       </ImageBackground>

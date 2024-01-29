@@ -1,3 +1,7 @@
+{/* 
+    Default text field component for IntelliPutt.
+*/}
+
 import React from 'react';
 import { TextInput } from 'react-native';
 

@@ -1,3 +1,7 @@
+{/* 
+    Configures the authentication for the app.
+*/}
+
 import { getAuth } from 'firebase/auth';
 import app from './firebase';
 
