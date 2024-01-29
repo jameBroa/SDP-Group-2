@@ -9,11 +9,15 @@ const Header = () => {
             lg:'101px',
             xs:'101px'
         }}}>
-            <Button sx={{color:'white',textTransform:'none'}}>
+            <Button sx={{color:'white', textTransform:'none', width:{
+                xs:'100px',
+            }}}>
                 <Typography>About</Typography>
             </Button>
             <img height='81px' width='81px' src={IntelliPutLogo}/>
-            <Button sx={{color:'white',textTransform:'none'}}>
+            <Button sx={{color:'white',textTransform:'none', width:{
+                xs:'100px',
+            }}}>
                 <Typography>Contact us</Typography>
             </Button>
 
