@@ -1,0 +1,13 @@
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .all-\[unset\] {
+    all: unset;
+  }
+}
+
+:root {
+  --brand-colorbroken-white: rgba(248, 247, 243, 1);
+  --brand-colordark-green: rgba(9, 57, 35, 1);
+}
