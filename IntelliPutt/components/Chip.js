@@ -1,3 +1,7 @@
+{/* 
+    Makes the individual choices for skill level in the registration process.
+*/}
+
 import React from 'react';
 import { Pressable, Text } from 'react-native';
 

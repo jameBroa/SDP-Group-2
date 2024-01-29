@@ -1,9 +1,24 @@
+{/* 
+    LOGIN PAGE
+    Authenticates user.
+
+    Input fields
+        - Email
+        - Password  
+
+    Links to
+        - Index page
+        - Register page
+        - Forgot password page
+        - Home page (if successfully authenticated)
+*/}
+
 import { ImageBackground, Text, View } from 'react-native';
 import { Link } from 'expo-router';
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import auth from '../config/firebase';
-import Button from '../components/Button';
+import CustomButton from '../components/CustomButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
@@ -55,7 +70,7 @@ export default function Login() {
                         <Link className="font-bold" href="./register"> Forgot your password? </Link>    
                     </Text> 
 
-                    <Button text="Log in" goTo="./home" onPress={handleLogin} /> 
+                    <CustomButton text="Log in" goTo="./home" onPress={handleLogin} /> 
                     <Text className="mb-10">
                         Don't have an account? <Link className="font-bold" href="./register">Register. </Link>    
                     </Text>      

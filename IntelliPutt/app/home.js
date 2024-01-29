@@ -1,3 +1,10 @@
+{/* 
+    HOME PAGE
+    User is directed here after logging in.
+
+    (needs to be implemented)
+*/}
+
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 

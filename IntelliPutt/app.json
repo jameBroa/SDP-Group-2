@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme": "acme",
+    "scheme": "IntelliPutt",
     "web": {
       "bundler": "metro"
     },

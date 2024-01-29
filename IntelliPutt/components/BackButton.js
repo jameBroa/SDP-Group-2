@@ -1,3 +1,7 @@
+{/* 
+    Back-button component to replace the one in the header.
+*/}
+
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
