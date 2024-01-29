@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
       borderRadius:20,
       position:'absolute',
       left:40,
-      top:40
+      top:50
     },
     text:{
       fontSize:32,

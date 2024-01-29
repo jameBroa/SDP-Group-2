@@ -57,7 +57,7 @@ export default function Login() {
 
                     <Button text="Log in" goTo="./home" onPress={handleLogin} /> 
                     <Text className="mb-10">
-                        Don't have an account? <Link className="font-bold" href="./register"> Register. </Link>    
+                        Don't have an account? <Link className="font-bold" href="./register">Register. </Link>    
                     </Text>      
                 </View>
             </SafeAreaView>
