@@ -1,3 +1,8 @@
+{/* 
+    Configures connection to firebase.
+    ISSUE: exposed API keys but only because it wouldn't work with (.env.local)
+*/}
+
 import { initializeApp } from 'firebase/app';
 
 // Initialize Firebase
