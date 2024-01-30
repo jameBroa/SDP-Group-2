@@ -14,12 +14,16 @@ export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [registrationSuccessful, setRegistrationSuccessful] = useState(false);
+
     const tabs = ["Beginner", "Intermediate", "Advanced"];
     const [experienceLevel, setExperienceLevel] = useState(tabs[0]);
 
     const handleRegister = () => {
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
+            setRegistrationSuccessful(true);
+            
             // User successfully created
             const user = userCredential.user;
             setEmail(userCredential.email);
@@ -36,10 +40,10 @@ export default function Register() {
             });
 
             console.log('Additional data stored successfully');
-
             alert("Account created. Hi " + name + "! Welcome to IntelliPutt.");
         })
         .catch((error) => {
+            setRegistrationSuccessful(false);
             // Handle errors
             if (error.code == 'auth/email-already-in-use') {
                 alert("Email already in use.");
@@ -93,7 +97,7 @@ export default function Register() {
                     ))}
                 </View>
 
-                <Button text="Register" onPress={handleRegister} goTo="./home" />
+                <Button text="Register" goTo={registrationSuccessful ? "./register" : "./home"} onPress={handleRegister}/>
                 <Text className="mb-10 mt-2 text-stone-900 font-medium">
                     Already have an account? <Link className="font-bold" href="./login">Login. </Link>    
                 </Text>
