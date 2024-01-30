@@ -14,9 +14,8 @@ export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [experienceLevel, setExperienceLevel] = useState('');
     const tabs = ["Beginner", "Intermediate", "Advanced"];
-    const [selected, setSelected] = useState(tabs[0]);
+    const [experienceLevel, setExperienceLevel] = useState(tabs[0]);
 
     const handleRegister = () => {
         createUserWithEmailAndPassword(auth, email, password)
@@ -38,7 +37,7 @@ export default function Register() {
 
             console.log('Additional data stored successfully');
 
-            alert('User created, hi ', user.email);
+            alert("Account created. Hi " + name + "! Welcome to IntelliPutt.");
         })
         .catch((error) => {
             // Handle errors
@@ -49,8 +48,8 @@ export default function Register() {
             } else if (error.code == 'auth/weak-password') {
                 alert("Weak password.");
             } else {
-                console.log('Error creating user:', error.message);
-                alert('Error creating user:', error.message)
+                console.log('Error creating user:' + error.message);
+                alert('Error creating user:' + error.message)
             }
         });   
     };
@@ -87,8 +86,8 @@ export default function Register() {
                     {tabs.map((tab) => (
                         <Chip
                             text={tab}
-                            selected={selected === tab}
-                            setSelected={setSelected}
+                            selected={experienceLevel === tab}
+                            setSelected={setExperienceLevel}
                             key={tab}
                         />
                     ))}
