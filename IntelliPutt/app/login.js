@@ -22,25 +22,68 @@ import CustomButton from '../components/CustomButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
+import db from '../config/database';
+import { ref, get } from 'firebase/database';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [logInSuccessful, setLogInSuccessful] = useState(false);
+   
+    // Function to fetch user data from the database
+    const fetchUserData = async (userId) => {
+        const userRef = ref(db, `users/${userId}`);
 
+        try {
+            const snapshot = await get(userRef);
+            console.log('User data:', snapshot.val());
+            if (snapshot.exists()) {
+                // Data found, set it in the state 
+                return snapshot.val();
+            } else {
+                // Data not found
+                console.log('No data found for the user with ID:', userId);
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error.message);
+        }
+    };
+
+    const auth = getAuth();
     const handleLogin = () => {
         signInWithEmailAndPassword(auth, email, password)
+        // User successfully signed in
         .then((userCredential) => {
-            // User successfully logged in
             const user = userCredential.user;
-            setEmail(userCredential.email);
-            setPassword(userCredential.password);
 
-            alert('User signed in, hi ', userCredential.user.displayName);
-            console.log('User signed in:', user);
+            // Get rest of user data from the database
+            fetchUserData(user.uid)
+            .then((userData) => {
+                // Data exists
+                console.log('User data:', userData.name);
+                alert('User signed in, hi ' + userData.name + '!');
+            }).catch((error) => {
+                // Data doesn't exist, old account?
+                if (error.message == "Cannot read property 'name' of undefined") {
+                    alert('User signed in, please update your user details!');
+                } else {
+                    console.error('Error fetching user data:', error.message); 
+                }           
+            });
+
+            setLogInSuccessful(true);
+            console.log('User signed in:' + user.uid);
         })
+        // Error with authentication
         .catch((error) => {
-            // Handle errors
-            alert('Failed to sign in ', error.message);
+            setLogInSuccessful(false);
+
+            if (error.message == 'auth/invalid-credential') {
+                alert("Invalid credentials.");
+            } else {
+                alert('Failed to sign in, try again later.');
+                console.error('Error signing in:', error.message);
+            }
         });   
     };
 
