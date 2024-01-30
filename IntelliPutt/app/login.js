@@ -12,6 +12,7 @@ import { ref, get } from 'firebase/database';
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [logInSuccessful, setLogInSuccessful] = useState(false);
    
     // Function to fetch user data from the database
     const fetchUserData = async (userId) => {
@@ -54,15 +55,19 @@ export default function Login() {
                 }           
             });
 
+            setLogInSuccessful(true);
             console.log('User signed in:' + user.uid);
         })
         // Error with authentication
         .catch((error) => {
+            setLogInSuccessful(false);
+
             if (error.message == 'auth/invalid-credential') {
                 alert("Invalid credentials.");
+            } else {
+                alert('Failed to sign in, try again later.');
+                console.error('Error signing in:', error.message);
             }
-
-            alert('Failed to sign in ' + error.message);
         });   
     };
 
@@ -92,7 +97,7 @@ export default function Login() {
                         <Link className="font-bold" href="./register"> Forgot your password? </Link>    
                     </Text> 
 
-                    <Button text="Log in" goTo="./home" onPress={handleLogin} /> 
+                    <Button text="Log in" goTo={logInSuccessful ? "./login" : "./home"} onPress={handleLogin} /> 
                     <Text className="mb-10">
                         Don't have an account? <Link className="font-bold" href="./register">Register. </Link>    
                     </Text>      
