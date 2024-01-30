@@ -114,7 +114,7 @@ export default function Register() {
                     ))}
                 </View>
 
-                <CustomButton text="Register" goTo={registrationSuccessful ? "./register" : "./home"} onPress={handleRegister}/>
+                <CustomButton text="Register" goTo={registrationSuccessful ? "./home" : "./register"} onPress={handleRegister}/>
                 <Text className="mb-10 mt-2 text-stone-900 font-medium">
                     Already have an account? <Link className="font-bold" href="./login">Login. </Link>    
                 </Text>
