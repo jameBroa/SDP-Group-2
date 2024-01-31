@@ -69,7 +69,7 @@ export default function Login() {
         })
         .catch((error) => {                             // Error with authentication
             setLogInSuccessful(false);
-            alert('Error signing in:' + error.message);
+            alert('Error signing in: ' + error.message);
         });   
     };
 
