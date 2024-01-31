@@ -18,7 +18,6 @@ import { Link } from 'expo-router';
 import React, { useState } from 'react';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import CustomButton from '../components/CustomButton';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
 import db from '../config/database';
@@ -114,5 +113,5 @@ const styles = {
     wrapper: {
       justifyContent: 'center',
       alignItems: 'center'
-    }
+    },
 }
