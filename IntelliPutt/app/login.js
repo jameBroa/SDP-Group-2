@@ -13,9 +13,9 @@
         - Home page (if successfully authenticated)
 */}
 
-import { ImageBackground, Text, View } from 'react-native';
+import { ImageBackground, ScrollView, Text, View } from 'react-native';
 import { Link } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import CustomButton from '../components/CustomButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -81,17 +81,18 @@ export default function Login() {
                 className="flex-1">
                 <BackButton href="./" />
             </ImageBackground>
-            <SafeAreaView className="bg-stone-50 items-center justify-center flex-1/2 rounded-lg">
+            
+            <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.wrapper} className="pt-20 bg-stone-50 h-1/2 rounded-lg" >
                 <View className="mb-10">
-                    <Text className="fixed top-0 left-0 [font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-[32px] tracking-[0] leading-[normal]">
+                    <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-[32px] tracking-[0] leading-[normal]">
                         Welcome back!
                     </Text>
-                    <Text className="mt-2 fixed h-[24px] top-0 left-0 [font-family:'Poppins-Regular',Helvetica] font-normal text-[#093923] text-[16px] tracking-[0] leading-[normal]">
+                    <Text className="mt-2 h-[24px] [font-family:'Poppins-Regular',Helvetica] font-normal text-[#093923] text-[16px] tracking-[0] leading-[normal]">
                         We're happy to see you again.
                     </Text>
                 </View>
                 
-                <View className="w-3/4 gap-[12px] px-[12px] py-[10px] rounded">
+                <View className="w-3/4 gap-[12px] px-[10px] py-[6px] rounded">
                     <TextField placeholder="Email" value={email} onChangeText={setEmail} />
                     <TextField placeholder="Password" value={password} onChangeText={setPassword} />
         
@@ -104,8 +105,14 @@ export default function Login() {
                         Don't have an account? <Link className="font-bold" href="./register">Register. </Link>    
                     </Text>      
                 </View>
-            </SafeAreaView>
+            </ScrollView>
         </View>
     );
 };
 
+const styles = {
+    wrapper: {
+      justifyContent: 'center',
+      alignItems: 'center'
+    }
+}
