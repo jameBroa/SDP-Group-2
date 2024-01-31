@@ -38,10 +38,9 @@ export default function Register() {
 
     const handleRegister = () => {
         createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then((userCredential) => {                         // User successfully created
             setRegistrationSuccessful(true);
             
-            // User successfully created
             const user = userCredential.user;
             setEmail(userCredential.email);
             setPassword(userCredential.password);
@@ -55,23 +54,13 @@ export default function Register() {
                 name: name,
                 experienceLevel: experienceLevel
             });
-
             console.log('Additional data stored successfully');
+
             alert("Account created. Hi " + name + "! Welcome to IntelliPutt.");
         })
-        .catch((error) => {
+        .catch((error) => {                                 // User creation failed
             setRegistrationSuccessful(false);
-            // Handle errors
-            if (error.code == 'auth/email-already-in-use') {
-                alert("Email already in use.");
-            } else if (error.code == 'auth/invalid-email') {
-                alert("Invalid email.");
-            } else if (error.code == 'auth/weak-password') {
-                alert("Weak password.");
-            } else {
-                console.log('Error creating user:' + error.message);
-                alert('Error creating user:' + error.message)
-            }
+            alert('Error creating user: ' + error.message)
         });   
     };
 
