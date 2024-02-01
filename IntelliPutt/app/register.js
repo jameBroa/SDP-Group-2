@@ -31,16 +31,13 @@ export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [registrationSuccessful, setRegistrationSuccessful] = useState(false);
 
     const tabs = ["Beginner", "Intermediate", "Advanced"];
     const [experienceLevel, setExperienceLevel] = useState(tabs[0]);
 
     const handleRegister = () => {
         createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {                         // User successfully created
-            setRegistrationSuccessful(true);
-            
+        .then((userCredential) => {                         // User successfully created            
             const user = userCredential.user;
             setEmail(userCredential.email);
             setPassword(userCredential.password);
@@ -60,7 +57,6 @@ export default function Register() {
             alert("Account created. Hi " + name + "! Welcome to IntelliPutt.");
         })
         .catch((error) => {                                 // User creation failed
-            setRegistrationSuccessful(false);
             alert('Error creating user: ' + error.message)
         });   
     };
