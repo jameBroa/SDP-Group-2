@@ -20,7 +20,7 @@ const Footer = () => {
     }
 });
   return (
-    <View style={styles.customGreen} className="w-full flex flex-row  justify-evenly items-center">
+    <View style={styles.customGreen} className="w-full h-[100%] flex flex-row  justify-evenly items-center">
             <View className=" flex flex-col space-y-1 justify-center items-center w-1/5 rounded-xl ">
               <AntDesign name="home" size={36} color="white" />
               <Text className="text-white text-sm">Home</Text>

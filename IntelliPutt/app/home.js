@@ -38,7 +38,7 @@ const Home = () => {
                     </View>
                 </View>
             </LinearGradient>
-            <View className="w-full h-full flex flex-col justify-between space-y-1">
+            <View className="w-full h-[70%]  justify-between flex flex-col space-y-1">
                 <Text className="text-xl text-gray-400 pl-4">Your Friends</Text>
                 <View className=" w-full flex flex-row justify-around ">
                     {/* TODO: Wrap in Pressables */}
@@ -61,7 +61,7 @@ const Home = () => {
                     <GuidesButton/>
                 </View>
                 {/* Footer */}
-                <View className="w-full h-full flex flex-col">
+                <View className="w-full flex flex-col h-[15%] bg-slate-400 justify-start">
                     <Footer/>
                 </View>
 
