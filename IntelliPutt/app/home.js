@@ -12,23 +12,25 @@ import BentoBoxes from '../components/BentoBoxes';
 import Footer from '../components/Footer';
 import {LinearGradient} from 'expo-linear-gradient';
 import FriendButton from '../components/FriendButton';
+import StatsButton from '../components/StatsButton';
+import GuidesButton from '../components/GuidesButton';
 
 
 const Home = () => {
     return (
         <View className="h-full">
-            <LinearGradient className="h-[40%]"
+            <LinearGradient className="h-[30%]"
             colors={['rgba(25,46,5,1)',  'rgba(105,190,25,0)']}
             start={[0, 0.1]}
             end={[0, 1]}
             >
                 <View className="top-[22%]">
                     <Header className=""/>
-                    <View className="flex flex-col space-y-2 pl-4 top-20">
+                    <View className="flex flex-col space-y-2 pl-4 top-14">
                         <Text className="text-3xl text-white ">Welcome back</Text>
                         <Text className="text-4xl text-white font-bold">Joseph</Text>
                     </View>
-                    <View className="absolute flex flex-row w-full justify-center top-[90%]">
+                    <View className="absolute flex flex-row w-full justify-center top-[45%]">
                         <Image
                             style={{ width: 400, height: 150 }}
                             source={require('../static/images/golf-graphic.png')}
@@ -36,15 +38,34 @@ const Home = () => {
                     </View>
                 </View>
             </LinearGradient>
-            <View className="w-full h-full  flex flex-col space-y-5">
+            <View className="w-full h-full flex flex-col justify-between space-y-1">
                 <Text className="text-xl text-gray-400 pl-4">Your Friends</Text>
-                <View className=" w-full grid gap-4 grid-cols-4 bg-slate-900">
+                <View className=" w-full flex flex-row justify-around ">
+                    {/* TODO: Wrap in Pressables */}
                     <FriendButton/>
                     <FriendButton/>
                     <FriendButton/>
                 </View>
+                <Text className="text-xl text-gray-400 pl-4">Your Stats</Text>
+                <View className=" w-full flex flex-row justify-around ">
+                    {/* TODO: Wrap in Pressables */}
+                    <StatsButton day={"Monday"} />
+                    <StatsButton day={"Tuesday"} />
+                    <StatsButton day={"View More"} view/>
+                </View>
+                <Text className="text-xl text-gray-400 pl-4">Reccommended Guides</Text> 
+                <View className=" w-full flex flex-row justify-around ">
+                    {/* TODO: Wrap in Pressables */}
+                    <GuidesButton/>
+                    <GuidesButton/>
+                    <GuidesButton/>
+                </View>
+                {/* Footer */}
+                <View className="w-full h-full flex flex-col">
+                    <Footer/>
+                </View>
+
             </View>
-            <Footer/>
         </View>
         // <View style={styles.container}>
         //     <Header
