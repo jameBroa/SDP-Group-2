@@ -15,7 +15,7 @@
 
 import { ImageBackground, ScrollView, Text, View, Pressable } from 'react-native';
 import Modal from "react-native-modal";
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
 import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import CustomButton from '../components/CustomButton';
@@ -67,6 +67,7 @@ export default function Login() {
 
             setLogInSuccessful(true);
             console.log('User signed in:' + user.uid);
+            router.push('./home');
         })
         .catch((error) => {                             // Error with authentication
             setLogInSuccessful(false);
@@ -116,7 +117,7 @@ export default function Login() {
                         </Pressable>   
                     </Text> 
 
-                    <CustomButton text="Log in" goTo={logInSuccessful ? "./home" : "./login"} onPress={handleLogin} /> 
+                    <CustomButton text="Log in" onPress={handleLogin} /> 
                     <Text className="mb-10">
                         Don't have an account? <Link className="font-bold" href="./register">Register. </Link>    
                     </Text>      

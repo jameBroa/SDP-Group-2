@@ -23,7 +23,7 @@ import auth from '../config/authentication';
 import db from '../config/database';
 import CustomButton from '../components/CustomButton';
 import Chip from '../components/Chip';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
 
@@ -56,6 +56,7 @@ export default function Register() {
             });
             console.log('Additional data stored successfully');
 
+            router.push('/home');
             alert("Account created. Hi " + name + "! Welcome to IntelliPutt.");
         })
         .catch((error) => {                                 // User creation failed
@@ -103,7 +104,7 @@ export default function Register() {
                     ))}
                 </View>
 
-                <CustomButton text="Register" goTo={registrationSuccessful ? "./home" : "./register"} onPress={handleRegister}/>
+                <CustomButton text="Register" onPress={handleRegister}/>
                 <Text className="mb-10 mt-2 text-stone-900 font-medium">
                     Already have an account? <Link className="font-bold" href="./login">Login. </Link>    
                 </Text>
