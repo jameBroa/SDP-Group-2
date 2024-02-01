@@ -23,7 +23,7 @@ import auth from '../config/authentication';
 import db from '../config/database';
 import CustomButton from '../components/CustomButton';
 import Chip from '../components/Chip';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
 
@@ -31,17 +31,13 @@ export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [registrationSuccessful, setRegistrationSuccessful] = useState(false);
 
     const tabs = ["Beginner", "Intermediate", "Advanced"];
     const [experienceLevel, setExperienceLevel] = useState(tabs[0]);
 
     const handleRegister = () => {
         createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            setRegistrationSuccessful(true);
-            
-            // User successfully created
+        .then((userCredential) => {                         // User successfully created            
             const user = userCredential.user;
             setEmail(userCredential.email);
             setPassword(userCredential.password);
@@ -55,23 +51,13 @@ export default function Register() {
                 name: name,
                 experienceLevel: experienceLevel
             });
-
             console.log('Additional data stored successfully');
+
+            router.push('/home');
             alert("Account created. Hi " + name + "! Welcome to IntelliPutt.");
         })
-        .catch((error) => {
-            setRegistrationSuccessful(false);
-            // Handle errors
-            if (error.code == 'auth/email-already-in-use') {
-                alert("Email already in use.");
-            } else if (error.code == 'auth/invalid-email') {
-                alert("Invalid email.");
-            } else if (error.code == 'auth/weak-password') {
-                alert("Weak password.");
-            } else {
-                console.log('Error creating user:' + error.message);
-                alert('Error creating user:' + error.message)
-            }
+        .catch((error) => {                                 // User creation failed
+            alert('Error creating user: ' + error.message)
         });   
     };
 
@@ -114,7 +100,7 @@ export default function Register() {
                     ))}
                 </View>
 
-                <CustomButton text="Register" goTo={registrationSuccessful ? "./home" : "./register"} onPress={handleRegister}/>
+                <CustomButton text="Register" onPress={handleRegister}/>
                 <Text className="mb-10 mt-2 text-stone-900 font-medium">
                     Already have an account? <Link className="font-bold" href="./login">Login. </Link>    
                 </Text>
