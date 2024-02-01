@@ -123,7 +123,7 @@ export default function Login() {
                 </View>
             </ScrollView>
 
-            <Modal isVisible={showModal} animationType='slide' className="w-[90%] mt-[50%]" style={styles.modal}>
+            <Modal isVisible={showModal} animationIn="slideInUp" animationOut="slideOutDown" className="w-[90%] mt-[50%]" style={styles.modal}>
                 <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.resetPasswordWrapper} className="bg-white px-[30px] pt-[20px] pb-[40px] rounded-lg w-full">
                     <Pressable className="my-[20px]" onPress={() => setShowModal(false)}>
                         <Text className="text-stone-900 text-[16px]"> &lt; </Text>
