@@ -13,10 +13,11 @@
         - Home page (if successfully authenticated)
 */}
 
-import { ImageBackground, ScrollView, Text, View } from 'react-native';
+import { ImageBackground, ScrollView, Text, View, Pressable } from 'react-native';
+import Modal from "react-native-modal";
 import { Link } from 'expo-router';
 import React, { useState } from 'react';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import CustomButton from '../components/CustomButton';
 import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
@@ -27,6 +28,7 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [logInSuccessful, setLogInSuccessful] = useState(false);
+    const [showModal, setShowModal] = useState(false);
    
     // Fetch name + experience level from database
     const fetchUserData = async (userId) => {
@@ -72,6 +74,19 @@ export default function Login() {
         });   
     };
 
+    const handlePasswordReset = () => {
+        sendPasswordResetEmail(auth, email)
+        .then(() => {
+            alert('Check your email for a link to reset your password.');
+            setTimeout(() => {
+                setShowModal(false);
+            }, 1000);
+        })
+        .catch((error) => {
+            alert('Error ' + error.message);
+        });
+    };
+    
     return (
         <View className="bg-white flex-1 flex-col">
             <ImageBackground
@@ -91,12 +106,14 @@ export default function Login() {
                     </Text>
                 </View>
                 
-                <View className="w-3/4 gap-[12px] px-[10px] py-[6px] rounded">
+                <View className="w-3/4 px-[10px] py-[6px] rounded">
                     <TextField placeholder="Email" value={email} onChangeText={setEmail} />
                     <TextField placeholder="Password" value={password} onChangeText={setPassword} />
         
                     <Text className="mb-8">
-                        <Link className="font-bold" href="./register"> Forgot your password? </Link>    
+                        <Pressable className="font-bold" onPress={() => setShowModal(true)}> 
+                            <Text className="font-bold mt-3"> Forgot your password? </Text>
+                        </Pressable>   
                     </Text> 
 
                     <CustomButton text="Log in" goTo={logInSuccessful ? "./home" : "./login"} onPress={handleLogin} /> 
@@ -105,13 +122,43 @@ export default function Login() {
                     </Text>      
                 </View>
             </ScrollView>
+
+            <Modal isVisible={showModal} animationType='slide' className="w-[90%] mt-[50%]" style={styles.modal}>
+                <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.resetPasswordWrapper} className="bg-white px-[30px] pt-[20px] pb-[40px] rounded-lg w-full">
+                    <Pressable className="my-[20px]" onPress={() => setShowModal(false)}>
+                        <Text className="text-stone-900 text-[16px]"> &lt; </Text>
+                    </Pressable>
+                    <View className="mb-10 mt-6 items-center">
+                        <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-center text-[30px] tracking-[0] leading-[normal]">
+                            Reset your password
+                        </Text>
+                        <Text className="font-light mt-4 text-base text-center">
+                            If your email is registered with us, we'll send you a link to reset your password.
+                        </Text>
+                    </View>
+
+                    <View className="items-center w-[95%] ml-2 mt-10">
+                        <TextField placeholder="Email" value={email} onChangeText={setEmail} />
+                        <CustomButton text="Send link" onPress={handlePasswordReset}/>
+                    </View>
+                </ScrollView>
+            </Modal>
         </View>
     );
 };
 
 const styles = {
     wrapper: {
-      justifyContent: 'center',
-      alignItems: 'center'
+        justifyContent: 'center',
+        alignItems: 'center'
     },
+    modal: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        maxHeight:"57%",
+    },
+    resetPasswordWrapper: {
+        flexGrow: 1,
+        height: '50%',
+    }
 }
