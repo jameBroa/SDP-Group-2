@@ -2,10 +2,13 @@ import React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import COLOURS from '../static/design_constants'
 
-const GuidesButton = () => {
+const GuidesButton = ({title}) => {
     const styles = StyleSheet.create({
         customGold: {
             backgroundColor: COLOURS.MEDIUM_GOLD
+        },
+        textGold: {
+            color: COLOURS.MEDIUM_GOLD
         },
         customGreen: {
             backgroundColor: COLOURS.DARK_GREEN
@@ -29,8 +32,8 @@ const GuidesButton = () => {
                 />
             </View>
             <View className="flex flex-col justify-around pl-1 h-[60%] ">
-                <Text className="text-white text-xl"></Text>
-                <Text className="text-white">View more -{'>'}</Text>
+                <Text className="text-white text-md font-semibold">{title}</Text>
+                <Text className="text-white" >View more -{'>'}</Text>
             </View>
         </View>
     </View>

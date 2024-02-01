@@ -14,6 +14,10 @@ import {LinearGradient} from 'expo-linear-gradient';
 import FriendButton from '../components/FriendButton';
 import StatsButton from '../components/StatsButton';
 import GuidesButton from '../components/GuidesButton';
+import StatsGraphic1 from '../static/images/test-image-2.png';
+import StatsGraphic2 from '../static/images/test-image-3.png';
+import StatsGraphic3 from '../static/images/test-image-4.png';
+
 
 
 const Home = () => {
@@ -39,26 +43,27 @@ const Home = () => {
                 </View>
             </LinearGradient>
             <View className="w-full h-[70%]  justify-between flex flex-col space-y-1">
-                <Text className="text-xl text-gray-400 pl-4">Your Friends</Text>
-                <View className=" w-full flex flex-row justify-around ">
+                <Text className="text-xl text-gray-400 pl-3">Your Friends</Text>
+                <View className=" w-full flex flex-row justify-around  ">
                     {/* TODO: Wrap in Pressables */}
-                    <FriendButton/>
-                    <FriendButton/>
-                    <FriendButton/>
+                    <FriendButton name={"Joe"} skill={"Advanced"} online/>
+                    <FriendButton name={"Adam"} skill={"Beginner"} online/>
+                    <FriendButton offline/>
+
                 </View>
-                <Text className="text-xl text-gray-400 pl-4">Your Stats</Text>
+                <Text className="text-xl text-gray-400 pl-3">Your Stats</Text>
                 <View className=" w-full flex flex-row justify-around ">
                     {/* TODO: Wrap in Pressables */}
-                    <StatsButton day={"Monday"} />
-                    <StatsButton day={"Tuesday"} />
-                    <StatsButton day={"View More"} view/>
+                    <StatsButton day={"Monday"} numToReview={"12"} imgSrc={StatsGraphic1}/>
+                    <StatsButton day={"Tuesday"} numToReview={"5"} imgSrc={StatsGraphic2}/>
+                    <StatsButton day={"View More"} view imgSrc={StatsGraphic3}/>
                 </View>
-                <Text className="text-xl text-gray-400 pl-4">Reccommended Guides</Text> 
+                <Text className="text-xl text-gray-400 pl-3">Reccommended Guides</Text> 
                 <View className=" w-full flex flex-row justify-around ">
                     {/* TODO: Wrap in Pressables */}
-                    <GuidesButton/>
-                    <GuidesButton/>
-                    <GuidesButton/>
+                    <GuidesButton title={"Putting Tutorial"}/>
+                    <GuidesButton title={"Control Tips"}/>
+                    <GuidesButton title={"View more Guides"}/>
                 </View>
                 {/* Footer */}
                 <View className="w-full flex flex-col h-[15%] bg-slate-400 justify-start">
@@ -67,26 +72,6 @@ const Home = () => {
 
             </View>
         </View>
-        // <View style={styles.container}>
-        //     <Header
-        //     ViewComponent={LinearGradient} // Don't forget this!
-        //     linearGradientProps={{
-        //         colors: ['red', 'pink'],
-        //         start: { x: 0, y: 0.5 },
-        //         end: { x: 1, y: 0.5 },
-        //     }}
-        //     />
-        //     {/* <View className="top-0 fixed bg-green-400 w-full">
-        //         <View className="display flex-row justify-evenly space-x-10">
-        //             <Text style={styles.title}>Drawer</Text>
-        //             <Text style={styles.title}>Logo</Text>
-        //             <Text style={styles.title}>Notifications</Text>
-
-        //         </View>
-        //     </View> */}
-        //     <Text style={styles.title}>Welcome to the Home Page!</Text>
-        //     <Text style={styles.title}>Welcome home broski</Text>
-        // </View>
     );
 };
 

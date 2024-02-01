@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import COLOURS from '../static/design_constants'
 
 
-const StatsButton = ({day, view}) => {
+const StatsButton = ({day, view, numToReview, imgSrc}) => {
     const styles = StyleSheet.create({
         customGold: {
             backgroundColor: COLOURS.MEDIUM_GOLD
@@ -25,14 +25,15 @@ const StatsButton = ({day, view}) => {
             <View className="w-28 h-[40%] bg-lime-50 rounded-xl">
                 <Image
                 style={styles.img}
-                source={require('../static/images/test-image-2.png')}
+                // source={require('../static/images/test-image-2.png')}
+                source={imgSrc}
                 className="rounded-xl"
                 />
             </View>
             <View className="flex flex-col justify-around pl-1 h-[60%] ">
-                <Text className="text-white text-xl">{day}</Text>
+                <Text className="text-white text-xl font-semibold">{day}</Text>
                 {!view && (
-                <Text className="text-white text-xs">12 Putts to review</Text>
+                <Text className="text-white text-xs">{numToReview} Putts to review</Text>
                 )}
                 {view && (
                     <Text className="text-white text-xs">View all your Putts</Text>
