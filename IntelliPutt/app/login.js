@@ -121,16 +121,16 @@ export default function Login() {
                 </View>
             </ScrollView>
 
-            <Modal isVisible={showModal} animationIn="slideInUp" animationOut="slideOutDown" className="w-[90%] mt-[50%]" style={styles.modal}>
-                <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.resetPasswordWrapper} className="bg-white px-[30px] pt-[20px] pb-[40px] rounded-lg w-full">
+            <Modal isVisible={showModal} animationIn="slideInUp" animationOut="slideOutDown" className="w-full ml-0 mt-[50%] mb-0" style={styles.modal}>
+                <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white px-[30px] pt-[20px] pb-[40px] rounded-lg w-full">
                     <Pressable className="my-[20px]" onPress={() => setShowModal(false)}>
-                        <Text className="text-stone-900 text-[16px]"> &lt; </Text>
+                        <Text className="text-stone-900 text-[16px]"> Cancel </Text>
                     </Pressable>
-                    <View className="mb-10 mt-6 items-center">
+                    <View className="mb-10 mt-[50px] pt-[20px] items-center">
                         <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-center text-[30px] tracking-[0] leading-[normal]">
                             Reset your password
                         </Text>
-                        <Text className="font-light mt-4 text-base text-center">
+                        <Text className="font-light m-4 text-base text-center">
                             If your email is registered with us, we'll send you a link to reset your password.
                         </Text>
                     </View>
@@ -153,9 +153,8 @@ const styles = {
     modal: {
         justifyContent: 'center',
         alignItems: 'center',
-        maxHeight:"57%",
     },
-    resetPasswordWrapper: {
+    modalWrapper: {
         flexGrow: 1,
         height: '50%',
     }
