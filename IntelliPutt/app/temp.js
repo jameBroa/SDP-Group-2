@@ -9,7 +9,6 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Header from '../components/Header';
 import BentoBoxes from '../components/BentoBoxes';
-import Footer from '../components/Footer';
 import {LinearGradient} from 'expo-linear-gradient';
 import FriendButton from '../components/FriendButton';
 import StatsButton from '../components/StatsButton';
@@ -17,24 +16,40 @@ import GuidesButton from '../components/GuidesButton';
 import StatsGraphic1 from '../static/images/test-image-2.png';
 import StatsGraphic2 from '../static/images/test-image-3.png';
 import StatsGraphic3 from '../static/images/test-image-4.png';
+import { Stack } from 'expo-router';
+import { Feather, Ionicons } from '@expo/vector-icons';
+import COLOURS from '../static/design_constants';
 
 
 
-const Home = () => {
+const Temp = () => {
     return (
         <View className="h-full">
-            <LinearGradient className="h-[30%]"
+            <Stack.Screen 
+            options={{
+                headerTitle:'',
+                headerStyle: {
+                    backgroundColor: COLOURS.DARK_GREEN,
+                    borderBottomWidth: 0,
+                    border: '0',
+                }, 
+                headerShadowVisible: false,
+                headerLeft: () => <Feather name="menu" size={32} color="white"/>,
+                headerRight: () => <Ionicons name="notifications-outline" size={32} color="white"/>,
+                headerShown:true}}> </Stack.Screen>
+
+            <LinearGradient className="h-[25%]"
             colors={['rgba(25,46,5,1)',  'rgba(105,190,25,0)']}
             start={[0, 0.1]}
             end={[0, 1]}
             >
-                <View className="top-[22%]">
-                    <Header className=""/>
+                <View className="top-[10%]">
+                    {/* <Header className=""/> */}
                     <View className="flex flex-col space-y-2 pl-4 top-14">
                         <Text className="text-3xl text-white ">Welcome back</Text>
                         <Text className="text-4xl text-white font-bold">Joseph</Text>
                     </View>
-                    <View className="absolute flex flex-row w-full justify-center top-[45%]">
+                    <View className="absolute flex flex-row w-full justify-center top-[25%]">
                         <Image
                             style={{ width: 400, height: 150 }}
                             source={require('../static/images/golf-graphic.png')}
@@ -42,7 +57,7 @@ const Home = () => {
                     </View>
                 </View>
             </LinearGradient>
-            <View className="w-full h-[70%]  justify-between flex flex-col space-y-1">
+            <View className="w-full h-[75%]  justify-between flex flex-col space-y-1">
                 <Text className="text-xl text-gray-400 pl-3">Your Friends</Text>
                 <View className=" w-full flex flex-row justify-around  ">
                     {/* TODO: Wrap in Pressables */}
@@ -67,7 +82,7 @@ const Home = () => {
                 </View>
                 {/* Footer */}
                 <View className="w-full flex flex-col h-[15%] bg-slate-400 justify-start">
-                    <Footer/>
+                    <Footer home/>
                 </View>
 
             </View>
@@ -88,4 +103,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Home;
+export default Temp;
