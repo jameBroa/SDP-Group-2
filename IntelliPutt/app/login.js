@@ -23,11 +23,14 @@ import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
 import db from '../config/database';
 import { ref, get } from 'firebase/database';
+import { useDispatch } from 'react-redux';
+import { login } from '../context/slices/userSlice';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const dispatch = useDispatch();
    
     // Fetch name + experience level from database
     const fetchUserData = async (userId) => {
@@ -65,7 +68,8 @@ export default function Login() {
             });
 
             console.log('User signed in:' + user.uid);
-            router.push('./home');
+            dispatch(login(user.uid));
+            router.push('/home');
         })
         .catch((error) => {                             // Error with authentication
             alert('Error signing in: ' + error.message);
