@@ -10,10 +10,13 @@
 import { SafeAreaView, ImageBackground, Image, Text, View } from 'react-native';
 import React from 'react';
 import CustomButton from '../components/CustomButton';
+import { Stack } from 'expo-router';
 
 export default function Index() {
   return (
     <View className="bg-white flex flex-row justify-center w-full" >
+      <Stack.Screen options={{headerTitle:'index', headerShown:false}}> </Stack.Screen>
+
       <ImageBackground
         resizeMode="cover"
         source={require('../static/images/background.png')}
