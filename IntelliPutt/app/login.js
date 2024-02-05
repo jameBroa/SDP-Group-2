@@ -59,12 +59,30 @@ export default function Login() {
             .then((userData) => {                        // Data found
                 console.log('User data:', userData.name);
                 alert('User signed in, hi ' + userData.name + '!');
+
+                dispatch(login(
+                    {
+                        uid: user.uid,
+                        email: userData.email,
+                        name: userData.name,
+                        experience: userData.experience
+                    }
+                ));
             }).catch((error) => {                        // Data not found
                 if (error.message == "Cannot read property 'name' of undefined") {
                     alert('User signed in, please update your user details!');
                 } else {
                     console.error('Error fetching user data:', error.message); 
                 }
+
+                dispatch(login(
+                    {
+                        uid: user.uid,
+                        email: email,
+                        name: "Untitled User",
+                        experience: "Not available"
+                    }
+                ));
             });
 
             console.log('User signed in:' + user.uid);

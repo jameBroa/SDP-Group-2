@@ -7,7 +7,8 @@ export default function Layout() {
         <Provider store={store}>
             <Stack
                 screenOptions={{
-                    headerShown: false
+                    headerShown: false,
+                    gestureEnabled: false
                 }}
             />
             {/* potentially replace header with tabs and manually code in header?

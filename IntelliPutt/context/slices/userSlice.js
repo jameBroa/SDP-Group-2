@@ -9,7 +9,12 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         login(state, action) {
-            state.user = action.payload;
+            state.user = {
+                uid: action.payload["uid"],
+                email: action.payload["email"],
+                name: action.payload["name"],
+                experience: action.payload["experience"],
+            };
         },
         logout(state) {
             state.user = null;

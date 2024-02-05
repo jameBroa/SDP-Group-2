@@ -17,7 +17,7 @@ export default function Index() {
   const user = useSelector((state) => state.user.user);
 
   if (user) { 
-      router.push('./home');
+    console.log('User is logged in');
   } else {
     return (
       <View className="bg-white flex flex-row justify-center w-full" >
