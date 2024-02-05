@@ -23,11 +23,14 @@ import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
 import db from '../config/database';
 import { ref, get } from 'firebase/database';
+import { useDispatch } from 'react-redux';
+import { login } from '../context/slices/userSlice';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const dispatch = useDispatch();
    
     // Fetch name + experience level from database
     const fetchUserData = async (userId) => {
@@ -56,16 +59,34 @@ export default function Login() {
             .then((userData) => {                        // Data found
                 console.log('User data:', userData.name);
                 alert('User signed in, hi ' + userData.name + '!');
+
+                dispatch(login(
+                    {
+                        uid: user.uid,
+                        email: userData.email,
+                        name: userData.name,
+                        experience: userData.experience
+                    }
+                ));
             }).catch((error) => {                        // Data not found
                 if (error.message == "Cannot read property 'name' of undefined") {
                     alert('User signed in, please update your user details!');
                 } else {
                     console.error('Error fetching user data:', error.message); 
                 }
+
+                dispatch(login(
+                    {
+                        uid: user.uid,
+                        email: email,
+                        name: "Untitled User",
+                        experience: "Not available"
+                    }
+                ));
             });
 
             console.log('User signed in:' + user.uid);
-            router.push('./home');
+            router.push('/home');
         })
         .catch((error) => {                             // Error with authentication
             alert('Error signing in: ' + error.message);

@@ -26,6 +26,8 @@ import Chip from '../components/Chip';
 import { Link, router } from 'expo-router';
 import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
+import { useDispatch } from 'react-redux';
+import { login } from '../context/slices/userSlice';
 
 export default function Register() {
     const [name, setName] = useState('');
@@ -34,6 +36,8 @@ export default function Register() {
 
     const tabs = ["Beginner", "Intermediate", "Advanced"];
     const [experienceLevel, setExperienceLevel] = useState(tabs[0]);
+
+    const dispatch = useDispatch();
 
     const handleRegister = () => {
         createUserWithEmailAndPassword(auth, email, password)
@@ -53,8 +57,17 @@ export default function Register() {
             });
             console.log('Additional data stored successfully');
 
-            router.push('/home');
+            dispatch(login(
+                {
+                    uid: user.uid,
+                    email: email,
+                    name: name,
+                    experience: experienceLevel
+                }
+            ));
+
             alert("Account created. Hi " + name + "! Welcome to IntelliPutt.");
+            router.push('/home');
         })
         .catch((error) => {                                 // User creation failed
             alert('Error creating user: ' + error.message)
