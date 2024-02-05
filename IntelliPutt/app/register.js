@@ -112,40 +112,48 @@ export default function Register() {
                 </View>
                 
             </SafeAreaView>
-            <Modal isVisible={showModal} animationIn="slideInUp" animationOut="slideOutDown" className="w-full mt-[50%] ml-0 mb-0" style={styles.modal}>
+            <Modal isVisible={showModal} animationIn="slideInUp" animationOut="slideOutDown" className="w-full mt-[40%] ml-0 mb-0 h-[90%]" style={styles.modal}>
                 <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white px-[30px] pt-[20px] pb-[40px] rounded-lg w-full">
-                    <Pressable className="my-[20px]" onPress={() => setShowModal(false)}>
-                        <Text className="text-stone-900 text-[16px]"> Back </Text>
+                    <Pressable className="w-[40px] h-[50px] my-[10px] mt-[15px] pt-1 border-solid rounded-full justify-center" onPress={() => setShowModal(false)}>
+                        <Text className="h-full border-double text-stone-700 rounded-full text-[25px] font-bold px-2"> &lt; </Text>
                     </Pressable>
-                    <View className="my-4">
-                        <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-900 text-[30px] tracking-[0] leading-[normal]">
-                            Skill levels
-                        </Text>
-
-                        <View className="mt-4">
+                    <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-900 text-[30px] tracking-[0] leading-[normal] mt-[20px] absolute left-[30%]">
+                        Skill Levels
+                    </Text>
+                    <View className="mt-[20px] my-4">
+                        <View className="mt-4 p-4 rounded-lg bg-stone-50">
                             <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-900 text-xl tracking-[0] leading-[normal]">
-                                &gt; Beginner
+                                Beginner
                             </Text>
                             <Text className="m-2 text-base">
-                                For users who want to learn the basics, for casual players.
+                                As a beginner, you may struggle with consistent alignment, stance, and grip. 
+                            </Text>
+                            <Text className="m-2 mt-1 text-base">  
+                                Beginners may have difficulty controlling the distance of their putts, leading to inconsistent results in terms of speed and lag putting.
                             </Text>
                         </View>
                         
-                        <View className="mt-4">
+                        <View className="mt-4 p-4 rounded-lg bg-stone-50">
                             <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-900 text-xl tracking-[0] leading-[normal]">
-                                &gt; Intermediate
+                                Intermediate
                             </Text>
                             <Text className="m-2 text-base">
-                                For users with experience in golfing but want to improve through the IntelliPutt system.
+                                As an intermediate putter, you may have a more refined putting stroke, with improved alignment, stance, and grip. 
+                            </Text>
+                            <Text className="m-2 mt-1 text-base">
+                                Your consistent technique may reduce the number of missed putts due to stroke errors.
                             </Text>
                         </View>
 
-                        <View className="mt-4">
+                        <View className="mt-4 p-4 rounded-lg bg-stone-50">
                             <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-900 text-xl tracking-[0] leading-[normal]">
-                                &gt; Advanced
+                                Advanced
                             </Text>
                             <Text className="m-2 text-base">
-                                For golfing experts who would like to perfect their putting technique. 
+                                As an advanced putter, you may have highly refined putting mechanics. 
+                            </Text>
+                            <Text className="m-2 mt-1 text-base">
+                                Your stroke is consistent, and you may use advanced techniques such as a particular grip or putting style.
                             </Text>
                         </View>
                     </View>
@@ -164,6 +172,6 @@ const styles = {
     },
     modalWrapper: {
         flexGrow: 1,
-        height: '50%',
+        height: '90%',
     }
 };
