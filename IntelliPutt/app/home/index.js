@@ -9,19 +9,15 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 
 // import Footer from '../components/Footer';
-import {LinearGradient} from 'expo-linear-gradient';
 // import FriendButton from '../components/FriendButton';
 // import StatsButton from '../components/StatsButton';
 // import GuidesButton from '../components/GuidesButton';
 import StatsGraphic1 from '../../static/images/test-image-2.png'
 import StatsGraphic2 from '../../static/images/test-image-3.png';
 import StatsGraphic3 from '../../static/images/test-image-4.png';
-import { Redirect, Stack } from 'expo-router';
-import { Feather, Ionicons } from '@expo/vector-icons';
 import FriendButton from '../../components/FriendButton';
 import StatsButton from '../../components/StatsButton';
 import GuidesButton from '../../components/GuidesButton';
-import COLOURS from '../../static/design_constants';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
 import { router } from 'expo-router';

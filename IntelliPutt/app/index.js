@@ -10,15 +10,13 @@
 import { SafeAreaView, ImageBackground, Image, Text, View } from 'react-native';
 import React from 'react';
 import CustomButton from '../components/CustomButton';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useSelector } from 'react-redux';
 
 export default function Index() {
   const user = useSelector((state) => state.user.user);
 
-  if (user) { 
-    console.log('User is logged in');
-  } else {
+  if (!user) { 
     return (
       <View className="bg-white flex flex-row justify-center w-full" >
         <Stack.Screen options={{headerTitle:'index', headerShown:false}}> </Stack.Screen>

@@ -86,7 +86,6 @@ export default function Login() {
             });
 
             console.log('User signed in:' + user.uid);
-            dispatch(login(user.uid));
             router.push('/home');
         })
         .catch((error) => {                             // Error with authentication

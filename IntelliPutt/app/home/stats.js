@@ -1,9 +1,5 @@
-import { Feather, Ionicons } from '@expo/vector-icons'
-import { Stack } from 'expo-router'
 import React from 'react'
-import { Image, Text, View } from 'react-native'
-import COLOURS from '../../static/design_constants'
-import { LinearGradient } from 'expo-linear-gradient'
+import { Text, View } from 'react-native'
 import DefaultContainer from '../../components/DefaultContainer'
 
 const stats = () => {

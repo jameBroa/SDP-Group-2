@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import DefaultContainer from '../../components/DefaultContainer'
 import { Text, View } from 'react-native'
 import CustomButton from '../../components/CustomButton'
