@@ -1,18 +1,22 @@
-import { Stack, Tabs } from 'expo-router';
+import { Stack } from 'expo-router';
 import { Provider } from 'react-redux';
 import store from '../context/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistStore } from 'redux-persist';
+
+let persistor = persistStore(store);
 
 export default function Layout() {
     return (
         <Provider store={store}>
-            <Stack
-                screenOptions={{
-                    headerShown: false,
-                    gestureEnabled: false
-                }}
-            />
-            {/* potentially replace header with tabs and manually code in header?
-            but then we have the problem of the animation between pages looking dodgy */}
+            <PersistGate loading={null} persistor={persistor}>
+                <Stack
+                    screenOptions={{
+                        headerShown: false,
+                        gestureEnabled: false
+                    }}
+                />
+            </PersistGate>
         </Provider>
     );
 }
