@@ -5,7 +5,7 @@
     (needs to be implemented)
 */}
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 
 // import Footer from '../components/Footer';
@@ -25,16 +25,18 @@ import { router } from 'expo-router';
 
 export default function Index() {
     const user = useSelector((state) => state.user.user);
+    const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
         // Check if user is logged in
         // If not, redirect to login page
-        if (!user) {
-            router.push('../login');
+        if (!user && loaded) {
+            router.replace("../login");
         }
-    }, [user]);
+    }, [user, loaded]);
     
     if (user) {
+        if (!loaded) {setLoaded(true)};
         return (
             <View className="h-full w-full flex flex-col ">
                 
