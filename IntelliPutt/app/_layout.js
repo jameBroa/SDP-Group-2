@@ -13,7 +13,9 @@ export default function Layout() {
                 <Stack
                     screenOptions={{
                         headerShown: false,
-                        gestureEnabled: false
+                        gestureEnabled: false,
+                        animationTypeForReplace: 'pop',
+                        animation: 'slide_from_right',
                     }}
                 />
             </PersistGate>

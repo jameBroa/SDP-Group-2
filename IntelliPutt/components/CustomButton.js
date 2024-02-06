@@ -21,9 +21,7 @@ const CustomButton = ({ text, onPress=null, goTo=null }) => {
                 </Pressable>
             </Link>
         );
-    }
-
-    
+    }    
 };
 
 export default CustomButton;

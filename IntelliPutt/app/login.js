@@ -58,7 +58,6 @@ export default function Login() {
             fetchUserData(user.uid)
             .then((userData) => {                        // Data found
                 console.log('User data:', userData.name);
-                alert('User signed in, hi ' + userData.name + '!');
 
                 dispatch(login(
                     {
@@ -86,6 +85,9 @@ export default function Login() {
             });
 
             console.log('User signed in:' + user.uid);
+            setEmail('');
+            setPassword('');
+
             router.push('/home');
         })
         .catch((error) => {                             // Error with authentication

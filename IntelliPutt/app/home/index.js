@@ -20,7 +20,7 @@ import StatsButton from '../../components/StatsButton';
 import GuidesButton from '../../components/GuidesButton';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
-import { Link, router } from 'expo-router';
+import { Link, Navigator, router } from 'expo-router';
 
 
 export default function Index() {
@@ -31,7 +31,7 @@ export default function Index() {
         // Check if user is logged in
         // If not, redirect to login page
         if (!user && loaded) {
-            router.replace("../login");
+            router.replace(".././");
         }
     }, [user, loaded]);
     
