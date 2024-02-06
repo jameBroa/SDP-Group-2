@@ -30,15 +30,15 @@ const StatsButton = ({day, view, numToReview, imgSrc}) => {
                 className="rounded-xl"
                 />
             </View>
-            <View className="flex flex-col justify-around pl-1 h-[60%] ">
-                <Text className="text-white text-xl font-semibold">{day}</Text>
+            <View className="ml-1 flex flex-col justify-around pl-1 h-[60%] ">
+                <Text className="text-white text-lg font-semibold">{day}</Text>
                 {!view && (
-                <Text className="text-white text-xs">{numToReview} Putts to review</Text>
+                <Text className="font-medium text-white text-xs">{numToReview} Putts to review</Text>
                 )}
                 {view && (
                     <Text className="text-white text-xs">View all your Putts</Text>
                 )}
-                <Text className="text-white">View more -{'>'}</Text>
+                <Text className="mb-1 text-white text-xs font-light">View more -{'>'}</Text>
             </View>
         </View>
     </View>

@@ -16,18 +16,17 @@ const FriendButton = ({name, skill, online, offline}) => {
     });
   return (
     <View style={styles.customGreen} className="rounded-xl w-28 h-16 flex flex-row justify-between pl-1 pr-1 items-center">
-        
             {/* AVATAR STUFF */}
             <View className="flex flex-col justify-center ">
-                <View className="w-8 h-8 rounded-full bg-slate-400"/>
+                <View className="ml-1 w-8 h-8 rounded-full bg-slate-400"/>
             </View>
             {/* NAME AND SKILL */}
-            <View className="h-[100%] flex flex-col justify-center space-y-2">
-                <Text  className="text-white text-xs">{name}</Text>
-                <Text className="text-white text-xs">{skill}</Text>
+            <View className="h-[100%] flex flex-col justify-center space-y-0.5">
+                <Text  className="text-white text-sm font-medium">{name}</Text>
+                <Text className="text-white text-xs font-light">{skill}</Text>
             </View>
             {/* ONLINE STATUS */}
-            <View className="h-[100%] flex flex-col justify-center " >
+            <View className="h-[100%] flex flex-col justify-center" >
                 {online && (
                 <View className="w-1 h-[70%] rounded-xl" style={styles.customGold}>
                     <Text></Text>

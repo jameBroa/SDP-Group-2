@@ -12,6 +12,7 @@ import React from 'react';
 import CustomButton from '../components/CustomButton';
 import { Stack } from 'expo-router';
 import { useSelector } from 'react-redux';
+import { Redirect } from 'expo-router';
 
 export default function Index() {
   const user = useSelector((state) => state.user.user);
@@ -46,5 +47,7 @@ export default function Index() {
         </ImageBackground>
       </View>
     );
+  } else {
+    return <Redirect href="./home" />;
   }
 };

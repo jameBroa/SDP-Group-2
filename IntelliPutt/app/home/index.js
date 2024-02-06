@@ -6,7 +6,7 @@
 */}
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 
 // import Footer from '../components/Footer';
 // import FriendButton from '../components/FriendButton';
@@ -20,7 +20,7 @@ import StatsButton from '../../components/StatsButton';
 import GuidesButton from '../../components/GuidesButton';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
-import { router } from 'expo-router';
+import { Link, Navigator, router } from 'expo-router';
 
 
 export default function Index() {
@@ -31,7 +31,7 @@ export default function Index() {
         // Check if user is logged in
         // If not, redirect to login page
         if (!user && loaded) {
-            router.replace("../login");
+            router.replace(".././");
         }
     }, [user, loaded]);
     
@@ -43,32 +43,45 @@ export default function Index() {
                 <View className="h-[30%]">
                     <DefaultContainer subheading="Welcome back!" heading={user["name"]}/>
                 </View>
-                
-                
-                <View className="w-full justify-between flex flex-col space-y-1 ">
-                    <Text className="text-xl text-gray-400 pl-3">Your Friends</Text>
-                    <View className=" w-full flex flex-row justify-around  ">
-                        {/* TODO: Wrap in Pressables */}
-                        <FriendButton name={"Joe"} skill={"Advanced"} online/>
-                        <FriendButton name={"Adam"} skill={"Beginner"} online/>
-                        <FriendButton offline/>
 
+                <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1 ">
+                    <View className="my-2">
+                        <Text className="text-xl text-gray-400 pl-3 pt-3 font-medium">Your Friends</Text>
+                        <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="./stats">
+                            <Text className="text-sm font-light">View all</Text>
+                        </Link>
+                        <View className="mt-2 w-full flex flex-row justify-around  ">
+                            {/* TODO: Wrap in Pressables */}
+                            <FriendButton name={"Joe"} skill={"Advanced"} online/>
+                            <FriendButton name={"Adam"} skill={"Beginner"} online/>
+                            <FriendButton name={"Matt"} skill={"Beginner"} offline/>
+                        </View>
                     </View>
-                    <Text className="text-xl text-gray-400 pl-3">Your Stats</Text>
-                    <View className=" w-full flex flex-row justify-around ">
-                        {/* TODO: Wrap in Pressables */}
-                        <StatsButton day={"Monday"} numToReview={"12"} imgSrc={StatsGraphic1}/>
-                        <StatsButton day={"Tuesday"} numToReview={"5"} imgSrc={StatsGraphic2}/>
-                        <StatsButton day={"View More"} view imgSrc={StatsGraphic3}/>
+                    <View className="my-2">
+                        <Text className="text-xl text-gray-400 pl-3 mt-1 font-medium">Your Stats</Text>
+                        <Link className="absolute mt-2 right-[5%] text-gray-600 text-sm" href="./stats">
+                            <Text className="text-sm font-light">View all</Text>
+                        </Link>
+                        <View className="mt-2 w-full flex flex-row justify-around ">
+                            {/* TODO: Wrap in Pressables */}
+                            <StatsButton day={"Monday"} numToReview={"12"} imgSrc={StatsGraphic1}/>
+                            <StatsButton day={"Tuesday"} numToReview={"5"} imgSrc={StatsGraphic2}/>
+                            <StatsButton day={"Wednesday"} numToReview={"8"} imgSrc={StatsGraphic3}/>
+                        </View>
                     </View>
-                    <Text className="text-xl text-gray-400 pl-3">Recommended Guides</Text> 
-                    <View className=" w-full flex flex-row justify-around ">
-                        {/* TODO: Wrap in Pressables */}
-                        <GuidesButton title={"Putting Tutorial"}/>
-                        <GuidesButton title={"Control Tips"}/>
-                        <GuidesButton title={"View more Guides"}/>
+                    <View className="my-2">
+                        <Text className="text-xl text-gray-400 pl-3 mt-1 font-medium">Recommended Guides</Text> 
+                        <Link className="absolute mt-2 right-[5%] text-gray-600 text-sm" href="./stats">
+                            <Text className="text-sm font-light">View all</Text>
+                        </Link>
+                        <View className="mt-2 w-full flex flex-row justify-around ">
+                            {/* TODO: Wrap in Pressables */}
+                            <GuidesButton title={"Putting Tutorial"}/>
+                            <GuidesButton title={"Control Tips"}/>
+                            <GuidesButton title={"Staying Consistent"}/>
+                        </View>
                     </View>
-                </View>
+                </ScrollView>
             </View>
         );
     }
@@ -84,5 +97,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 16,
+    },
+    wrapper: {
+        justifyContent: 'between',
     },
 });
