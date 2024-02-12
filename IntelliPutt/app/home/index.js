@@ -21,11 +21,37 @@ import GuidesButton from '../../components/GuidesButton';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
 import { Link, Navigator, router } from 'expo-router';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { firestore } from '../../config/firebase';
 
 
 export default function Index() {
+
+    // Redux vars
     const user = useSelector((state) => state.user.user);
+    const uid = user.uid;
+
+    // State management
     const [loaded, setLoaded] = useState(false);
+    const [name, setName] = useState(null);
+
+    // Firebase vars
+    const userCollectionRef = collection(firestore, "users");
+
+    useEffect(() => {
+        const getUserData = async() => {
+            try{
+                const q = query(userCollectionRef, where("__name__", "==", uid))
+                const response = await getDocs(q);
+                setName(response.docs[0].data().name);
+                console.log("current user logged in: " + response.docs[0].data().name);
+            } catch(error) {
+                console.log(error);
+            }
+        }
+        getUserData();
+    }, [uid])
+
 
     useEffect(() => {
         // Check if user is logged in
@@ -41,7 +67,7 @@ export default function Index() {
             <View className="h-full w-full flex flex-col ">
                 
                 <View className="h-[30%]">
-                    <DefaultContainer subheading="Welcome back!" heading={user["name"]}/>
+                    <DefaultContainer subheading="Welcome back!" heading={name}/>
                 </View>
 
                 <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1 ">

@@ -58,6 +58,9 @@ export default function Login() {
             fetchUserData(user.uid)
             .then((userData) => {                        // Data found
                 console.log('User data:', userData.name);
+                console.log("TEST TEST TEST");
+                console.log(user);
+                console.log(user.uid);
 
                 dispatch(login(
                     {

@@ -1,16 +1,20 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import DefaultContainer from '../../components/DefaultContainer'
 import { LineGraph } from 'react-native-graph'
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import COLOURS from '../../static/design_constants';
 import { FontAwesome6 } from '@expo/vector-icons';
-
+import {useStore, useSelector} from 'react-redux';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { firestore } from '../../config/firebase';
   
 
 
 
 export default function stats() {
+
+  // Test data for Linegraph
   const POINTS = [
     {
       date: new Date(new Date(2000, 0, 1).getTime() + 1000 * 60 * 60 * 24 * 0),
@@ -97,11 +101,40 @@ export default function stats() {
     },
   ]
 
-
-// Graph data below
-
+  // State management vars
   const [graphdata, setgraphdata] = useState(POINTS)
   const [activeButton, setActiveButton] = useState("W1")
+  const [userData, setUserData] = useState(null);
+
+  // Redux vars
+  const currUser = useSelector((state) => state.user.user);
+  const uid = currUser.uid;
+
+  // Firebase vars
+  const userCollectionRef = collection(firestore, "users");
+  const userDataCollectionRef = collection(firestore, "users/data");
+
+  useEffect(() => {
+
+    const getUserData = async() => {
+      try{
+        const q = query(userCollectionRef, where("__name__", "==", uid));
+        const response = await getDocs(q);
+        console.log(response.docs);
+        console.log(response.docs[0].data());
+        console.log("test")
+      } catch(error) {
+        console.log(error)
+      }
+      
+    }
+
+    getUserData();
+
+
+    console.log(uid);
+    
+  }, [uid]);
 
 
   const changeGraph1 = useCallback(() => {

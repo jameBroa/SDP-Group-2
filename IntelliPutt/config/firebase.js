@@ -4,6 +4,7 @@
 */}
 
 import { initializeApp } from 'firebase/app';
+import {getFirestore} from 'firebase/firestore';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -18,4 +19,5 @@ const firebaseConfig = {
 }
 
 const app = initializeApp(firebaseConfig);
+export const firestore = getFirestore(app); //Added to be able to connect to Firestore
 export default app;
