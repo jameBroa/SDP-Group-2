@@ -41,7 +41,7 @@ export default function Index() {
             
             <View className="inline-flex flex-col items-center justify-center h-1/3 w-2/3">
               <CustomButton text="Login" goTo="./login" />
-              <CustomButton text="Create an account" goTo="./register" />
+              <CustomButton text="Create an account" goTo="/register" />
             </View>
           </SafeAreaView>
         </ImageBackground>

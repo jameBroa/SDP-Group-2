@@ -22,7 +22,7 @@ import CustomButton from '../components/CustomButton';
 import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
 import db from '../config/database';
-import { ref, get } from 'firebase/database';
+import { doc, getDoc } from "firebase/firestore";
 import { useDispatch } from 'react-redux';
 import { login } from '../context/slices/userSlice';
 
@@ -34,10 +34,10 @@ export default function Login() {
    
     // Fetch name + experience level from database
     const fetchUserData = async (userId) => {
-        const userRef = ref(db, `users/${userId}`);
+        const userRef = doc(db, "users", userId);
 
         try {
-            const snapshot = await get(userRef);
+            const snapshot = await getDoc(userRef);
             if (snapshot.exists()) {
                 return snapshot.val();
             } else {
