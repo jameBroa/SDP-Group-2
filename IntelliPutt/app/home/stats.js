@@ -112,24 +112,29 @@ export default function stats() {
 
   // Firebase vars
   const userCollectionRef = collection(firestore, "users");
-  const userDataCollectionRef = collection(firestore, "users/data");
+  const userDataCollectionRef = collection(firestore, "users/" + uid + "/data");
 
   useEffect(() => {
 
     const getUserData = async() => {
       try{
-        const q = query(userCollectionRef, where("__name__", "==", uid));
+        const q = query(userDataCollectionRef);
         const response = await getDocs(q);
-        console.log(response.docs);
-        console.log(response.docs[0].data());
-        console.log("test")
+        let puttingData = [];
+        response.docs.map((doc) => {
+          console.log(doc.data());
+          puttingData.push(doc.data());
+        })
+        console.log(puttingData);
+        setUserData(puttingData);
       } catch(error) {
         console.log(error)
       }
-      
     }
 
     getUserData();
+
+    console.log(currUser)
 
 
     console.log(uid);
