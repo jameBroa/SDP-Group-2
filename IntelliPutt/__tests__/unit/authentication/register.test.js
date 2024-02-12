@@ -1,9 +1,8 @@
-import { fireEvent } from '@testing-library/react';
-import Utils from '../utils';
-import Register from '../../../app/register';
+import { render, fireEvent } from '@testing-library/react';
+import Helper from '../Helper.js';
+import Register from '../../../app/register.js';
 import admin from 'firebase-admin';
-import serviceAccount from '../serviceAccountKey.json';
-
+import serviceAccount from '../serviceAccountKey.json' with { type: "json" };
 
 describe('Firebase Registration', () => {
   beforeAll(async () => {
@@ -15,10 +14,10 @@ describe('Firebase Registration', () => {
 
   it('should register a valid user to Firebase', async () => {
     // part 1) simulate the user filling out the form
-    const validEmail = Utils.generateValidEmail();
-    const validPassword = Utils.generateValidPassword();
-    const validExperienceLevel = Utils.getValidExperienceLevel();
-    const validName = Utils.generateValidName();
+    const validEmail = Helper.generateValidEmail();
+    const validPassword = Helper.generateValidPassword();
+    const validExperienceLevel = Helper.getValidExperienceLevel();
+    const validName = Helper.generateValidName();
 
     // render the Register component
     const { getByPlaceholderText } = render(Register);

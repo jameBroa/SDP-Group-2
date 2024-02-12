@@ -1,7 +1,7 @@
 import { RandExp } from 'randexp';
 import { experienceLevels } from './testConstants';
 
-class Utils {
+class Helper {
     static generateValidEmail() {
         return RandExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/).gen();
     }
@@ -19,4 +19,4 @@ class Utils {
     }
 }
 
-export default Utils;
+export default Helper;
