@@ -4,7 +4,7 @@ import Modal from "react-native-modal";
 import CustomButton from '../../components/CustomButton';
 import TextField from '../../components/TextField';
 import { ScrollView, Text, View, Pressable } from 'react-native';
-import { collection, getDocs, query, where, arrayUnion, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, query, where, serverTimestamp  } from "firebase/firestore";
 import db from '../../config/database';
 import { useSelector } from 'react-redux';
 
@@ -15,8 +15,6 @@ export default function Social() {
 
   const handleAddFriend = async () => {
     const userRef = collection(db, "users");
-    console.log('Current user:', currentUser.uid);
-    const currentUserRef = doc(db, "users", currentUser.uid);
     const q = query(userRef, where("email", "==", friendEmail.toLowerCase()));
     
     try {
@@ -27,18 +25,22 @@ export default function Social() {
       } 
 
       const friendData = querySnapshot.docs[0].data()["uid"];
-      // Add friend to user's friends list
-      await updateDoc(currentUserRef, {
-        friends: arrayUnion(friendData)
-      })
+      // Add friend request
+      setDoc(doc(db, "friendRequest", friendData), 
+          {
+              from: currentUser.uid,
+              status: 'pending',
+              timestamp: serverTimestamp()
+          }
+      )
       .then(() => {
-        alert('Friend added successfully to current user\'s friends list.');
+        alert('Friend request sent!');
         setTimeout(() => {
           setShowModal(false);
         }, 1000);
       })
       .catch(error => {
-        console.error('Error updating current user\'s friends list:', error);
+        console.error('Error sending request: ', error);
       });
       
     } catch (error) {

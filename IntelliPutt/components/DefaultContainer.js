@@ -1,12 +1,12 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { Stack } from 'expo-router'
-import React from 'react'
-import { Image, Text, View } from 'react-native'
+import { Redirect, Stack, router } from 'expo-router'
+import React, { useState, useEffect } from 'react'
+import { Image, Pressable, Text, View } from 'react-native'
 import COLOURS from '../static/design_constants'
-import { Feather, Ionicons } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 
 const DefaultContainer = ({subheading, heading}) => {
-  return (
+    return (
     <View className="h-[100%] w-full flex flex-col justify-start">
         <Stack.Screen 
             options={{
@@ -16,8 +16,9 @@ const DefaultContainer = ({subheading, heading}) => {
                     borderBottomWidth: 0,
                 }, 
             headerShadowVisible: false,
-            headerLeft: () => <View className="w-[45%] flex flex-row justify-center "><Feather name="menu" size={32} color="white"/></View>,
-            headerRight: () => <View className="w-[45%] flex flex-row justify-center "><Ionicons name="notifications-outline" size={32} color="white"/></View>,
+            headerRight: () => <Pressable onPress = {
+                () => router.push("/home/notifications")
+            } className="w-[45%] flex flex-row justify-center "><Ionicons name="notifications-outline" size={32} color="white"/></Pressable>,
             headerShown:true}}>
         </Stack.Screen>
         <LinearGradient className="h-[100%] flex flex-col justify-start "
@@ -33,13 +34,10 @@ const DefaultContainer = ({subheading, heading}) => {
                     <Image
                         style={{ width: 400, height: 150 }}
                         source={require('../static/images/golf-graphic.png')}
-                        />
+                    />
                 </View>
             </View>
         </LinearGradient>
-
-
-
     </View>
   )
 }

@@ -6,12 +6,7 @@
 */}
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
-
-// import Footer from '../components/Footer';
-// import FriendButton from '../components/FriendButton';
-// import StatsButton from '../components/StatsButton';
-// import GuidesButton from '../components/GuidesButton';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import StatsGraphic1 from '../../static/images/test-image-2.png'
 import StatsGraphic2 from '../../static/images/test-image-3.png';
 import StatsGraphic3 from '../../static/images/test-image-4.png';
@@ -20,7 +15,7 @@ import StatsButton from '../../components/StatsButton';
 import GuidesButton from '../../components/GuidesButton';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
-import { Link, Navigator, router } from 'expo-router';
+import { Link, router } from 'expo-router';
 
 
 export default function Index() {
