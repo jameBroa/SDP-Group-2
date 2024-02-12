@@ -18,7 +18,7 @@
 import { SafeAreaView, Text, View, Image, Pressable, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { ref, set } from 'firebase/database';
+import { setDoc, doc } from "firebase/firestore"; 
 import auth from '../config/authentication';
 import db from '../config/database';
 import CustomButton from '../components/CustomButton';
@@ -50,21 +50,24 @@ export default function Register() {
 
             console.log('User created');
 
-            // Store additional user data in Firestore
-            const usersRef = ref(db, `users/${user.uid}`);
-            set(usersRef, {
-                uid: user.uid,
-                name: name,
-                experienceLevel: experienceLevel
-            });
-            console.log('Additional data stored successfully');
+            setDoc(doc(db, "users", user.uid), 
+                {
+                    uid: user.uid,
+                    email: email,
+                    name: name,
+                    experienceLevel: experienceLevel,
+                    friends: []
+                }
+            );
+            console.log('Additional data stored in Firestore successfully');
 
             dispatch(login(
                 {
                     uid: user.uid,
                     email: email,
                     name: name,
-                    experience: experienceLevel
+                    experience: experienceLevel,
+                    friends: []
                 }
             ));
 

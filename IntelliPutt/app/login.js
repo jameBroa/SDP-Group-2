@@ -22,7 +22,7 @@ import CustomButton from '../components/CustomButton';
 import TextField from '../components/TextField';
 import BackButton from '../components/BackButton';
 import db from '../config/database';
-import { ref, get } from 'firebase/database';
+import { doc, getDoc } from "firebase/firestore";
 import { useDispatch } from 'react-redux';
 import { login } from '../context/slices/userSlice';
 
@@ -34,16 +34,18 @@ export default function Login() {
    
     // Fetch name + experience level from database
     const fetchUserData = async (userId) => {
-        const userRef = ref(db, `users/${userId}`);
+        const userRef = doc(db, "users", userId);
 
         try {
-            const snapshot = await get(userRef);
+            const snapshot = await getDoc(userRef);
             if (snapshot.exists()) {
-                return snapshot.val();
+                console.log('User data:', snapshot.data());
+                return snapshot.data();
             } else {
                 return {};
             }
         } catch (error) {
+            console.error('Error fetching user data:', error.message);
             return {};
         }
     };
@@ -67,7 +69,8 @@ export default function Login() {
                         uid: user.uid,
                         email: userData.email,
                         name: userData.name,
-                        experience: userData.experience
+                        experience: userData.experience,
+                        friends: userData.friends
                     }
                 ));
             }).catch((error) => {                        // Data not found
@@ -82,7 +85,8 @@ export default function Login() {
                         uid: user.uid,
                         email: email,
                         name: "Untitled User",
-                        experience: "Not available"
+                        experience: "Not available",
+                        friends: []
                     }
                 ));
             });

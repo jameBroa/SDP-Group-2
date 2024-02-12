@@ -4,8 +4,11 @@ import { Text, View } from 'react-native'
 import CustomButton from '../../components/CustomButton'
 import { useDispatch } from 'react-redux';
 import { logout } from '../../context/slices/userSlice';
+<<<<<<< HEAD
 import { Link, Redirect } from 'expo-router';
 import { LineGraph } from 'react-native-graph';
+=======
+>>>>>>> migrate-to-firestore
 
 export default function Profile() {
   const dispatch = useDispatch();

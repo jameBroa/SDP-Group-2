@@ -2,9 +2,9 @@
     Configures the database connection to the Firebase Realtime Database.
 */}
 
-import { getDatabase } from 'firebase/database';
+import { getFirestore } from "firebase/firestore";
 import app from './firebase';
 
-const db = getDatabase(app);
+const db = getFirestore(app);
 
 export default db;
