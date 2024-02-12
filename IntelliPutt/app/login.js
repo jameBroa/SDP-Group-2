@@ -39,11 +39,13 @@ export default function Login() {
         try {
             const snapshot = await getDoc(userRef);
             if (snapshot.exists()) {
-                return snapshot.val();
+                console.log('User data:', snapshot.data());
+                return snapshot.data();
             } else {
                 return {};
             }
         } catch (error) {
+            console.error('Error fetching user data:', error.message);
             return {};
         }
     };
@@ -64,7 +66,8 @@ export default function Login() {
                         uid: user.uid,
                         email: userData.email,
                         name: userData.name,
-                        experience: userData.experience
+                        experience: userData.experience,
+                        friends: userData.friends
                     }
                 ));
             }).catch((error) => {                        // Data not found
@@ -79,7 +82,8 @@ export default function Login() {
                         uid: user.uid,
                         email: email,
                         name: "Untitled User",
-                        experience: "Not available"
+                        experience: "Not available",
+                        friends: []
                     }
                 ));
             });

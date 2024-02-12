@@ -7,15 +7,15 @@ import { initializeApp } from 'firebase/app';
 
 // Initialize Firebase
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket:process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
-}
+  apiKey: "AIzaSyAzgblCXbj26BLR7zwA7cS3AL9YAtT3Pmo",
+  authDomain: "intelliputt-2024.firebaseapp.com",
+  databaseURL: "https://intelliputt-2024-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "intelliputt-2024",
+  storageBucket: "intelliputt-2024.appspot.com",
+  messagingSenderId: "948856177961",
+  appId: "1:948856177961:web:70e43e3b337f65b3d86338",
+  measurementId: "G-FY8BZ58JLE"
+};
 
 const app = initializeApp(firebaseConfig);
 export default app;

@@ -2,8 +2,8 @@
     Configures the database connection to the Firebase Realtime Database.
 */}
 
-import app from './firebase';
 import { getFirestore } from "firebase/firestore";
+import app from './firebase';
 
 const db = getFirestore(app);
 
