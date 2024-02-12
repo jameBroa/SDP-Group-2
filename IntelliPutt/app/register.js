@@ -53,6 +53,7 @@ export default function Register() {
             setDoc(doc(db, "users", user.uid), 
                 {
                     uid: user.uid,
+                    email: email,
                     name: name,
                     experienceLevel: experienceLevel,
                     friends: []
