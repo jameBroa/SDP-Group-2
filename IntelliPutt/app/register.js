@@ -12,13 +12,13 @@
         - Index page
         - Login page
         - Home page (if account successfully created)
-        - What's this? (skill level) (missing)
+        - What's this? (skill level)
 */}
 
 import { SafeAreaView, Text, View, Image, Pressable, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore"; 
+import { setDoc, doc, query, where, collection, getDocs } from "firebase/firestore"; 
 import auth from '../config/authentication';
 import db from '../config/database';
 import CustomButton from '../components/CustomButton';
@@ -34,6 +34,7 @@ export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
     const [showModal, setShowModal] = useState(false);
 
     const tabs = ["Beginner", "Intermediate", "Advanced"];
@@ -42,6 +43,17 @@ export default function Register() {
     const dispatch = useDispatch();
 
     const handleRegister = () => {
+        // Does username already exist
+        const userRef = collection(db, "users");
+        const q = query(userRef, where('username', '==', username.toLowerCase()));
+        const querySnapshot = getDocs(q);
+        querySnapshot.then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+                alert("Username already exists. Please choose another one.");
+                return;
+            }
+        });
+
         createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {                         // User successfully created            
             const user = userCredential.user;
@@ -49,12 +61,13 @@ export default function Register() {
             setPassword(userCredential.password);
 
             console.log('User created');
-
+            // if not, store user data in Firestore
             setDoc(doc(db, "users", user.uid), 
                 {
                     uid: user.uid,
                     email: email,
                     name: name,
+                    username: username.toLowerCase(),
                     experienceLevel: experienceLevel,
                     friends: []
                 }
@@ -66,6 +79,7 @@ export default function Register() {
                     uid: user.uid,
                     email: email,
                     name: name,
+                    username: username,
                     experience: experienceLevel,
                     friends: []
                 }
@@ -99,7 +113,8 @@ export default function Register() {
                 </View>
 
                 <View className="w-4/5">
-                    <TextField placeholder="Name" value={name} onChangeText={setName} />
+                    <TextField placeholder="Name" value={name} onChangeText={setName}/>
+                    <TextField placeholder="Username" value={username} onChangeText={setUsername} />
                     <TextField placeholder="Email" value={email} onChangeText={setEmail} />
                     <TextField placeholder="Password" value={password} onChangeText={setPassword} />
                     

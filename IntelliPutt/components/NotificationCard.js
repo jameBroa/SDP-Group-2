@@ -23,9 +23,8 @@ const NotificationCard = ({ id }) => {
         const friendRequestQuery = doc(db, "friendRequests", id);
         const response = getDoc(friendRequestQuery);
         response.then((querySnapshot) => {
-            const data = querySnapshot.data();
-            setFriendUID(data["from"])
-            const individualRequestQ = query(userRef, where("uid", "==", friendUID));
+            setFriendUID(querySnapshot.data()["from"])
+            const individualRequestQ = query(userRef, where("uid", "==", querySnapshot.data()["from"]));
             const individualRequest = getDocs(individualRequestQ);
             individualRequest.then((individualRequestSnapshot) => {
                 if (individualRequestSnapshot.empty) {
@@ -38,7 +37,7 @@ const NotificationCard = ({ id }) => {
 
                 setName(friendData["name"]);
                 setEmail(friendData["email"]);
-                setIsRead(data["status"] == "pending" ? false : true);
+                setIsRead(querySnapshot.data()["status"] == "pending" ? false : true);
                 setTime(new Date(data["timestamp"]["seconds"] * 1000).toLocaleDateString());
             });
         });

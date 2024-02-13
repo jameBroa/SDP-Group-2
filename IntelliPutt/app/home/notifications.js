@@ -1,13 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, StyleSheet, RefreshControl, ScrollView } from "react-native";
+import { View, Text, Pressable, RefreshControl, ScrollView } from "react-native";
 import NotificationCard from "../../components/NotificationCard";
-import { router, Stack } from "expo-router";
+import { Redirect, router, Stack } from "expo-router";
 import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
 import { useSelector } from 'react-redux';
 import db from "../../config/database";
 
 export default function Notifications() {
     const user = useSelector((state) => state.user.user);
+
+    if (user == null) {
+        return <Redirect to="../." />
+    }
 
     const [cards, setCards] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
