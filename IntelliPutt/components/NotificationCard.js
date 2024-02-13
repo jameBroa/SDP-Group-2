@@ -3,24 +3,29 @@ import { AntDesign } from '@expo/vector-icons';
 import Modal from "react-native-modal";
 import CustomButton from './CustomButton';
 import { ScrollView, Text, View, Pressable } from 'react-native';
-import { collection, query, where, getDoc, getDocs, doc, updateDoc } from "firebase/firestore";
-import db from '../config/database';                
+import { collection, query, where, getDoc, getDocs, doc, updateDoc, arrayUnion } from "firebase/firestore";
+import db from '../config/database';     
+import { useSelector } from 'react-redux';           
 
 const NotificationCard = ({ id }) => {
     const [showModal, setShowModal] = useState(false);
-    const userRef = collection(db, "users");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [isRead, setIsRead] = useState(false);
     const [time, setTime] = useState("");
     const [loaded, setLoaded] = useState(false);
 
+    const userRef = collection(db, "users");
+    const currentUser = useSelector((state) => state.user.user);
+    const [friendUID, setFriendUID] = useState("");
+
     if (!loaded) {
         const friendRequestQuery = doc(db, "friendRequests", id);
         const response = getDoc(friendRequestQuery);
         response.then((querySnapshot) => {
             const data = querySnapshot.data();
-            const individualRequestQ = query(userRef, where("uid", "==", data["from"]));
+            setFriendUID(data["from"])
+            const individualRequestQ = query(userRef, where("uid", "==", friendUID));
             const individualRequest = getDocs(individualRequestQ);
             individualRequest.then((individualRequestSnapshot) => {
                 if (individualRequestSnapshot.empty) {
@@ -43,6 +48,11 @@ const NotificationCard = ({ id }) => {
     const acceptFriendRequest = () => {
         console.log("Friend request accepted");
         updateDoc(doc(db, "friendRequests", id), { status: "accepted" });
+
+        // Add friend to both users' friend list
+        updateDoc(doc(db, "users", friendUID), { friends: arrayUnion(currentUser.uid) });
+        updateDoc(doc(db, "users", currentUser.uid), { friends: arrayUnion(friendUID) });
+        
         setLoaded(false);
         setTimeout(() => {
             setShowModal(false);
