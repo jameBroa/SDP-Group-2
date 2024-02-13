@@ -1,14 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import Modal from "react-native-modal";
 import CustomButton from './CustomButton';
 import { ScrollView, Text, View, Pressable } from 'react-native';
+import { collection, query, where, getDoc, getDocs, doc, updateDoc } from "firebase/firestore";
+import db from '../config/database';                
 
-const NotificationCard = ({isRead, name, email, content, time}) => {
+const NotificationCard = ({ id }) => {
     const [showModal, setShowModal] = useState(false);
+    const userRef = collection(db, "users");
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [isRead, setIsRead] = useState(false);
+    const [time, setTime] = useState("");
+    const [loaded, setLoaded] = useState(false);
+
+    if (!loaded) {
+        const friendRequestQuery = doc(db, "friendRequests", id);
+        const response = getDoc(friendRequestQuery);
+        response.then((querySnapshot) => {
+            const data = querySnapshot.data();
+            const individualRequestQ = query(userRef, where("uid", "==", data["from"]));
+            const individualRequest = getDocs(individualRequestQ);
+            individualRequest.then((individualRequestSnapshot) => {
+                if (individualRequestSnapshot.empty) {
+                    console.log("User has been deleted.");
+                    return;
+                }
+                
+                console.log("User exists, fetching data: " + individualRequestSnapshot.docs[0].data());
+                const friendData = individualRequestSnapshot.docs[0].data();
+
+                setName(friendData["name"]);
+                setEmail(friendData["email"]);
+                setIsRead(data["status"] == "pending" ? false : true);
+                setTime(new Date(data["timestamp"]["seconds"] * 1000).toLocaleDateString());
+            });
+        });
+        setLoaded(true);
+    }
 
     const acceptFriendRequest = () => {
         console.log("Friend request accepted");
+        updateDoc(doc(db, "friendRequests", id), { status: "accepted" });
+        setLoaded(false);
         setTimeout(() => {
             setShowModal(false);
         }, 500);
@@ -16,6 +51,8 @@ const NotificationCard = ({isRead, name, email, content, time}) => {
 
     const ignoreFriendRequest = () => {   
         console.log("Friend request ignored");
+        updateDoc(doc(db, "friendRequests", id), { status: "ignored" });
+        setLoaded(false);
         setTimeout(() => {
             setShowModal(false);
         }, 500);
@@ -34,10 +71,16 @@ const NotificationCard = ({isRead, name, email, content, time}) => {
                     }
                     <View className="pl-3">
                         <Text className="font-bold text-lime-900 mr-1">{name} </Text>
-                        <Text className="py-2">{content}</Text>
+                        <Text className="py-2">
+                        <Fragment>
+                            <Text className="text-stone-600">
+                                sent you a friend request
+                            </Text>
+                        </Fragment>
+                        </Text>
                         
                         <View>
-                            <Text className="text-stone-700">{time} ago</Text>
+                            <Text className="text-stone-700">{time}</Text>
                         </View>
                     </View>
                 </View>

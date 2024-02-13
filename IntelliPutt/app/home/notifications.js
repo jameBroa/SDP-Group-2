@@ -1,55 +1,40 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { View, Text, Pressable } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Pressable, StyleSheet, RefreshControl, ScrollView } from "react-native";
 import NotificationCard from "../../components/NotificationCard";
 import { router, Stack } from "expo-router";
+import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
+import { useSelector } from 'react-redux';
+import db from "../../config/database";
 
-function Notifications() {
-    const [cards, setCards] = useState([
-        {
-            name: "Adam",
-            email: "adam@gmail.com",
-            isRead: false,
-            content: (
-                <Fragment>
-                    <Text className="text-stone-600">
-                        sent you a friend request
-                    </Text>
-                </Fragment>
-            ),
-            time: "1m",
-        },
-        {
-            name: "Joe",
-            email: "joe@gmail.com",
-            isRead: false,
-            content: (
-                <Fragment>
-                    <Text className="text-stone-600">
-                        sent you a friend request
-                    </Text>
-                </Fragment>
-            ),
-            time: "1m",
+export default function Notifications() {
+    const user = useSelector((state) => state.user.user);
+
+    const [cards, setCards] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const friendRequestQuery = query(collection(db, "friendRequests"), where("to", "==", user.uid));
+    const response = getDocs(friendRequestQuery);
+    response.then((querySnapshot) => {
+        const requests = [];
+        for (const doc of querySnapshot.docs) {
+            requests.push(doc.id);
         }
-    ]);
+        setCards(requests);
+    })
 
-    const [allRead, setAllRead] = useState(false);
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
 
-    useEffect(() => {
-        if (allRead) {
-            const tempCards = [...cards];
-            setCards(
-                tempCards.map((card) => {
-                    const index = tempCards.indexOf(card);
-                    tempCards[index] = { ...cards[index] };
-                    tempCards[index].isRead = true;
-                    return tempCards[index];
-                })
-            );
-        }
-    }, [allRead]);
-
-    const count = cards.filter((card) => !card.isRead).length;
+        const unsubscribe = onSnapshot(friendRequestQuery, async (querySnapshot) => {
+            const requests = [];
+            for (const doc of querySnapshot.docs) {
+                requests.push(doc.id);
+            }
+            setCards(requests);
+        });
+        setTimeout(() => setRefreshing(false), 2000);
+        unsubscribe();
+    }, [])
 
     return (
         <View className="flex-1 bg-white px-10 pt-10">
@@ -59,22 +44,20 @@ function Notifications() {
             </Pressable>
             <View className="flex-row justify-between mb-10">
                 <View className="flex-row">
-                    <Text className="font-bold text-2xl">Notifications</Text>
-                    <View className="bg-lime-800 rounded-full ml-2 px-[10px] py-[5px]">
-                        <Text className="text-white text-sm">{count}</Text>
-                    </View>
+                    <Text className="font-bold text-2xl text-lime-900">Notifications</Text>
                 </View>
-
-                <Text className="text-lime-800 font-bold cursor-pointer" onPress={() => setAllRead(true)} >
-                    Mark all as read
-                </Text>
             </View>
 
-            {cards.map((card) => (
-                <NotificationCard {...card} key={card.name} />
-            ))}
+            <ScrollView
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }>
+                {cards.map((card) => (
+                    <NotificationCard {...card} key={card} id={card} />
+                ))}
+            </ScrollView>
         </View>
-    );
-}
+    )
+};
 
-export default Notifications;
+
