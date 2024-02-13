@@ -1,4 +1,4 @@
-## How to use
+## How to run
 1.
 ```
     npm install
@@ -21,7 +21,7 @@
     Scan QR code
 ```
 
-If you want to pull a specific branch 
+## Pulling specific branch
 
 1.
 ```
@@ -35,10 +35,18 @@ If you want to pull a specific branch
 
 3.
 ```
-    Run the following command: 'git pull https://github.com/jameBroa/SDP-Group-2.git <branch name online>:<local branch name>
+    Run the following command: 
+    'git pull https://github.com/jameBroa/SDP-Group-2.git <branch name online>:<local branch name>
 ```
 
 4.
 ```
     Happy debugging
+```
+
+## Pushing to specific branch
+1.
+```
+    run the following command:
+    'git push https://github.com/jameBroa/SDP-Group-2.git <local branch>:<remote branch>
 ```
