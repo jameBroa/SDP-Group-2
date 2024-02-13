@@ -20,3 +20,25 @@
 ```
     Scan QR code
 ```
+
+If you want to pull a specific branch 
+
+1.
+```
+    git pull the repo
+```
+
+2.
+```
+    create local branch with whatever name with 'git checkout -b <branch name>
+```
+
+3.
+```
+    Run the following command: 'git pull https://github.com/jameBroa/SDP-Group-2.git <branch name online>:<local branch name>
+```
+
+4.
+```
+    Happy debugging
+```

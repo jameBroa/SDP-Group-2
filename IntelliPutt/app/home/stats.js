@@ -135,8 +135,6 @@ export default function stats() {
     getUserData();
 
     console.log(currUser)
-
-
     console.log(uid);
     
   }, [uid]);
