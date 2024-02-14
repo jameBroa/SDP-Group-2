@@ -19,7 +19,7 @@ const NotificationCard = ({ id }) => {
     const currentUser = useSelector((state) => state.user.user);
     const [friendUID, setFriendUID] = useState("");
 
-    if (!loaded) {
+    const fetchFriend = () => {
         const friendRequestQuery = doc(db, "friendRequests", id);
         const response = getDoc(friendRequestQuery);
         response.then((querySnapshot) => {
@@ -38,9 +38,13 @@ const NotificationCard = ({ id }) => {
                 setName(friendData["name"]);
                 setEmail(friendData["email"]);
                 setIsRead(querySnapshot.data()["status"] == "pending" ? false : true);
-                setTime(new Date(data["timestamp"]["seconds"] * 1000).toLocaleDateString());
+                setTime(new Date(querySnapshot.data()["timestamp"]["seconds"] * 1000).toLocaleDateString());
             });
         });
+    }
+
+    if (!loaded) {
+        fetchFriend();
         setLoaded(true);
     }
 

@@ -22,18 +22,10 @@ import { doc, getDoc } from 'firebase/firestore';
 export default function Index() {
     const user = useSelector((state) => state.user.user);
     const [loaded, setLoaded] = useState(false);
-    const [friends, setFriends] = useState(
-        [{
-            "name": "John Doe",
-            "skill": "Beginner"
-        }]
-    );
+    const [friends, setFriends] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
 
-    const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-
-        runningListOfFriends = [];
+    const fetchFriends = () => {
         getDoc(doc(db, "users", user["uid"]))
         .then((d) => {
             const listOfUIDs = d.data()["friends"];
@@ -43,16 +35,24 @@ export default function Index() {
                 .then((d) => {
                     console.log("Friend data: ", d.data());
                     
-                    setFriends(friends.concat({
+                    const friendData = {
                         name: d.data()["name"],
                         skill: d.data()["experienceLevel"],
                         uid: d.data()["uid"]
-                    }));
+                    };
+
+                    if (!friends.includes(friendData)) {
+                        setFriends([...friends, friendData]);
+                    }
                 })
             })
-            setFriends(runningListOfFriends);
+            
         });
+    }
 
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        fetchFriends();
         setTimeout(() => setRefreshing(false), 2000);
     }, [])
 
@@ -65,11 +65,13 @@ export default function Index() {
     }, [user, loaded]);
     
     if (user) {
-        if (!loaded) {setLoaded(true)};
+        if (!loaded) {
+            setLoaded(true);
+            fetchFriends();
+        };
 
         return (
-            <View className="h-full w-full flex flex-col ">
-
+            <View className="h-full w-full flex flex-col">
                 <View className="h-[30%]">
                     <DefaultContainer subheading="Welcome back!" heading={user["name"]}/>
                 </View>
@@ -80,12 +82,12 @@ export default function Index() {
                     }>
                     <View className="my-2">
                         <Text className="text-xl text-gray-400 pl-3 pt-3 font-medium">Your Friends</Text>
-                        <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="./stats">
+                        <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="/home/social">
                             <Text className="text-sm font-light">View all</Text>
                         </Link>
-                        <View className="mt-2 w-full flex flex-row justify-around  ">
+                        <View className="mt-2 w-full flex-row justify-items-start ml-2">
                             {friends.map((friend) => {
-                                return <FriendButton name={friend.name} skill={friend.skill} key={friend.uid} online/>
+                                return <FriendButton {...friend} name={friend.name} skill={friend.skill} key={friend.uid} online/>
                             })}
                         </View>
                     </View>

@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import COLOURS from '../static/design_constants'
+import { AntDesign } from '@expo/vector-icons'
 
 const FriendButton = ({name, skill, online, offline}) => {
     const styles = StyleSheet.create({
@@ -15,14 +16,14 @@ const FriendButton = ({name, skill, online, offline}) => {
         },
     });
   return (
-    <View style={styles.customGreen} className="rounded-xl w-28 h-16 flex flex-row justify-between pl-1 pr-1 items-center">
+    <View style={styles.customGreen} className="rounded-xl w-[33%] h-16 flex flex-row justify-between pl-1 pr-1 items-center">
             {/* AVATAR STUFF */}
             <View className="flex flex-col justify-center ">
-                <View className="ml-1 w-8 h-8 rounded-full bg-slate-400"/>
+                <AntDesign name="user" size={30} color="white" />
             </View>
             {/* NAME AND SKILL */}
             <View className="h-[100%] flex flex-col justify-center space-y-0.5">
-                <Text  className="text-white text-sm font-medium">{name}</Text>
+                <Text  className="text-white text-sm font-medium flex-wrap">{name}</Text>
                 <Text className="text-white text-xs font-light">{skill}</Text>
             </View>
             {/* ONLINE STATUS */}
@@ -41,9 +42,6 @@ const FriendButton = ({name, skill, online, offline}) => {
         
     </View>
   )
-  
-
-
 }
 
 export default FriendButton
