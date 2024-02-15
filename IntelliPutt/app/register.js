@@ -13,14 +13,8 @@
         - Index page
         - Login page
         - Home page (if account successfully created)
-<<<<<<< HEAD
         - What's this? (skill level)
 */}
-=======
-        - What's this? (skill level) (missing)
-*/
-}
->>>>>>> origin/main
 
 import { SafeAreaView, Text, View, Image, Pressable, ScrollView } from 'react-native';
 import React, { useState } from 'react';
