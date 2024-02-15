@@ -9,6 +9,15 @@ export default function Layout() {
             >
 
             </Tabs.Screen>
+            <Tabs.Screen
+            name="notifications"
+            href="/notifications"
+            options={{
+                href:null
+            }}
+            >
+
+            </Tabs.Screen>
         </Tabs>
     );
 }

@@ -13,14 +13,13 @@
         - Index page
         - Login page
         - Home page (if account successfully created)
-        - What's this? (skill level) (missing)
-*/
-}
+        - What's this? (skill level)
+*/}
 
 import { SafeAreaView, Text, View, Image, Pressable, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { ref, set } from 'firebase/database';
+import { setDoc, doc, query, where, collection, getDocs } from "firebase/firestore"; 
 import auth from '../config/authentication';
 import db from '../config/database';
 import CustomButton from '../components/CustomButton';
@@ -36,6 +35,7 @@ export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
     const [showModal, setShowModal] = useState(false);
 
   const tabs = ["Beginner", "Intermediate", "Advanced"];
@@ -43,31 +43,47 @@ export default function Register() {
   const dispatch = useDispatch();
   const [loginPressed, setLoginPressed] = useState(false);
 
-  const handleRegister = () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // User successfully created
-        const user = userCredential.user;
-        setEmail(userCredential.email);
-        setPassword(userCredential.password);
-
-        console.log("User created");
-
-        // Store additional user data in Firestore
-        const usersRef = ref(db, `users/${user.uid}`);
-        set(usersRef, {
-          uid: user.uid,
-          name: name,
-          experienceLevel: experienceLevel,
+  
+    const handleRegister = () => {
+        // Does username already exist
+        const userRef = collection(db, "users");
+        const q = query(userRef, where('username', '==', username.toLowerCase()));
+        const querySnapshot = getDocs(q);
+        querySnapshot.then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+                alert("Username already exists. Please choose another one.");
+                return;
+            }
         });
-        console.log("Additional data stored successfully");
+
+        createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {                         // User successfully created            
+            const user = userCredential.user;
+            setEmail(userCredential.email);
+            setPassword(userCredential.password);
+
+            console.log('User created');
+            // if not, store user data in Firestore
+            setDoc(doc(db, "users", user.uid), 
+                {
+                    uid: user.uid,
+                    email: email,
+                    name: name,
+                    username: username.toLowerCase(),
+                    experienceLevel: experienceLevel,
+                    friends: []
+                }
+            );
+            console.log('Additional data stored in Firestore successfully');
 
             dispatch(login(
                 {
                     uid: user.uid,
                     email: email,
                     name: name,
-                    experience: experienceLevel
+                    username: username,
+                    experience: experienceLevel,
+                    friends: []
                 }
             ));
 
@@ -98,14 +114,29 @@ export default function Register() {
                     </Text>
                 </View>
 
-      <View className="w-4/5">
-        <TextField placeholder="Name" value={name} onChangeText={setName} />
-        <TextField placeholder="Email" value={email} onChangeText={setEmail} />
-        <TextField
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-        />
+                <View className="w-4/5">
+                    <TextField placeholder="Name" value={name} onChangeText={setName}/>
+                    <TextField placeholder="Username" value={username} onChangeText={setUsername} />
+                    <TextField placeholder="Email" value={email} onChangeText={setEmail} />
+                    <TextField placeholder="Password" value={password} onChangeText={setPassword} />
+                    
+                    <View className="flex-row mt-5 pt-4 my-4 justify-between">
+                        <Text className="font-bold"> Skill level: </Text>
+                        <Pressable className="font-bold" onPress={() => setShowModal(true)}> 
+                            <Text className="font-bold"> What's this? </Text>
+                        </Pressable>  
+                    </View>
+                    
+                    <View className="flex-row flex items-center flex-wrap gap-2 justify-center mb-5">
+                        {tabs.map((tab) => (
+                            <Chip
+                                text={tab}
+                                selected={experienceLevel === tab}
+                                setSelected={setExperienceLevel}
+                                key={tab}
+                            />
+                        ))}
+                    </View>
 
         <View className="flex-row mt-5 pt-4 my-4 justify-between">
           <Text className="font-bold"> Skill level: </Text>

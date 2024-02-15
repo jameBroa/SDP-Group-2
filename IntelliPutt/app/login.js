@@ -23,18 +23,14 @@ import {
   Pressable,
 } from "react-native";
 import Modal from "react-native-modal";
-import { Link, router } from "expo-router";
-import React, { useState } from "react";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from "firebase/auth";
-import CustomButton from "../components/CustomButton";
-import TextField from "../components/TextField";
-import BackButton from "../components/BackButton";
-import db from "../config/database";
-import { ref, get } from "firebase/database";
+import { Link, router } from 'expo-router';
+import React, { useState } from 'react';
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import CustomButton from '../components/CustomButton';
+import TextField from '../components/TextField';
+import BackButton from '../components/BackButton';
+import db from '../config/database';
+import { doc, getDoc } from "firebase/firestore";
 import { useDispatch } from 'react-redux';
 import { login } from '../context/slices/userSlice';
 
@@ -47,40 +43,50 @@ export default function Login() {
   const [forgotPasswordPassed, setForgotPasswordPressed] = useState(false);
   const [registerPressed, setRegisterPressed] = useState(false);
 
-  // Fetch name + experience level from database
-  const fetchUserData = async (userId) => {
-    const userRef = ref(db, `users/${userId}`);
+    // Fetch name + experience level from database
+    const fetchUserData = async (userId) => {
+        const userRef = doc(db, "users", userId);
 
-    try {
-      const snapshot = await get(userRef);
-      if (snapshot.exists()) {
-        return snapshot.val();
-      } else {
-        return {};
-      }
-    } catch (error) {
-      return {};
-    }
-  };
+        try {
+            const snapshot = await getDoc(userRef);
+            if (snapshot.exists()) {
+                console.log('User data:', snapshot.data());
+                return snapshot.data();
+            } else {
+                return {};
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error.message);
+            return {};
+        }
+    };
+
+
 
   const auth = getAuth();
+
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // User successfully signed in
         const user = userCredential.user;
-
+        console.log(user)
+        console.log("checkpoint ^")
             // Get rest of user data from the database
             fetchUserData(user.uid)
             .then((userData) => {                        // Data found
                 console.log('User data:', userData.name);
+                console.log("TEST TEST TEST");
+                console.log(user);
+                console.log(user.uid);
 
                 dispatch(login(
                     {
                         uid: user.uid,
                         email: userData.email,
                         name: userData.name,
-                        experience: userData.experience
+                        experience: userData.experience,
+                        friends: userData.friends
                     }
                 ));
             }).catch((error) => {                        // Data not found
@@ -95,7 +101,8 @@ export default function Login() {
                         uid: user.uid,
                         email: email,
                         name: "Untitled User",
-                        experience: "Not available"
+                        experience: "Not available",
+                        friends: []
                     }
                 ));
             });

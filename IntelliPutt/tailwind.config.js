@@ -8,11 +8,15 @@ module.exports = {
       },
       colors: {
         "brand-colorbroken-white": "var(--brand-colorbroken-white)",
-        "brand-colordark-green": "#093923",
+        "brand-colordark-green": "#192e05",
+        "brand-colordark-greengray": "#5C6A50",
+        "brand-colorlight-greengray": "#BECBB2"
       },
       backgroundColor: {
         "brand-colorbroken-white": "var(--brand-colorbroken-white)",
-        "brand-colordark-green": "#093923",
+        "brand-colordark-green": "#192e05",
+        "brand-colordark-greengray": "#5C6A50",
+        "brand-colorlight-greengray": "#BECBB2"
       },
     },
   },

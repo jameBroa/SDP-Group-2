@@ -6,7 +6,17 @@
 
 2.
 ```
+    Create file in SDP-GROUP-2/Intelliputt called .env.local and add the env 
+    variables. 
+    Can be found in the Discord chat
+```
+
+3.
+```
     npx expo start
 ```
 
-3. scan QR code
+4.
+```
+    Scan QR code
+```

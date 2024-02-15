@@ -35,6 +35,33 @@ const TextField = ({ placeholder, value, onChangeText }) => {
         );
     };
 
+    if (placeholder == "Email") {
+        return (
+            <TextInput
+                className="bg-lime-950 w-full rounded-lg border-2 border-lime-950 p-4 text-stone-50 text-base mt-3 font-medium"
+                placeholderTextColor="#f5f5f4"
+                placeholder={placeholder}
+                value={value}
+                onChangeText={onChangeText}
+                textContentType='oneTimeCode'
+                inputMode='email'
+            />
+        );
+    }
+
+    if (placeholder == "Name") {
+        return (
+            <TextInput
+                className="bg-lime-950 w-full rounded-lg border-2 border-lime-950 p-4 text-stone-50 text-base mt-3 font-medium"
+                placeholderTextColor="#f5f5f4"
+                placeholder={placeholder}
+                value={value}
+                onChangeText={onChangeText}
+                required
+            />
+        );
+    }
+
     return (
         <TextInput
             className="bg-lime-950 w-full rounded-lg border-2 border-lime-950 p-4 text-stone-50 text-base mt-3 font-medium"
@@ -42,7 +69,6 @@ const TextField = ({ placeholder, value, onChangeText }) => {
             placeholder={placeholder}
             value={value}
             onChangeText={onChangeText}
-            textContentType='oneTimeCode'
         />
     );
 };
