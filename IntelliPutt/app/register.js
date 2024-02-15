@@ -49,15 +49,7 @@ export default function Register() {
   const dispatch = useDispatch();
   const [loginPressed, setLoginPressed] = useState(false);
 
-  const handleRegister = () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // User successfully created
-        const user = userCredential.user;
-        setEmail(userCredential.email);
-        setPassword(userCredential.password);
-
-<<<<<<< HEAD
+  
     const handleRegister = () => {
         // Does username already exist
         const userRef = collection(db, "users");
@@ -89,18 +81,6 @@ export default function Register() {
                 }
             );
             console.log('Additional data stored in Firestore successfully');
-=======
-        console.log("User created");
-
-        // Store additional user data in Firestore
-        const usersRef = ref(db, `users/${user.uid}`);
-        set(usersRef, {
-          uid: user.uid,
-          name: name,
-          experienceLevel: experienceLevel,
-        });
-        console.log("Additional data stored successfully");
->>>>>>> origin/main
 
             dispatch(login(
                 {
@@ -140,7 +120,6 @@ export default function Register() {
                     </Text>
                 </View>
 
-<<<<<<< HEAD
                 <View className="w-4/5">
                     <TextField placeholder="Name" value={name} onChangeText={setName}/>
                     <TextField placeholder="Username" value={username} onChangeText={setUsername} />
@@ -164,16 +143,6 @@ export default function Register() {
                             />
                         ))}
                     </View>
-=======
-      <View className="w-4/5">
-        <TextField placeholder="Name" value={name} onChangeText={setName} />
-        <TextField placeholder="Email" value={email} onChangeText={setEmail} />
-        <TextField
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-        />
->>>>>>> origin/main
 
         <View className="flex-row mt-5 pt-4 my-4 justify-between">
           <Text className="font-bold"> Skill level: </Text>
