@@ -31,9 +31,9 @@ const GuidesButton = ({title}) => {
                 className="rounded-xl"
                 />
             </View>
-            <View className="flex flex-col justify-around pl-1 h-[60%] ">
-                <Text className="text-white text-md font-semibold">{title}</Text>
-                <Text className="text-white" >View more -{'>'}</Text>
+            <View className="ml-1 flex flex-col justify-around pl-1 h-[60%] ">
+                <Text className="text-white text-lg font-semibold flex-wrap max-w-[85%]">{title} </Text>
+                <Text className="text-white font-light text-xs" >View more -{'>'}</Text>
             </View>
         </View>
     </View>

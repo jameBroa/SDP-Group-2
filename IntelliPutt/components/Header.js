@@ -5,14 +5,12 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import CustomButton from './CustomButton';
 import COLOURS from '../static/design_constants';
-const Header = () => {
 
+const Header = () => {
     const openMenu = (e) => {
         console.log("Menu open");
     }
-
-
-  return (
+    return (
     <View className="w-full flex flex-row justify-between">
             <View className=" w-[20%] flex flex-row justify-end">
                 <Pressable onPress={openMenu}>
@@ -23,7 +21,7 @@ const Header = () => {
                 <Ionicons name="notifications-outline" size={32} color='white' />
             </View>
     </View>
-  )
+    )
 }
 
 const styles = StyleSheet.create({

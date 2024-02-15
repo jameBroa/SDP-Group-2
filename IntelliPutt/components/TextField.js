@@ -29,6 +29,7 @@ const TextField = ({ placeholder, value, onChangeText }) => {
                     size={24} 
                     color="#f5f5f4"
                     onPress={toggleShowPassword} 
+                    textContentType='oneTimeCode'
                 />
             </View>
         );
@@ -41,6 +42,7 @@ const TextField = ({ placeholder, value, onChangeText }) => {
             placeholder={placeholder}
             value={value}
             onChangeText={onChangeText}
+            textContentType='oneTimeCode'
         />
     );
 };

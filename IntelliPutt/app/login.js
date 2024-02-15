@@ -35,11 +35,14 @@ import TextField from "../components/TextField";
 import BackButton from "../components/BackButton";
 import db from "../config/database";
 import { ref, get } from "firebase/database";
+import { useDispatch } from 'react-redux';
+import { login } from '../context/slices/userSlice';
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const dispatch = useDispatch();
   const [buttonPressed, setButtonPressed] = useState(false);
   const [forgotPasswordPassed, setForgotPasswordPressed] = useState(false);
   const [registerPressed, setRegisterPressed] = useState(false);
@@ -67,30 +70,46 @@ export default function Login() {
         // User successfully signed in
         const user = userCredential.user;
 
-        // Get rest of user data from the database
-        fetchUserData(user.uid)
-          .then((userData) => {
-            // Data found
-            console.log("User data:", userData.name);
-            alert("User signed in, hi " + userData.name + "!");
-          })
-          .catch((error) => {
-            // Data not found
-            if (error.message == "Cannot read property 'name' of undefined") {
-              alert("User signed in, please update your user details!");
-            } else {
-              console.error("Error fetching user data:", error.message);
-            }
-          });
+            // Get rest of user data from the database
+            fetchUserData(user.uid)
+            .then((userData) => {                        // Data found
+                console.log('User data:', userData.name);
 
-        console.log("User signed in:" + user.uid);
-        router.push("./home");
-      })
-      .catch((error) => {
-        // Error with authentication
-        alert("Error signing in: " + error.message);
-      });
-  };
+                dispatch(login(
+                    {
+                        uid: user.uid,
+                        email: userData.email,
+                        name: userData.name,
+                        experience: userData.experience
+                    }
+                ));
+            }).catch((error) => {                        // Data not found
+                if (error.message == "Cannot read property 'name' of undefined") {
+                    alert('User signed in, please update your user details!');
+                } else {
+                    console.error('Error fetching user data:', error.message); 
+                }
+
+                dispatch(login(
+                    {
+                        uid: user.uid,
+                        email: email,
+                        name: "Untitled User",
+                        experience: "Not available"
+                    }
+                ));
+            });
+
+            console.log('User signed in:' + user.uid);
+            setEmail('');
+            setPassword('');
+
+            router.push('/home');
+        })
+        .catch((error) => {                             // Error with authentication
+            alert('Error signing in: ' + error.message);
+        });   
+    };
 
   const handlePasswordReset = () => {
     sendPasswordResetEmail(auth, email)

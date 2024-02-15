@@ -1,5 +1,4 @@
-import { Stack, Tabs } from 'expo-router';
-
+import { Tabs } from 'expo-router';
 
 export default function Layout() {
     return (
@@ -10,7 +9,6 @@ export default function Layout() {
             >
 
             </Tabs.Screen>
-            
         </Tabs>
     );
 }

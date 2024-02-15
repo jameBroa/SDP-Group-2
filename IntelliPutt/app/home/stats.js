@@ -1,9 +1,5 @@
-import { Feather, Ionicons } from '@expo/vector-icons'
-import { Stack } from 'expo-router'
 import React from 'react'
-import { Image, Text, View } from 'react-native'
-import COLOURS from '../../static/design_constants'
-import { LinearGradient } from 'expo-linear-gradient'
+import { Text, View } from 'react-native'
 import DefaultContainer from '../../components/DefaultContainer'
 
 const stats = () => {
@@ -12,7 +8,7 @@ const stats = () => {
         <View className="h-[30%] ">
             <DefaultContainer subheading="Let's view your" heading="Statistics!"/>
         </View>
-        <View className=" h-[70%] w-full flex flex-row justify-center items-center bg-slate-300">
+        <View className=" h-[70%] w-full flex flex-row justify-center items-center">
             <Text className="text-2xl ">🚧This area is to be completed🚧</Text>
 
         </View>
