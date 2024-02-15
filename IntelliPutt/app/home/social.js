@@ -4,7 +4,7 @@ import Modal from "react-native-modal";
 import CustomButton from '../../components/CustomButton';
 import TextField from '../../components/TextField';
 import { ScrollView, Text, View, Pressable } from 'react-native';
-import { collection, getDocs, query, where, serverTimestamp  } from "firebase/firestore";
+import { collection, getDocs, query, where, serverTimestamp, addDoc, or } from "firebase/firestore";
 import db from '../../config/database';
 import { useSelector } from 'react-redux';
 
@@ -15,7 +15,10 @@ export default function Social() {
 
   const handleAddFriend = async () => {
     const userRef = collection(db, "users");
-    const q = query(userRef, where("email", "==", friendEmail.toLowerCase()));
+    const friendRef = collection(db, "friendRequests");
+    const q = query(userRef, or (
+      where('email', '==', friendEmail.toLowerCase()), where('username', '==', friendEmail.toLowerCase())
+    ));
     
     try {
       const querySnapshot = await getDocs(q);
@@ -26,8 +29,9 @@ export default function Social() {
 
       const friendData = querySnapshot.docs[0].data()["uid"];
       // Add friend request
-      setDoc(doc(db, "friendRequest", friendData), 
+      addDoc(friendRef, 
           {
+              to: friendData,
               from: currentUser.uid,
               status: 'pending',
               timestamp: serverTimestamp()
