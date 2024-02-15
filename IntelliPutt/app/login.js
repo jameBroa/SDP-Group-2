@@ -35,12 +35,6 @@ import { useDispatch } from 'react-redux';
 import { login } from '../context/slices/userSlice';
 
 export default function Login() {
-    // const [email, setEmail] = useState('');
-    // const [password, setPassword] = useState('');
-    // const [showModal, setShowModal] = useState(false);
-    // const dispatch = useDispatch();
-
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showModal, setShowModal] = useState(false);

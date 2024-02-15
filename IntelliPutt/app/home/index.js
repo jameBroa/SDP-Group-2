@@ -20,10 +20,8 @@ import db from '../../config/database';
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function Index() {
-
     // Redux vars
     const user = useSelector((state) => state.user.user);
-    const uid = user.uid;
 
     // State management
     const [loaded, setLoaded] = useState(false);

@@ -10,7 +10,7 @@ export default function Notifications() {
     const user = useSelector((state) => state.user.user);
 
     if (user == null) {
-        return <Redirect to="../." />
+        return <Redirect to="/app/" />
     }
 
     const [cards, setCards] = useState([]);
