@@ -64,12 +64,14 @@ export default function Login() {
 
 
   const auth = getAuth();
+
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // User successfully signed in
         const user = userCredential.user;
-
+        console.log(user)
+        console.log("checkpoint ^")
             // Get rest of user data from the database
             fetchUserData(user.uid)
             .then((userData) => {                        // Data found

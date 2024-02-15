@@ -115,7 +115,6 @@ export default function stats() {
   const userDataCollectionRef = collection(firestore, "users/" + uid + "/data");
 
   useEffect(() => {
-
     const getUserData = async() => {
       try{
         const q = query(userDataCollectionRef);
@@ -131,14 +130,7 @@ export default function stats() {
         console.log(error)
       }
     }
-
     getUserData();
-
-    console.log(currUser)
-
-
-    console.log(uid);
-    
   }, [uid]);
 
 
