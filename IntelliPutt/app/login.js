@@ -43,28 +43,25 @@ export default function Login() {
   const [forgotPasswordPassed, setForgotPasswordPressed] = useState(false);
   const [registerPressed, setRegisterPressed] = useState(false);
 
-    // Fetch name + experience level from database
-    const fetchUserData = async (userId) => {
-        const userRef = doc(db, "users", userId);
+  // Fetch name + experience level from database
+  const fetchUserData = async (userId) => {
+      const userRef = doc(db, "users", userId);
 
-        try {
-            const snapshot = await getDoc(userRef);
-            if (snapshot.exists()) {
-                console.log('User data:', snapshot.data());
-                return snapshot.data();
-            } else {
-                return {};
-            }
-        } catch (error) {
-            console.error('Error fetching user data:', error.message);
-            return {};
-        }
-    };
-
-
+      try {
+          const snapshot = await getDoc(userRef);
+          if (snapshot.exists()) {
+              console.log('User data:', snapshot.data());
+              return snapshot.data();
+          } else {
+              return {};
+          }
+      } catch (error) {
+          console.error('Error fetching user data:', error.message);
+          return {};
+      }
+  };
 
   const auth = getAuth();
-
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
