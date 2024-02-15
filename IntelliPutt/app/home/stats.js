@@ -3,16 +3,18 @@ import { Pressable, Text, View } from 'react-native'
 import DefaultContainer from '../../components/DefaultContainer'
 import { LineGraph } from 'react-native-graph'
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import COLOURS from '../../static/design_constants';
 import { FontAwesome6 } from '@expo/vector-icons';
-import {useStore, useSelector} from 'react-redux';
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { useSelector} from 'react-redux';
+import { collection, getDocs, query } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
   
-
-
-
 export default function stats() {
+  // Redux vars
+  const currUser = useSelector((state) => state.user.user);
+
+  if (currUser == null) {
+    return <Redirect to="/app/" />
+  }
 
   // Test data for Linegraph
   const POINTS = [
@@ -106,13 +108,9 @@ export default function stats() {
   const [activeButton, setActiveButton] = useState("W1")
   const [userData, setUserData] = useState(null);
 
-  // Redux vars
-  const currUser = useSelector((state) => state.user.user);
-  const uid = currUser.uid;
-
   // Firebase vars
   const userCollectionRef = collection(firestore, "users");
-  const userDataCollectionRef = collection(firestore, "users/" + uid + "/data");
+  const userDataCollectionRef = collection(firestore, "users/" + currUser.uid + "/data");
 
   useEffect(() => {
     const getUserData = async() => {
@@ -131,7 +129,7 @@ export default function stats() {
       }
     }
     getUserData();
-  }, [uid]);
+  }, [currUser]);
 
 
   const changeGraph1 = useCallback(() => {
@@ -143,8 +141,6 @@ export default function stats() {
     setActiveButton("W2")
 
   }, [setgraphdata])
-
-
 
   const [percentage, setPerc] = useState("36.4")
   return (
@@ -197,13 +193,10 @@ export default function stats() {
                     <Text className="font-bold">3M</Text>
                   </Pressable>
                   {/* <Pressable onPress={() => {changeGraph2()}} className="w-32 h-10 flex flex-row justify-center bg-slate-200 rounded-xl items-center"><Text>points 2</Text></Pressable> */}
-
                 </View>
               </View>
-
             </View>
         </View>
-
     </View>
   )
 }

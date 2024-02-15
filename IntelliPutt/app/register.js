@@ -38,12 +38,11 @@ export default function Register() {
     const [username, setUsername] = useState('');
     const [showModal, setShowModal] = useState(false);
 
-  const tabs = ["Beginner", "Intermediate", "Advanced"];
-  const [experienceLevel, setExperienceLevel] = useState(tabs[0]);
-  const dispatch = useDispatch();
-  const [loginPressed, setLoginPressed] = useState(false);
+    const tabs = ["Beginner", "Intermediate", "Advanced"];
+    const [experienceLevel, setExperienceLevel] = useState(tabs[0]);
 
-  
+    const dispatch = useDispatch();
+
     const handleRegister = () => {
         // Does username already exist
         const userRef = collection(db, "users");
@@ -138,42 +137,12 @@ export default function Register() {
                         ))}
                     </View>
 
-        <View className="flex-row mt-5 pt-4 my-4 justify-between">
-          <Text className="font-bold"> Skill level: </Text>
-          <Link className="font-bold" href="./register">
-            {" "}
-            What's this?{" "}
-          </Link>
-        </View>
-
-        <View className="flex-row flex items-center flex-wrap gap-2 justify-center mb-5">
-          {tabs.map((tab) => (
-            <Chip
-              text={tab}
-              selected={experienceLevel === tab}
-              setSelected={setExperienceLevel}
-              key={tab}
-            />
-          ))}
-        </View>
-
-        <CustomButton text="Register" onPress={handleRegister} />
-        <Text className="mb-10 mt-2 text-stone-900 font-medium">
-          Already have an account?{" "}
-          <Link
-            className={loginPressed ? "font-bold text-sky-800" : "font-bold"}
-            onPressIn={() => {
-              setLoginPressed(true);
-            }}
-            onPressOut={() => {
-              setLoginPressed(false);
-            }}
-            href="./login"
-          >
-            Login.{" "}
-          </Link>
-        </Text>
-      </View>
+                    <CustomButton text="Register" onPress={handleRegister}/>
+                    <Text className="mb-10 mt-2 text-stone-900 font-medium">
+                        Already have an account? <Link className="font-bold" href="./login">Login. </Link>    
+                    </Text>
+                </View>
+                
             </SafeAreaView>
             <Modal isVisible={showModal} animationIn="slideInUp" animationOut="slideOutDown" className="w-full mt-[40%] ml-0 mb-0 h-[90%]" style={styles.modal}>
                 <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white px-[30px] pt-[20px] pb-[40px] rounded-lg w-full">
