@@ -7,6 +7,7 @@ import { ScrollView, Text, View, Pressable } from 'react-native';
 import { collection, getDocs, query, where, serverTimestamp, addDoc, or } from "firebase/firestore";
 import db from '../../config/database';
 import { useSelector } from 'react-redux';
+import { LineChart } from 'react-native-chart-kit';
 
 export default function Social() {
   const [showModal, setShowModal] = useState(false);
@@ -60,6 +61,7 @@ export default function Social() {
         </View>
         <View className="h-[70%] w-full flex flex-col justify-center items-center">
             <Text className="text-2xl ">🚧This area is to be completed🚧</Text>
+            
             <CustomButton text="Add friend" onPress={() => setShowModal(true)} />
         </View>
 
