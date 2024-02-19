@@ -87,6 +87,7 @@ export default function Index() {
             setLoaded(true);
             fetchFriends();
             getNumNotifications();
+            console.log("looping?")
         };
 
         return (
