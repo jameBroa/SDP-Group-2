@@ -8,17 +8,14 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import {useStore, useSelector} from 'react-redux';
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
-import {convertUserData, filterByWeek, filterByXMonth, filterByXWeek, getData, getLabels, getPercentage} from '../../logic/stats-logic';
+import {calculatePercChange, convertUserData, filterByWeek, filterByXMonth, filterByXWeek, getData, getLabels, getPercentage} from '../../logic/stats-logic';
 import {getGlobalPercentage} from '../../logic/stats-logic';
 import {
   LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart
 } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
+import {Svg, Text as TextSVG} from 'react-native-svg';
+import Chip from '../../components/Chip';
 
 
 export default function stats() {
@@ -112,6 +109,10 @@ export default function stats() {
     },
   ]
 
+  //data vars
+  const tabs = ["ALL", "1W", "2W", "1M", "3M"]
+
+
   // State management vars
   const [activeButton, setActiveButton] = useState("W1")
   const [userData, setUserData] = useState({});
@@ -119,6 +120,12 @@ export default function stats() {
   const [loading, setLoading] = useState(true);
   const [graphLabels, setGraphLabels] = useState(["January", "February"]);
   const [graphdata, setgraphdata] = useState([Math.random() * 100, Math.random() * 100])
+  const [percentageChange, setPercentageChange] = useState(0);
+  const [graphState, setGraphState] = useState(tabs[0]);
+
+
+
+
 
   // Redux vars
   const currUser = useSelector((state) => state.user.user);
@@ -127,6 +134,9 @@ export default function stats() {
   // Firebase vars
   const userCollectionRef = collection(firestore, "users");
   const userDataCollectionRef = collection(firestore, "users/" + uid + "/data");
+
+  
+
 
   useEffect(() => {
     const getUserData = async() => {
@@ -147,10 +157,14 @@ export default function stats() {
         const globalPercentage = getGlobalPercentage(puttingData);
         const labels = getLabels(putts)
         const data = getData(putts);
+        // const percChange = calculatePercChange(putts);
+
+
         setGraphLabels(labels);
         setgraphdata(data);
         setGlobalPercentage(globalPercentage);
         setLoading(false);
+        // setPercentageChange(percChange);
 
       } catch(error) {
         console.log(error)
@@ -158,6 +172,31 @@ export default function stats() {
     }
     getUserData();
   }, [uid]);
+
+
+  useEffect(() => {
+    if(loading == false) {
+    switch(graphState) {
+      case "1W":
+        filterOneWeek()
+        break;
+      case "2W":
+        filterTwoWeek()
+        break;
+      case "1M":
+        filterMonth()
+        break;
+      case "3M":
+        filterThreeMonth()
+        break;
+      default:
+        resetGraph();
+        break;
+      
+    }
+  }
+
+  }, [graphState, loading])
 
   const filterOneWeek = () => {
     filteredDate = filterByXWeek(userData, 1);
@@ -208,45 +247,22 @@ export default function stats() {
     setGlobalPercentage(percentage); 
   }
 
-  
-
-
-  // const changeGraph1 = useCallback(() => {
-
-  //   userData.map((item) => {
-  //     console.log(item.value);
-  //   })
-  //   console.log(userData)
-  //   console.log("userData")
-    
-  //   setgraphdata((userData))
-    
-  // }, [userData, setgraphdata])
-
-  // const changeGraph2 = useCallback(() => {
-  //   setgraphdata(POINTS2)
-  //   setActiveButton("W2")
-
-  // }, [userData, setgraphdata])
-
-  
-
   return (
     <View className="w-full h-full flex flex-col">
         <View className="h-[30%] ">
             <DefaultContainer subheading="Let's view your" heading="Statistics!"/>
         </View>
         <View className=" h-[70%] w-full flex flex-col">
-            <Text className="text-xl text-gray-400 pl-3 pt-3 font-medium">Global hitting percentage</Text>
-            <View className="w-[100%]  h-[90%] flex flex-row justify-center">
+            {/* <Text className="text-xl text-gray-400 pl-3 pt-3 font-medium">Global hitting percentage</Text> */}
+            <View className="w-[100%] pt-3 h-[95%] flex flex-row justify-center items-center">
               <View className="w-[95%] h-[100%] bg-brand-colordark-green justify-center rounded-xl flex flex-col">
                 <Text className="text-white text-3xl pl-3 font-medium mb-2">Putting percentage</Text>
                 <View className="flex flex-row space-x-5">
                   <Text className="text-white text-5xl pl-3 font-light">{globalPercentage}%</Text>
-                  <View className="flex flex-row space-x-1 items-center">
+                  {/* <View className="flex flex-row space-x-1 items-center">
                     <FontAwesome6 name="arrow-trend-up" size={10} color={"#69DF87"} />                  
-                    <Text className="text-white">5.64%</Text>
-                  </View>
+                    <Text className="text-white">{percentageChange}%</Text>
+                  </View> */}
                   
                 </View>
                 {/* Graphic for up or down */}
@@ -259,8 +275,13 @@ export default function stats() {
                     labels: graphLabels,
                     datasets: [
                       {
-                        data: graphdata
-                      }
+                        data: graphdata,
+                        
+                      },
+                      {
+                        data: [100],
+                        color : () => 'transparent', strokeWidth:0, withDots:false,
+                      },
                     ]
                   }}
                   width={360} // from react-native
@@ -270,9 +291,6 @@ export default function stats() {
                   yAxisInterval={1} // optional, defaults to 1
                   chartConfig={{
                     backgroundColor:"#fff",
-                    // backgroundColor: "#e26a00",
-                    // backgroundGradientFrom: "#fb8c00",
-                    // backgroundGradientTo: "#ffa726",
                     backgroundGradientFrom: COLOURS.DARK_GREEN,
                     backgroundGradientTo: COLOURS.DARK_GREEN,
                     decimalPlaces: 2, // optional, defaults to 2dp
@@ -289,32 +307,70 @@ export default function stats() {
                   }}
                   bezier
                   withVerticalLabels={false}
-                  // fromZero={true}
+                  fromZero={true}
+                  onDataPointClick={({value, dataset, getColor}) => {
+                    console.log(value);
+                    return (
+                      <Text className="z-10 text-4xl">{value}</Text>
+                    )
+                  }
+                  
+                  }
+                  renderDotContent={({x, y, index, indexData}) => {
+                    if(graphdata.length < 15) {
+                      return (
+                      <TextSVG
+                        key={index}
+                        x={x}
+                        y={y - 10}
+                        fill="white"
+                        fontSize="12"
+                        fontWeight="normal"
+                        textAnchor="middle">
+                        {graphdata[index]}
+                      </TextSVG>
+                    )
+                    }
+                    
+                  }
+                    
+                  }
                   
                   style={{
                     marginVertical: 8,
                     borderRadius: 16
                   }}
                 />
-                    {/* <GestureHandlerRootView className="w-[100%] h-[100%] flex flex-row justify-center">
-                      <LineGraph className="w-[90%] h-[90%]" 
-                      points={graphdata}  
-                      animated={true}
-                      enablePanGesture={true} 
-                      color="#fff"
-                      // onGestureStart={() => hapticFeedback('impactLight')}
-                      onPointSelected={(p) => {console.log(p)}}
-                      // onGestureEnd={() => setPerc("36.4")}
-                      // onGestureEnd={() => resetPriceTitle()}
-                      TopAxisLabel={() => <Text>lol</Text>}
-                      BottomAxisLabel={() => <Text>lol</Text>}
-                      />
-                      </GestureHandlerRootView> */}
-                    
                 
                 </View>
                 <View className="flex flex-row w-[100%] justify-evenly pb-2">
-                <Pressable  onPress={() => {resetGraph()}} className=" bg-brand-colordark-greengray w-12 h-10 flex flex-row justify-center  rounded-xl items-center">
+                  
+                 {tabs.map((tab) => {
+                  return(
+                    <Chip
+                    text={tab}
+                    selected={graphState === tab}
+                    setSelected={setGraphState}
+                    key={tab}
+                    color={COLOURS.BRAND_COLORDARK_GREENGRAY}
+                    />
+                  )
+                 })}
+
+
+
+
+
+
+                {/* <ButtonGroup
+                className="bg-slate-300"
+                  items={items}
+                  selectedItem={selectedItem}
+                  onSelect={(newSelectedItem) => setSelectedItem(newSelectedItem)}
+                /> */}
+
+
+                {/* <Pressable onPress={() => {resetGraph()}} className=" bg-brand-colordark-greengray w-12 h-10 flex flex-row justify-center  rounded-xl items-center">
                     <Text className="font-bold">ALL</Text>
                   </Pressable>
                   <Pressable  onPress={() => {filterOneWeek()}} className=" bg-brand-colordark-greengray w-12 h-10 flex flex-row justify-center  rounded-xl items-center">
@@ -329,7 +385,7 @@ export default function stats() {
                   <Pressable onPress={() => {filterThreeMonth()}} className="w-12 h-10 flex flex-row justify-center bg-brand-colordark-greengray rounded-xl items-center">
                     <Text className="font-bold">3M</Text>
                   </Pressable>
-                  {/* <Pressable onPress={() => {changeGraph2()}} className="w-32 h-10 flex flex-row justify-center bg-slate-200 rounded-xl items-center"><Text>points 2</Text></Pressable> */}
+                  <Pressable onPress={() => {changeGraph2()}} className="w-32 h-10 flex flex-row justify-center bg-slate-200 rounded-xl items-center"><Text>points 2</Text></Pressable> */}
 
                 </View>
               </View>

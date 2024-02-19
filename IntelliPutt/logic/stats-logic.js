@@ -80,11 +80,28 @@ export function getPercentage(input) {
     })
 
     return (sum / counter).toFixed(2)
-
-
-
-
 }
+
+// // TAKES INPUT OBJECT: {date: Date(), value: x}
+
+// export function calculatePercChange(input) {
+//     const currPerc = getPercentage(input);
+//     const date = new Date();
+//     date.setDate(date.getDate()-7);
+//     const res = input.filter((obj) => obj.date <= date);
+
+//     const oldPerc = getPercentage(res);
+//     console.log(currPerc)
+//     console.log(oldPerc)
+
+
+//     console.log(currPerc - oldPerc);
+//     return (currPerc-oldPerc).toFixed(2)
+// }
+
+
+
+
 
 export function convertUserData(input){
     if(input.length > 0) {
