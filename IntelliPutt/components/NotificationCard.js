@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import Modal from "react-native-modal";
 import CustomButton from './CustomButton';
@@ -6,18 +6,24 @@ import { ScrollView, Text, View, Pressable } from 'react-native';
 import { collection, query, where, getDoc, getDocs, doc, updateDoc, arrayUnion } from "firebase/firestore";
 import db from '../config/database';     
 import { useSelector } from 'react-redux';           
+import COLOURS from '../static/design_constants';
 
-const NotificationCard = ({ id }) => {
+const NotificationCard = ({ id, reqData, userData }) => {
+
+    // State vars
     const [showModal, setShowModal] = useState(false);
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
+    const [name, setName] = useState(userData.name);
+    const [email, setEmail] = useState(userData.email);
     const [isRead, setIsRead] = useState(false);
-    const [time, setTime] = useState("");
+    const [time, setTime] = useState(new Date((reqData.timestamp.seconds *1000)).toLocaleDateString());
     const [loaded, setLoaded] = useState(false);
+    const [friendUID, setFriendUID] = useState(reqData.from);
 
+    // Firebase vars
     const userRef = collection(db, "users");
+
+    //Redux vars
     const currentUser = useSelector((state) => state.user.user);
-    const [friendUID, setFriendUID] = useState("");
 
     const fetchFriend = () => {
         const friendRequestQuery = doc(db, "friendRequests", id);
@@ -43,10 +49,18 @@ const NotificationCard = ({ id }) => {
         });
     }
 
-    if (!loaded) {
-        fetchFriend();
-        setLoaded(true);
-    }
+    useEffect(() => {
+        if(reqData.status == "accepted"){
+            setIsRead(true);
+        }
+        console.log(new Date((reqData.timestamp.seconds *1000)).toLocaleDateString());
+
+    }, [userData])
+
+    // if (!loaded) {
+    //     fetchFriend();
+    //     setLoaded(true);
+    // }
 
     const acceptFriendRequest = () => {
         console.log("Friend request accepted");
@@ -72,7 +86,10 @@ const NotificationCard = ({ id }) => {
     } 
 
     return (
-        <View className="flex-row items-center justify-between rounded-xl mb-2 p-4 bg-stone-100">
+        <View style={{
+            backgroundColor: isRead==false ? COLOURS.BRAND_DEFAULTGRAY : COLOURS.BRAND_DARKGRAY
+
+        }} className="flex-row items-center justify-between rounded-xl mb-2 p-4 bg-stone-100">
             <Pressable onPress={() => setShowModal(true)}>
                 <View className="flex-row items-center">
                     <AntDesign name="user" size={30} color="black" />
@@ -83,7 +100,7 @@ const NotificationCard = ({ id }) => {
                         )
                     }
                     <View className="pl-3">
-                        <Text className="font-bold text-lime-900 mr-1">{name} </Text>
+                        <Text className="font-bold text-lime-900 mr-1">{name}</Text>
                         <Text className="py-2">
                         <Fragment>
                             <Text className="text-stone-600">
