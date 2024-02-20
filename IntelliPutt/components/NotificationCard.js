@@ -7,7 +7,7 @@ import { collection, query, where, getDoc, getDocs, doc, updateDoc, arrayUnion }
 import db from '../config/database';     
 import { useSelector } from 'react-redux';           
 import COLOURS from '../static/design_constants';
-
+import { Ionicons } from '@expo/vector-icons';
 const NotificationCard = ({ id, reqData, userData }) => {
 
     // State vars
@@ -99,8 +99,24 @@ const NotificationCard = ({ id, reqData, userData }) => {
                             />
                         )
                     }
+                    
                     <View className="pl-3">
-                        <Text className="font-bold text-lime-900 mr-1">{name}</Text>
+                        <View className="flex flex-row">
+                            <Text className="font-bold text-lime-900 mr-1">{name}</Text>
+                            {isRead && reqData.status == "accepted" && (
+
+                                <View className="top-[-20%] flex flex-row">                            
+                                    <Ionicons name="checkmark-outline" size={24} color="#A3FFA1" />
+                                </View>
+                            )}
+                            {isRead && reqData.status == "ignored" && (
+
+                            <View className="top-[-20%] flex flex-row">                            
+                                <Ionicons name="close-outline" size={24} color="#ffa3a1" />                            
+                            </View>
+                            )}
+
+                        </View>
                         <Text className="py-2">
                         <Fragment>
                             <Text className="text-stone-600">
@@ -115,27 +131,30 @@ const NotificationCard = ({ id, reqData, userData }) => {
                     </View>
                 </View>
             </Pressable>
-            
+            {!isRead && (
             <Modal isVisible={showModal} animationIn="slideInUp" animationOut="slideOutDown" className="w-full ml-0 mt-[50%] mb-0" style={styles.modal}>
-                <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white px-[30px] pt-[20px] pb-[40px] rounded-lg w-full">
-                    <Pressable className="my-[20px]" onPress={() => setShowModal(false)}>
-                    <Text className="text-stone-900 text-[16px]"> Cancel </Text>
+                <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white px-[30px] rounded-lg w-full">
+                    <Pressable style={{backgroundColor:COLOURS.BRAND_DEFAULTGRAY}} className="my-[20px] rounded-lg w-16 h-8 flex items-center justify-center " onPress={() => setShowModal(false)}>
+                        <Text  className="text-stone-900 text-[16px]"> Cancel </Text>
                     </Pressable>
-                    <View className="mb-10 mt-[50px] pt-[20px] items-center">
-                    <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-center text-[30px] tracking-[0] leading-[normal]">
-                        {name} has sent you a friend request!
-                    </Text>
-                    <Text className="font-light m-4 text-base text-center">
-                        Do you recognise <Text className="underline">{email}</Text>?
-                    </Text>
-                    </View>
+                    <View className="w-full flex flex-col h-[80%] justify-evenly items-center ">
+                        <AntDesign name="user" size={192} color="black" />
 
-                    <View className="items-center w-[95%] ml-2 mt-10">
-                        <CustomButton text="Accept" onPress={acceptFriendRequest}/>
-                        <CustomButton text="Ignore" onPress={ignoreFriendRequest}/>
-                    </View>
+                        <Text className="[font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-center text-[30px] tracking-[0] leading-[normal]">
+                            {name} has sent you a friend request!
+                        </Text>
+                        <Text className="font-light  m-4 text-base text-center">
+                            Do you recognise <Text className="underline text-xl">{email}</Text>?
+                        </Text>
+                            <View className="items-center w-fit">
+                                <CustomButton text="Accept" onPress={acceptFriendRequest}/>
+                                <CustomButton text="Ignore" onPress={ignoreFriendRequest}/>
+                            </View>
+                        </View>
+                    
                 </ScrollView>
             </Modal>
+            )}
         </View>
     );
 };
