@@ -3,11 +3,11 @@ import { Pressable, Text, View } from 'react-native'
 import DefaultContainer from '../../components/DefaultContainer'
 import { LineGraph } from 'react-native-graph'
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import COLOURS from '../../static/design_constants';
 import { FontAwesome6 } from '@expo/vector-icons';
-import {useStore, useSelector} from 'react-redux';
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { useSelector} from 'react-redux';
+import { collection, getDocs, query } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
+
 import {calculatePercChange, convertUserData, filterByWeek, filterByXMonth, filterByXWeek, getData, getLabels, getPercentage} from '../../logic/stats-logic';
 import {getGlobalPercentage} from '../../logic/stats-logic';
 import {
@@ -18,7 +18,14 @@ import {Svg, Text as TextSVG} from 'react-native-svg';
 import Chip from '../../components/Chip';
 
 
+
 export default function stats() {
+  // Redux vars
+  const currUser = useSelector((state) => state.user.user);
+
+  if (currUser == null) {
+    return <Redirect to="/app/" />
+  }
 
   const screenWidth = Dimensions.get("window").width;
 
@@ -127,13 +134,9 @@ export default function stats() {
 
 
 
-  // Redux vars
-  const currUser = useSelector((state) => state.user.user);
-  const uid = currUser.uid;
-
   // Firebase vars
   const userCollectionRef = collection(firestore, "users");
-  const userDataCollectionRef = collection(firestore, "users/" + uid + "/data");
+  const userDataCollectionRef = collection(firestore, "users/" + currUser.uid + "/data");
 
   
 
@@ -171,7 +174,7 @@ export default function stats() {
       }
     }
     getUserData();
-  }, [uid]);
+  }, [currUser]);
 
 
   useEffect(() => {
@@ -228,6 +231,7 @@ export default function stats() {
     setGlobalPercentage(percentage);
   }
 
+
   const filterThreeMonth = () => {
     filteredDate = filterByXMonth(userData, 3);
     const labels = getLabels(filteredDate);
@@ -246,6 +250,7 @@ export default function stats() {
     setgraphdata(data);
     setGlobalPercentage(percentage); 
   }
+
 
   return (
     <View className="w-full h-full flex flex-col">
@@ -385,14 +390,11 @@ export default function stats() {
                   <Pressable onPress={() => {filterThreeMonth()}} className="w-12 h-10 flex flex-row justify-center bg-brand-colordark-greengray rounded-xl items-center">
                     <Text className="font-bold">3M</Text>
                   </Pressable>
-                  <Pressable onPress={() => {changeGraph2()}} className="w-32 h-10 flex flex-row justify-center bg-slate-200 rounded-xl items-center"><Text>points 2</Text></Pressable> */}
 
                 </View>
               </View>
-
             </View>
         </View>
-
     </View>
   )
 }
