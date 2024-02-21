@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import DefaultContainer from '../../components/DefaultContainer'
-import { LineGraph } from 'react-native-graph'
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import { FontAwesome6 } from '@expo/vector-icons';
 import { useSelector} from 'react-redux';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';

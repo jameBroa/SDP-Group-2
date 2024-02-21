@@ -6,6 +6,12 @@ import React, { useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
+// Removing `mt-3` from View component here. Need to adjust: 
+// - register.js 
+// - social.js
+// - login.js
+
+
 const TextField = ({ placeholder, value, onChangeText }) => {
     const [showPassword, setShowPassword] = useState(false); 
     const toggleShowPassword = () => { 

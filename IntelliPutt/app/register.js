@@ -30,18 +30,59 @@ import BackButton from '../components/BackButton';
 import Modal from "react-native-modal";
 import { useDispatch } from 'react-redux';
 import { login } from '../context/slices/userSlice';
+import * as ImagePicker from 'expo-image-picker';
+import { getStorage, uploadBytes } from 'firebase/storage';
+import {ref as refStorage} from 'firebase/storage';
 
 export default function Register() {
+
+    // Data vars
+    const tabs = ["Beginner", "Intermediate", "Advanced"];
+
+    // State vars
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
     const [showModal, setShowModal] = useState(false);
-
-    const tabs = ["Beginner", "Intermediate", "Advanced"];
     const [experienceLevel, setExperienceLevel] = useState(tabs[0]);
-
+    const [profileImg, setProfileImg] = useState();
+    //Redux Vars
     const dispatch = useDispatch();
+
+    //Functions
+
+    // input is the uid of the user, which is also the image name
+    async function _uploadProfileImg(uid){
+        const storage = getStorage();
+        
+        const response = await fetch(profileImg)
+        const blob = await response.blob()
+        const imageRef = refStorage(storage, `images/${uid}`)
+        uploadBytes(imageRef, blob).then((snapshot) => {
+            console.log('image uploaded???')
+        })
+        // const blob = await new Promise((resolve, reject) => {
+        //     const xhr = new XMLHttpRequest();
+        //     xhr.onload = function () {
+        //       resolve(xhr.response);
+        //     };
+        //     xhr.onerror = function (e) {
+        //       console.log(e);
+        //       reject(new TypeError("Network request failed"));
+        //     };
+        //     xhr.responseType = "blob";
+        //     xhr.open("GET", profileImg, true);
+        //     xhr.send(null);
+        //   });
+        
+        //   const fileRef = ref(getStorage(), uid);
+        //   const result = await uploadBytes(fileRef, blob);
+        
+        //   // We're done with the blob, close and release it
+        //   blob.close();
+
+    }
 
     const handleRegister = () => {
         // Does username already exist
@@ -60,7 +101,7 @@ export default function Register() {
             const user = userCredential.user;
             setEmail(userCredential.email);
             setPassword(userCredential.password);
-
+            _uploadProfileImg(user.uid);
             console.log('User created');
             // if not, store user data in Firestore
             setDoc(doc(db, "users", user.uid), 
@@ -94,39 +135,56 @@ export default function Register() {
         });   
     };
 
+    const pickImage = async() => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing:true,
+            aspect:[4,3],
+            quality:1
+        })
+        if(!result.canceled){
+            setProfileImg(result.assets[0].uri);
+        }
+    }
+
     return (
         <View className="max-h-full ">
-            <SafeAreaView className="bg-stone-100 flex flex-col items-center justify-center h-full">
-                <BackButton href="./" />
-                <Image
-                    style={{ width: 50, height: 50 }}
-                    source={require('../static/images/logo_transparent.png')}
-                    className="absolute top-[50px] right-[50px]"
-                />
-                
-                <View className="mb-10 items-center">
+            <SafeAreaView className="bg-stone-100 flex flex-col space-y-2 items-center justify-start h-full">
+
+                <View className="flex flex-row w-[90%] h-[50px] justify-between ">
+                    {/* <BackButton href="./" /> */}
+                    
+                    <Pressable onPress={() => {router.replace("./")}} className="w-14 h-[100%] bg-white rounded-2xl flex flex-row justify-center items-center">
+                        <Text>Back</Text>
+                    </Pressable>
+                    <Image
+                        style={{ width: 50, height: 50 }}
+                        source={require('../static/images/logo_transparent.png')}
+                    />
+                </View>
+                <View className="flex flex-col items-center  w-4/5">
                     <Text className="fixed top-0 left-0 [font-family:'Poppins-Bold',Helvetica] font-bold text-lime-950 text-[32px] tracking-[0] leading-[normal]">
                         Hi!
                     </Text>
-                    <Text className="mt-2 fixed h-[24px] top-0 left-0 [font-family:'Poppins-Regular',Helvetica] font-normal text-[#093923] text-[16px] tracking-[0] leading-[normal]">
+                    <Text className="fixed h-[24px] top-0 left-0 [font-family:'Poppins-Regular',Helvetica] font-normal text-[#093923] text-[16px] tracking-[0] leading-[normal]">
                         Create an account to get started.
                     </Text>
                 </View>
 
-                <View className="w-4/5">
+                <View className="w-4/5 flex flex-col ">
                     <TextField placeholder="Name" value={name} onChangeText={setName}/>
                     <TextField placeholder="Username" value={username} onChangeText={setUsername} />
                     <TextField placeholder="Email" value={email} onChangeText={setEmail} />
                     <TextField placeholder="Password" value={password} onChangeText={setPassword} />
                     
-                    <View className="flex-row mt-5 pt-4 my-4 justify-between">
+                    <View className="flex-row justify-between pt-4 pb-1 ">
                         <Text className="font-bold"> Skill level: </Text>
                         <Pressable className="font-bold" onPress={() => setShowModal(true)}> 
                             <Text className="font-bold"> What's this? </Text>
                         </Pressable>  
                     </View>
-                    
-                    <View className="flex-row flex items-center flex-wrap gap-2 justify-center mb-5">
+
+                    <View className="flex flex-row justify-between items-center space-x-4 mb-4 ">
                         {tabs.map((tab) => (
                             <Chip
                                 text={tab}
@@ -135,6 +193,29 @@ export default function Register() {
                                 key={tab}
                             />
                         ))}
+                    </View>
+
+                    <View className="w-full h-20 flex flex-row justify-between mb-4 ">
+                        <View className="w-20 bg-stone-400 rounded-xl h-[100%] flex flex-row justify-center items-center ">
+                            {/* <Text>no photo :(</Text> */}
+                            {profileImg &&(
+                                <Image source={{uri: profileImg}} style={{width:80, height:80, borderRadius:10}}/>
+                            )}
+                        </View>
+                        <View className="w-[65%] h-[100%]  flex flex-col justify-between">
+                            <Text className="text-xl">Select a profile picture</Text>
+                            <Pressable onPress={pickImage} className="w-[100%] h-[50%] rounded-lg bg-brand-colordark-green flex flex-row items-center justify-center">
+                                <Text className="text-stone-50">Upload now!</Text>
+                            </Pressable>
+                        </View>
+
+
+                            {/* <Pressable onPress={pickImage} className="w-[30%] h-[100%] bg-red-200 rounded-xl flex flex-row justify-center items-center">
+                                <Text>Select profile photo</Text>
+                            </Pressable> */}
+                            {/* {profileImg && (
+                                <Image source={{uri: profileImg}} style={{width:100, height:100}}/>
+                            )} */}
                     </View>
 
                     <CustomButton text="Register" onPress={handleRegister}/>
