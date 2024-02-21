@@ -7,7 +7,7 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import { useSelector} from 'react-redux';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
-
+import COLOURS from '../../static/design_constants';
 import {calculatePercChange, convertUserData, filterByWeek, filterByXMonth, filterByXWeek, getData, getLabels, getPercentage} from '../../logic/stats-logic';
 import {getGlobalPercentage} from '../../logic/stats-logic';
 import {
@@ -16,7 +16,6 @@ import {
 import { Dimensions } from "react-native";
 import {Svg, Text as TextSVG} from 'react-native-svg';
 import Chip from '../../components/Chip';
-
 
 
 export default function stats() {
@@ -119,7 +118,6 @@ export default function stats() {
   //data vars
   const tabs = ["ALL", "1W", "2W", "1M", "3M"]
 
-
   // State management vars
   const [activeButton, setActiveButton] = useState("W1")
   const [userData, setUserData] = useState({});
@@ -130,16 +128,9 @@ export default function stats() {
   const [percentageChange, setPercentageChange] = useState(0);
   const [graphState, setGraphState] = useState(tabs[0]);
 
-
-
-
-
   // Firebase vars
   const userCollectionRef = collection(firestore, "users");
   const userDataCollectionRef = collection(firestore, "users/" + currUser.uid + "/data");
-
-  
-
 
   useEffect(() => {
     const getUserData = async() => {
@@ -161,7 +152,6 @@ export default function stats() {
         const labels = getLabels(putts)
         const data = getData(putts);
         // const percChange = calculatePercChange(putts);
-
 
         setGraphLabels(labels);
         setgraphdata(data);
@@ -198,7 +188,6 @@ export default function stats() {
       
     }
   }
-
   }, [graphState, loading])
 
   const filterOneWeek = () => {
@@ -250,7 +239,6 @@ export default function stats() {
     setgraphdata(data);
     setGlobalPercentage(percentage); 
   }
-
 
   return (
     <View className="w-full h-full flex flex-col">
@@ -389,13 +377,12 @@ export default function stats() {
                   </Pressable>
                   <Pressable onPress={() => {filterThreeMonth()}} className="w-12 h-10 flex flex-row justify-center bg-brand-colordark-greengray rounded-xl items-center">
                     <Text className="font-bold">3M</Text>
-                  </Pressable>
-
+                  </Pressable> */}              
                 </View>
               </View>
             </View>
         </View>
     </View>
-  )
+  );
 }
 

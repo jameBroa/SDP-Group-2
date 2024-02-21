@@ -12,15 +12,10 @@ import { FontAwesome5 } from '@expo/vector-icons';
 export default function Layout() {
     return (
         <Tabs 
-        
         screenOptions={{
             tabBarActiveTintColor: COLOURS.BRAND_COLORDARK_GREEN
-
-
-
         }}
-        
-        
+           
         >
             <Tabs.Screen
             name="index"
@@ -51,7 +46,7 @@ export default function Layout() {
                 title:"Social",
                 tabBarIcon:({color}) => (
                     <FontAwesome5 name="users" size={24} color={color} />
-                )  
+                )
             }}
             />
 

@@ -1,8 +1,6 @@
 {/* 
     HOME PAGE
     User is directed here after logging in.
-
-    (needs to be implemented)
 */}
 
 import React, { useEffect, useState } from 'react';
@@ -17,12 +15,11 @@ import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
 import { Link, router } from 'expo-router';
 import db from '../../config/database';
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, where, and } from 'firebase/firestore';
+import ReduxStateUpdater from '../../context/util/updateState';
 
 export default function Index() {
-
-
-    //Firebase vars
+    // Firebase vars
     const friendRequestCollection = collection(db, "friendRequests");
 
     // Redux vars
@@ -30,25 +27,23 @@ export default function Index() {
 
     // State management
     const [loaded, setLoaded] = useState(false);
-    const [friends, setFriends] = useState([]);
+    const [friends, setFriends] = useState(new Map());
     const [refreshing, setRefreshing] = useState(false);
-    const [numNotifications, setNumNotifications] = useState(0);
+    const [unreadNotifications, setUnreadNotifications] = useState(false);
 
     const getNumNotifications = async() => {
-        const q = query(friendRequestCollection, where("to", "==", user.uid));
+        const q = query(friendRequestCollection, 
+            and(
+                where("to", "==", user.uid), where("status", "==", "pending")
+            ));
         const response = await getDocs(q);
-        setNumNotifications(response.docs.length)
-        console.log(response.docs.length)
-        console.log("num notifications ^^")
+        setUnreadNotifications(response.docs.length == 0 ? false : true);
     }
 
-    const fetchFriends = () => {
-        getDoc(doc(db, "users", user["uid"]))
-        .then((d) => {
-            const listOfUIDs = d.data()["friends"];
-            console.log("List of UIDs: ", listOfUIDs);
-            listOfUIDs.forEach(friendUID => {
-                getDoc(doc(db, "users", friendUID))
+    const updateFriends = () => {
+        // compare against friends in state
+        user["friends"].forEach(friendUID => {
+            getDoc(doc(db, "users", friendUID))
                 .then((d) => {
                     console.log("Friend data: ", d.data());
                     
@@ -57,21 +52,22 @@ export default function Index() {
                         skill: d.data()["experienceLevel"],
                         uid: d.data()["uid"]
                     };
-
-                    if (!friends.includes(friendData)) {
-                        setFriends([...friends, friendData]);
+                    
+                    // if not in friends, add to friends
+                    if (friends.has(friendUID) == false) {
+                        friends.set(friendUID, friendData);
+                        setFriends(new Map(friends));
                     }
                 })
-            })
-            
         });
-    }
+    };
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        fetchFriends();
+        ReduxStateUpdater.fetchFriends(user);
+        updateFriends();
         getNumNotifications();
-        setTimeout(() => setRefreshing(false), 2000);
+        setTimeout(() => setRefreshing(false), 1000);
     }, [])
 
     useEffect(() => {
@@ -85,15 +81,14 @@ export default function Index() {
     if (user) {
         if (!loaded) {
             setLoaded(true);
-            fetchFriends();
+            updateFriends();
             getNumNotifications();
-            console.log("looping?")
         };
 
         return (
             <View className="h-full w-full flex flex-col">
                 <View className="h-[30%]">
-                    <DefaultContainer subheading="Welcome back!" heading={user["name"]} number={numNotifications}/>
+                    <DefaultContainer subheading="Welcome back!" heading={user.name} number={unreadNotifications}/>
                 </View>
 
                 <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1 "
@@ -106,9 +101,9 @@ export default function Index() {
                             <Text className="text-sm font-light">View all</Text>
                         </Link>
                         <View className="mt-2 w-full flex-row justify-items-start ml-2">
-                            {friends.map((friend) => {
-                                return <FriendButton {...friend} name={friend.name} skill={friend.skill} key={friend.uid} online/>
-                            })}
+                            {Array.from(friends).map(([key, value]) => (
+                                <FriendButton key={key} friend={value} online />
+                            ))}
                         </View>
                     </View>
                     <View className="my-2">

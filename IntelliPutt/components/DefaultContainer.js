@@ -12,8 +12,8 @@ const DefaultContainer = ({subheading, heading, number}) => {
             options={{
                 headerTitle:'',
                 headerStyle: {
-                    backgroundColor: COLOURS.DARK_GREEN,
-                    borderBottomWidth: 0,
+                    backgroundColor: "#rgba(40, 60, 10, 1)",
+                    borderBottomWidth: 0
                 }, 
             headerShadowVisible: false,
             headerRight: () => <Pressable onPress = {() => router.push("/home/notifications")} className="w-[45%] flex flex-row justify-center ">
@@ -26,9 +26,9 @@ const DefaultContainer = ({subheading, heading, number}) => {
             headerShown:true}}>
         </Stack.Screen>
         <LinearGradient className="h-[100%] flex flex-col justify-start "
-            colors={['rgba(25,46,5,1)',  'rgba(105,190,25,0.1)']}
-            start={[0, 0.1]}
-            end={[0, 1]}>
+            colors={['rgba(40, 60, 10, 1)',  'rgba(105, 190, 25, 0.1)']}
+            start={[0, 0]}
+            end={[0, 2.5]}>
             <View className="top-[18%]">
                 <View className="flex flex-col space-y-2 pl-4 top-14">
                     <Text className="text-3xl text-white ">{subheading}</Text>

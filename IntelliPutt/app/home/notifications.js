@@ -10,7 +10,6 @@ import COLOURS from "../../static/design_constants";
 import { filterSeenNotifs, filterUnseenNotifs } from "../../logic/notifications-logic";
 
 export default function Notifications() {
-
     // Data vars
     const tabs = ["All", "Unseen", "Seen"];
 
@@ -25,9 +24,6 @@ export default function Notifications() {
     const [notifsDisplayed, setNotifsDisplayed] = useState(tabs[0]);
     const [usersInfo, setUsersInfo] = useState([]);         // So NotificationsCard.js doesn't need to query FB everytime
     const [loaded, setLoaded] = useState(false);
-
-
-
     const [globalData, setGlobalData] = useState([]);
     const [currentData, setCurrentData] = useState([]);
 

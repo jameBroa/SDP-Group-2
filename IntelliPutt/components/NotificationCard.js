@@ -3,14 +3,14 @@ import { AntDesign } from '@expo/vector-icons';
 import Modal from "react-native-modal";
 import CustomButton from './CustomButton';
 import { ScrollView, Text, View, Pressable } from 'react-native';
-import { collection, query, where, getDoc, getDocs, doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import db from '../config/database';     
 import { useSelector } from 'react-redux';           
 import COLOURS from '../static/design_constants';
 import { Ionicons } from '@expo/vector-icons';
-const NotificationCard = ({ id, reqData, userData }) => {
 
-    // State vars
+const NotificationCard = ({ id, reqData, userData }) => {
+    // state vars
     const [showModal, setShowModal] = useState(false);
     const [name, setName] = useState(userData.name);
     const [email, setEmail] = useState(userData.email);
@@ -19,35 +19,8 @@ const NotificationCard = ({ id, reqData, userData }) => {
     const [loaded, setLoaded] = useState(false);
     const [friendUID, setFriendUID] = useState(reqData.from);
 
-    // Firebase vars
-    const userRef = collection(db, "users");
-
-    //Redux vars
+    // redux vars
     const currentUser = useSelector((state) => state.user.user);
-
-    const fetchFriend = () => {
-        const friendRequestQuery = doc(db, "friendRequests", id);
-        const response = getDoc(friendRequestQuery);
-        response.then((querySnapshot) => {
-            setFriendUID(querySnapshot.data()["from"])
-            const individualRequestQ = query(userRef, where("uid", "==", querySnapshot.data()["from"]));
-            const individualRequest = getDocs(individualRequestQ);
-            individualRequest.then((individualRequestSnapshot) => {
-                if (individualRequestSnapshot.empty) {
-                    console.log("User has been deleted.");
-                    return;
-                }
-                
-                console.log("User exists, fetching data: " + individualRequestSnapshot.docs[0].data());
-                const friendData = individualRequestSnapshot.docs[0].data();
-
-                setName(friendData["name"]);
-                setEmail(friendData["email"]);
-                setIsRead(querySnapshot.data()["status"] == "pending" ? false : true);
-                setTime(new Date(querySnapshot.data()["timestamp"]["seconds"] * 1000).toLocaleDateString());
-            });
-        });
-    }
 
     useEffect(() => {
         if(reqData.status == "accepted"){
@@ -56,11 +29,6 @@ const NotificationCard = ({ id, reqData, userData }) => {
         console.log(new Date((reqData.timestamp.seconds *1000)).toLocaleDateString());
 
     }, [userData])
-
-    // if (!loaded) {
-    //     fetchFriend();
-    //     setLoaded(true);
-    // }
 
     const acceptFriendRequest = () => {
         console.log("Friend request accepted");
@@ -86,13 +54,10 @@ const NotificationCard = ({ id, reqData, userData }) => {
     } 
 
     return (
-        <View style={{
-            backgroundColor: isRead==false ? COLOURS.BRAND_DEFAULTGRAY : COLOURS.BRAND_DARKGRAY
-
-        }} className="flex-row items-center justify-between rounded-xl mb-2 p-4 bg-stone-100">
+        <View className="flex-row items-center justify-between rounded-xl mb-2 p-4 bg-stone-100">
             <Pressable onPress={() => setShowModal(true)}>
                 <View className="flex-row items-center">
-                    <AntDesign name="user" size={30} color="black" />
+                    <AntDesign name="user" size={30} color={!isRead ? "grey" : COLOURS.BRAND_DARKGRAY} />
                     {!isRead && (
                             <View
                                 className="h-[5px] w-[5px] bg-red-500 rounded-md absolute top-[15%] right-[99%]"
@@ -102,13 +67,14 @@ const NotificationCard = ({ id, reqData, userData }) => {
                     
                     <View className="pl-3">
                         <View className="flex flex-row">
-                            <Text className="font-bold text-lime-900 mr-1">{name}</Text>
-                            {isRead && reqData.status == "accepted" && (
+                            <Text style={{color: !isRead ? COLOURS.DARK_GREEN : "grey"}}
+                                className="font-bold text-lime-900 mr-1">{name}</Text>
+                            {/* {isRead && reqData.status == "accepted" && (
 
                                 <View className="top-[-20%] flex flex-row">                            
-                                    <Ionicons name="checkmark-outline" size={24} color="#A3FFA1" />
+                                    <Ionicons name="checkmark-outline" size={20} color={COLOURS.MEDIUM_GREEN} />
                                 </View>
-                            )}
+                            )} */}
                             {isRead && reqData.status == "ignored" && (
 
                             <View className="top-[-20%] flex flex-row">                            
@@ -119,14 +85,14 @@ const NotificationCard = ({ id, reqData, userData }) => {
                         </View>
                         <Text className="py-2">
                         <Fragment>
-                            <Text className="text-stone-600">
+                            <Text style={{color: !isRead ? "grey" : COLOURS.BRAND_DARKGRAY}}>
                                 sent you a friend request
                             </Text>
                         </Fragment>
                         </Text>
                         
                         <View>
-                            <Text className="text-stone-700">{time}</Text>
+                            <Text style={{color: !isRead ? "grey" : COLOURS.BRAND_DARKGRAY}}>{time}</Text>
                         </View>
                     </View>
                 </View>
