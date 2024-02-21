@@ -5,6 +5,7 @@
 import { Link } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, Text } from 'react-native';
+import COLOURS from '../static/design_constants';
 
 const CustomButton = ({ text, onPress=null, goTo=null }) => {
     const [buttonClicked,setButtonClicked] = useState(false);
@@ -12,6 +13,7 @@ const CustomButton = ({ text, onPress=null, goTo=null }) => {
     const stylesText = buttonClicked ? "[font-family:'Poppins-Medium',Helvetica] text-base text-stone-200 text-center font-medium": "[font-family:'Poppins-Medium',Helvetica] text-base text-stone-600 text-center font-medium";
     if (goTo == null) {
         return (
+
             <Pressable className={stylesButton} onPress={onPress} onPressIn={() => setButtonClicked(true)} onPressOut={() => setButtonClicked(false)}> 
                 <Text className={stylesText}> {text} </Text>
             </Pressable>
@@ -19,6 +21,7 @@ const CustomButton = ({ text, onPress=null, goTo=null }) => {
     } else {
         return (
             <Link className="my-2" href={goTo} asChild>
+
                 <Pressable className={stylesButton} onPress={onPress} onPressIn={() => setButtonClicked(true)} onPressOut={() => setButtonClicked(false)}> 
                     <Text className={stylesText}> {text} </Text>
                 </Pressable>

@@ -5,7 +5,7 @@ import { Image, Pressable, Text, View } from 'react-native'
 import COLOURS from '../static/design_constants'
 import { Ionicons } from '@expo/vector-icons'
 
-const DefaultContainer = ({subheading, heading}) => {
+const DefaultContainer = ({subheading, heading, number}) => {
     return (
     <View className="h-[100%] w-full flex flex-col justify-start">
         <Stack.Screen 
@@ -16,9 +16,13 @@ const DefaultContainer = ({subheading, heading}) => {
                     borderBottomWidth: 0,
                 }, 
             headerShadowVisible: false,
-            headerRight: () => <Pressable onPress = {
-                () => router.push("/home/notifications")
-            } className="w-[45%] flex flex-row justify-center "><Ionicons name="notifications-outline" size={32} color="white"/></Pressable>,
+            headerRight: () => <Pressable onPress = {() => router.push("/home/notifications")} className="w-[45%] flex flex-row justify-center ">
+                        <Ionicons name="notifications-outline" size={32} color="white"/>
+                        <View className="h-4 w-4 rounded-full absolute right-6 bg-red-600 flex flex-row justify-center">
+                            <Text className="text-white">{number}</Text>
+                        </View>
+
+                </Pressable>,
             headerShown:true}}>
         </Stack.Screen>
         <LinearGradient className="h-[100%] flex flex-col justify-start "

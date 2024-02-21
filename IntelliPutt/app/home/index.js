@@ -17,9 +17,14 @@ import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
 import { Link, router } from 'expo-router';
 import db from '../../config/database';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 
 export default function Index() {
+
+
+    //Firebase vars
+    const friendRequestCollection = collection(db, "friendRequests");
+
     // Redux vars
     const user = useSelector((state) => state.user.user);
 
@@ -27,6 +32,15 @@ export default function Index() {
     const [loaded, setLoaded] = useState(false);
     const [friends, setFriends] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
+    const [numNotifications, setNumNotifications] = useState(0);
+
+    const getNumNotifications = async() => {
+        const q = query(friendRequestCollection, where("to", "==", user.uid));
+        const response = await getDocs(q);
+        setNumNotifications(response.docs.length)
+        console.log(response.docs.length)
+        console.log("num notifications ^^")
+    }
 
     const fetchFriends = () => {
         getDoc(doc(db, "users", user["uid"]))
@@ -56,6 +70,7 @@ export default function Index() {
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         fetchFriends();
+        getNumNotifications();
         setTimeout(() => setRefreshing(false), 2000);
     }, [])
 
@@ -71,12 +86,14 @@ export default function Index() {
         if (!loaded) {
             setLoaded(true);
             fetchFriends();
+            getNumNotifications();
+            console.log("looping?")
         };
 
         return (
             <View className="h-full w-full flex flex-col">
                 <View className="h-[30%]">
-                    <DefaultContainer subheading="Welcome back!" heading={user["name"]}/>
+                    <DefaultContainer subheading="Welcome back!" heading={user["name"]} number={numNotifications}/>
                 </View>
 
                 <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1 "
