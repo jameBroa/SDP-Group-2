@@ -6,7 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 const FriendCard = ({ friend }) => {
     return (
-        <View className="items-center flex-row py-3 my-1 w-[90%] mx-[5%] rounded-xl " style={styles.customGreen}>
+        <View className="items-center flex-row py-3 my-1 mx-2 w-full rounded-xl" style={styles.customGreen}>
             <View className="px-5">
                 <Image source={require('../static/images/michael.jpg')} className="rounded-full w-16 h-16" />
             </View>

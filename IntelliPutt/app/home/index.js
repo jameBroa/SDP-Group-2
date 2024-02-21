@@ -1,8 +1,6 @@
 {/* 
     HOME PAGE
     User is directed here after logging in.
-
-    (needs to be implemented)
 */}
 
 import React, { useEffect, useState } from 'react';
@@ -21,7 +19,7 @@ import { collection, doc, getDoc, getDocs, query, where, and } from 'firebase/fi
 import ReduxStateUpdater from '../../context/util/updateState';
 
 export default function Index() {
-    //Firebase vars
+    // Firebase vars
     const friendRequestCollection = collection(db, "friendRequests");
 
     // Redux vars
@@ -44,8 +42,6 @@ export default function Index() {
 
     const updateFriends = () => {
         // compare against friends in state
-        console.log("Friends in state: " + user["friends"]);
-        console.log("Initial: Friends in local state: ", friends);
         user["friends"].forEach(friendUID => {
             getDoc(doc(db, "users", friendUID))
                 .then((d) => {
@@ -68,7 +64,7 @@ export default function Index() {
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        ReduxStateUpdater.fetchFriends();
+        ReduxStateUpdater.fetchFriends(user);
         updateFriends();
         getNumNotifications();
         setTimeout(() => setRefreshing(false), 1000);
@@ -92,7 +88,7 @@ export default function Index() {
         return (
             <View className="h-full w-full flex flex-col">
                 <View className="h-[30%]">
-                    <DefaultContainer subheading="Welcome back!" heading={user["name"]} number={unreadNotifications}/>
+                    <DefaultContainer subheading="Welcome back!" heading={user.name} number={unreadNotifications}/>
                 </View>
 
                 <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1 "

@@ -19,16 +19,13 @@ export default function Social() {
   // state management
   const [showModal, setShowModal] = useState(false);
   const [friendEmail, setFriendEmail] = useState("");
-  const [friends, setFriends] = useState([]);
+  const [friends, setFriends] = useState(new Map());
   const [loaded, setLoaded] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const updateFriends = () => {
     // compare against friends in state
-    console.log("Friends in state: " + user["friends"]);
     user["friends"].forEach(friendUID => {
-        console.log("Friend uid: ", friendUID);
-
         getDoc(doc(db, "users", friendUID))
             .then((d) => {
                 console.log("Friend data: ", d.data());
@@ -40,9 +37,11 @@ export default function Social() {
                     skill: d.data()["experienceLevel"],
                     uid: d.data()["uid"]
                 };
-
-                if (!friends.includes(friendData)) {
-                    setFriends([...friends, friendData]);
+                
+                // if not in friends, add to friends
+                if (friends.has(friendUID) == false) {
+                    friends.set(friendUID, friendData);
+                    setFriends(new Map(friends));
                 }
             })
     });
@@ -50,7 +49,7 @@ export default function Social() {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    ReduxStateUpdater.fetchFriends();
+    ReduxStateUpdater.fetchFriends(user);
     updateFriends();
     setTimeout(() => setRefreshing(false), 1000);
   }, [])
@@ -118,10 +117,10 @@ export default function Social() {
                 <AntDesign name="plus" size={24} color="black" />
               </Pressable>
             </View>
-            <View className="w-full h-full">
-              {friends.map((friend) => { 
-                return <FriendCard key={friend.uid} friend={friend} />
-              })}
+            <View className="w-[95%] h-full">
+              {Array.from(friends).map(([key, value]) => (
+                <FriendCard key={key} friend={value} />
+              ))}
             </View>
           </View>
         </ScrollView>
