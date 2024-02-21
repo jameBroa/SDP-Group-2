@@ -106,8 +106,8 @@ export default function Index() {
                             <Text className="text-sm font-light">View all</Text>
                         </Link>
                         <View className="mt-2 w-full flex-row justify-items-start ml-2">
-                            {friends.map((friend) => {
-                                return <FriendButton {...friend} name={friend.name} skill={friend.skill} key={friend.uid} online/>
+                            {friends.forEach(function(value, key) {
+                                return <FriendButton {...value} key={key} friend={value} online/>
                             })}
                         </View>
                     </View>
