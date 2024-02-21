@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import COLOURS from '../static/design_constants'
 import { AntDesign } from '@expo/vector-icons'
 
-const FriendButton = ({name, skill, online, offline}) => {
+const FriendButton = ({friend, online, offline}) => {
     const styles = StyleSheet.create({
         customGold: {
             backgroundColor: COLOURS.MEDIUM_GOLD
@@ -23,8 +23,8 @@ const FriendButton = ({name, skill, online, offline}) => {
             </View>
             {/* NAME AND SKILL */}
             <View className="h-[100%] flex flex-col justify-center space-y-0.5">
-                <Text  className="text-white text-sm font-medium flex-wrap">{name}</Text>
-                <Text className="text-white text-xs font-light">{skill}</Text>
+                <Text  className="text-white text-sm font-medium flex-wrap">{friend.name}</Text>
+                <Text className="text-white text-xs font-light">{friend.skill}</Text>
             </View>
             {/* ONLINE STATUS */}
             <View className="h-[100%] flex flex-col justify-center" >

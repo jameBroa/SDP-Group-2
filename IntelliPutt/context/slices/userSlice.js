@@ -20,9 +20,15 @@ export const userSlice = createSlice({
         logout(state) {
             state.user = null;
         },
+        setFriends(state, action) {
+            state.user.friends = action.payload;
+        },
+        addFriend(state, action) {
+            state.user.friends.push(action.payload);
+        }
     },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, addFriend, setFriends } = userSlice.actions;
 
 export default userSlice.reducer;

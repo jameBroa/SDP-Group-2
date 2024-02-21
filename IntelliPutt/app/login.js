@@ -72,8 +72,6 @@ export default function Login() {
             // Get rest of user data from the database
             fetchUserData(user.uid)
             .then((userData) => {                        // Data found
-                console.log('User data:', userData.name);
-                console.log("TEST TEST TEST");
                 console.log(user);
                 console.log(user.uid);
 
