@@ -5,7 +5,8 @@
 
 import { initializeApp } from 'firebase/app';
 import {getFirestore} from 'firebase/firestore';
-
+import {getStorage} from 'firebase/storage';
+import {ref as storageReference} from 'firebase/storage'
 // Initialize Firebase
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -20,4 +21,17 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const firestore = getFirestore(app); //Added to be able to connect to Firestore
+export const storage = getStorage(app);     //For photo and video support
+
+export const uploadFromBlobAsync = async ({ blobUrl, name }) => {
+  if (!blobUrl || !name) return null
+
+  try {
+    const blob = await fetch(blobUrl).then((r) => r.blob())
+    const snapshot = await storageReference().child(name).put(blob)
+    return await snapshot.storageReference.getDownloadURL()
+  } catch (error) {
+    throw error
+  }
+}
 export default app;

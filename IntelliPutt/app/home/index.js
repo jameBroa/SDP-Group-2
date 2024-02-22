@@ -56,7 +56,9 @@ export default function Index() {
                     // if not in friends, add to friends
                     if (friends.has(friendUID) == false) {
                         friends.set(friendUID, friendData);
+
                         setFriends(new Map(friends));
+                        console.log(new Map(friends))
                     }
                 })
         });
@@ -102,7 +104,7 @@ export default function Index() {
                         </Link>
                         <View className="mt-2 w-full flex flex-row justify-start ml-2">
                             {Array.from(friends).map(([key, value]) => (
-                                <FriendButton key={key} friend={value} online />
+                                    <FriendButton key={key} friend={value} online />
                             ))}
                         </View>
                     </View>
