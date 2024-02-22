@@ -12,12 +12,13 @@ import { Ionicons } from '@expo/vector-icons';
 const NotificationCard = ({ id, reqData, userData }) => {
     // state vars
     const [showModal, setShowModal] = useState(false);
-    const [name, setName] = useState(userData.name);
-    const [email, setEmail] = useState(userData.email);
     const [isRead, setIsRead] = useState(false);
-    const [time, setTime] = useState(new Date((reqData.timestamp.seconds *1000)).toLocaleDateString());
-    const [loaded, setLoaded] = useState(false);
-    const [friendUID, setFriendUID] = useState(reqData.from);
+
+    // data vars
+    const name = userData.name;
+    const email = userData.email;
+    const time = new Date((reqData.timestamp.seconds *1000)).toLocaleDateString();
+    const friendUID = reqData.from;
 
     // redux vars
     const currentUser = useSelector((state) => state.user.user);
@@ -38,7 +39,6 @@ const NotificationCard = ({ id, reqData, userData }) => {
         updateDoc(doc(db, "users", friendUID), { friends: arrayUnion(currentUser.uid) });
         updateDoc(doc(db, "users", currentUser.uid), { friends: arrayUnion(friendUID) });
         
-        setLoaded(false);
         setTimeout(() => {
             setShowModal(false);
         }, 500);
@@ -69,12 +69,6 @@ const NotificationCard = ({ id, reqData, userData }) => {
                         <View className="flex flex-row">
                             <Text style={{color: !isRead ? COLOURS.DARK_GREEN : "grey"}}
                                 className="font-bold text-lime-900 mr-1">{name}</Text>
-                            {/* {isRead && reqData.status == "accepted" && (
-
-                                <View className="top-[-20%] flex flex-row">                            
-                                    <Ionicons name="checkmark-outline" size={20} color={COLOURS.MEDIUM_GREEN} />
-                                </View>
-                            )} */}
                             {isRead && reqData.status == "ignored" && (
 
                             <View className="top-[-20%] flex flex-row">                            
