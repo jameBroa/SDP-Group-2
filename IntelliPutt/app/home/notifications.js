@@ -5,9 +5,10 @@ import { Redirect, router, Stack } from "expo-router";
 import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
 import { useSelector } from 'react-redux';
 import db from "../../config/database";
-import Chip from "../../components/Chip";
+import NotificationTab from "../../components/NotificationTab";
 import COLOURS from "../../static/design_constants";
 import { filterSeenNotifs, filterUnseenNotifs } from "../../logic/notifications-logic";
+import BackButton from "../../components/BackButton";
 
 export default function Notifications() {
     // Data vars
@@ -18,7 +19,6 @@ export default function Notifications() {
 
     //State vars
     const [allCards, setAllCards] = useState([]);           //Card == document id of a friend request
-    const [currentCards, setCurrentCards] = useState([]);
     const [zippedData, setZippedData] = useState([]);       // Zips card and data so document id need not be fetched.
     const [refreshing, setRefreshing] = useState(false);
     const [notifsDisplayed, setNotifsDisplayed] = useState(tabs[0]);
@@ -40,7 +40,6 @@ export default function Notifications() {
     // Manages retrieving user data
     useEffect(() => {
         if(user) {
-
             async function _getValidUsersInfo(input){
                 let promises = input.map(async (data) => {
                     const q = query(usersCollection, where("uid", "==", data[0].from))
@@ -54,13 +53,8 @@ export default function Notifications() {
                     userMap[temp.uid] = temp;
                 })
 
-                // console.log(userMap)
-                // console.log("userMap")
-
                 setUsersInfo(userMap);
                 setLoaded(true);
-
-                
             }
             
             // Takes zipped input
@@ -105,13 +99,10 @@ export default function Notifications() {
                 setZippedData(validRequests);
                 setCurrentData(validRequests);
                 setGlobalData(validRequests);
-                // console.log(validRequests)
                 _getValidUsersInfo(validRequests);
-                // console.log(usersInfo);
                 
             }
         _queryFriends();
-        console.log("rerunning?")
         }
         
     }, [user.uid, user])
@@ -131,7 +122,6 @@ export default function Notifications() {
                 setCurrentData(seenNotifs);
                 break;
         }
-
     }, [notifsDisplayed])
 
     // Refresh page
@@ -149,28 +139,29 @@ export default function Notifications() {
     }, [])
 
     return (
-        <View className="flex-1 bg-white px-10 pt-10">
+        <View className="flex-1 bg-stone-50">
             <Stack.Screen options={{headerShown:false}}></Stack.Screen>
-            <Pressable className="my-[20px]" onPress={() => router.back()}>
-                <Text className="text-stone-900 text-[16px] font-medium"> Cancel </Text>
-            </Pressable>
-            <View className="flex-row justify-between mb-10">
-                <View className="flex-row">
-                    <Text className="font-bold text-4xl text-brand-colordark-green">Notifications</Text>
+            <View className="bg-[#283C0A] pt-10 px-5 border-lime-700 h-[25%]">
+                <BackButton className="h-[5%]" action={() => router.back()} />
+                <View className="flex-row justify-end items-center mb-10 absolute left-[10%] top-[80%]">
+                    <View className="flex-row ">
+                        <Text className="font-semibold text-4xl text-stone-50">Notifications</Text>
+                    </View>
                 </View>
             </View>
-            <View className="divide-y space-y-1">
+
+            <View className="space-y-1 px-8 pt-4">
                 {/* tabs */}
                 <View className="w-full  flex flex-row justify-around space-x-4">
                     {tabs.map((tab) => {
                         return(
-                            <Chip
-                            text={tab}
-                            selected={notifsDisplayed === tab}
-                            setSelected={setNotifsDisplayed}
-                            key={tab}
-                            color={COLOURS.BRAND_COLORDARK_GREEN}
-                            bWidth={100}
+                            <NotificationTab
+                                text={tab}
+                                selected={notifsDisplayed === tab}
+                                setSelected={setNotifsDisplayed}
+                                key={tab}
+                                color={COLOURS.BRAND_COLORDARK_GREEN}
+                                bWidth={100}
                             />
                         )
                     })}
@@ -178,7 +169,7 @@ export default function Notifications() {
                 </View>
                 {/* Actual Notifications */}
                 <ScrollView
-                    className="pt-2 h-96"
+                    className="pt-2 h-full"
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }
@@ -190,12 +181,6 @@ export default function Notifications() {
                             )
                         })
                     )}
-
-
-                    {/* {zippedData.map((data) => (
-                        // <NotificationCard {...card} key={card} id={card}/>
-                        <NotificationCard reqData={data} userData={usersInfo[data.from]} id={data[1]} />
-                    ))} */}
                 </ScrollView>
             </View>
         </View>

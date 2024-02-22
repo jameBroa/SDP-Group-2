@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLOURS.MEDIUM_GOLD
     },
     customGreen: {
-        backgroundColor: COLOURS.DARK_GREEN
+        backgroundColor: COLOURS.BRAND_COLORDARK_GREEN
     },
     customGrayedGreen: {
         backgroundColor: COLOURS.GRAYED_GREEN

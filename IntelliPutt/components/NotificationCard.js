@@ -57,7 +57,7 @@ const NotificationCard = ({ id, reqData, userData }) => {
         <View className="flex-row items-center justify-between rounded-xl mb-2 p-4 bg-stone-100">
             <Pressable onPress={() => setShowModal(true)}>
                 <View className="flex-row items-center">
-                    <AntDesign name="user" size={30} color={!isRead ? "grey" : COLOURS.BRAND_DARKGRAY} />
+                    <AntDesign name="mail" size={30} color={!isRead ? "grey" : COLOURS.BRAND_DARKGRAY} />
                     {!isRead && (
                             <View
                                 className="h-[5px] w-[5px] bg-red-500 rounded-md absolute top-[15%] right-[99%]"
@@ -79,7 +79,7 @@ const NotificationCard = ({ id, reqData, userData }) => {
                         </View>
                         <Text className="py-2">
                         <Fragment>
-                            <Text style={{color: !isRead ? "grey" : COLOURS.BRAND_DARKGRAY}}>
+                            <Text style={{color: !isRead ? "grey" : "darkgrey"}}>
                                 sent you a friend request
                             </Text>
                         </Fragment>

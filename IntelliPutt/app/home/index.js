@@ -100,7 +100,7 @@ export default function Index() {
                         <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="/home/social">
                             <Text className="text-sm font-light">View all</Text>
                         </Link>
-                        <View className="mt-2 w-full flex-row justify-items-start ml-2">
+                        <View className="mt-2 w-full flex flex-row justify-start ml-2">
                             {Array.from(friends).map(([key, value]) => (
                                 <FriendButton key={key} friend={value} online />
                             ))}
@@ -111,7 +111,7 @@ export default function Index() {
                         <Link className="absolute mt-2 right-[5%] text-gray-600 text-sm" href="./stats">
                             <Text className="text-sm font-light">View all</Text>
                         </Link>
-                        <View className="mt-2 w-full flex flex-row justify-around ">
+                        <View className="mt-2 w-full flex flex-row justify-around">
                             {/* TODO: Wrap in Pressables */}
                             <StatsButton day={"Monday"} numToReview={"12"} imgSrc={StatsGraphic1}/>
                             <StatsButton day={"Tuesday"} numToReview={"5"} imgSrc={StatsGraphic2}/>
