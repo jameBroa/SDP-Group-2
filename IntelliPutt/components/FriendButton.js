@@ -9,14 +9,14 @@ const FriendButton = ({friend, online, offline}) => {
             backgroundColor: COLOURS.MEDIUM_GOLD
         },
         customGreen: {
-            backgroundColor: COLOURS.DARK_GREEN
+            backgroundColor: COLOURS.BRAND_COLORDARK_GREEN
         },
         customGrayedGreen: {
             backgroundColor: COLOURS.GRAYED_GREEN
         },
     });
   return (
-    <View style={styles.customGreen} className="rounded-xl w-[33%] h-16 flex flex-row justify-between pl-1 pr-1 items-center">
+    <View style={styles.customGreen} className="rounded-xl w-[33%] h-16 flex flex-row justify-between pl-1 pr-1 items-center mx-1">
             {/* AVATAR STUFF */}
             <View className="flex flex-col justify-center ">
                 <AntDesign name="user" size={30} color="white" />

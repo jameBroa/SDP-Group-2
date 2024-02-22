@@ -3,10 +3,18 @@
 */}
 
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, Pressable } from 'react-native';
 import { Link } from 'expo-router';
 
-const BackButton = ({ href }) => {
+const BackButton = ({ href=null, action=null }) => {
+    if (href == null) {
+        return (
+            <Pressable onPress={action} style={ styles.button } >
+                <Text style={ styles.text }>&lt;</Text>
+            </Pressable>
+        );
+    }
+
     return (
         <Link href={href} style={ styles.button } >
             <Text style={ styles.text }>  &lt;</Text>
@@ -16,8 +24,8 @@ const BackButton = ({ href }) => {
 
 const styles = StyleSheet.create({
     button:{
-      width:45,
-      height:45,
+      width:42,
+      height:42,
       backgroundColor:'white',
       alignItems:'center',
       justifyContent:'center',
