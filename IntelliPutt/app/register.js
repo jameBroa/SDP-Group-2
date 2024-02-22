@@ -17,7 +17,7 @@
 */}
 
 import { SafeAreaView, Text, View, Image, Pressable, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc, query, where, collection, getDocs } from "firebase/firestore"; 
 import auth from '../config/authentication';
@@ -33,7 +33,9 @@ import { login } from '../context/slices/userSlice';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, uploadBytes } from 'firebase/storage';
 import {ref as refStorage} from 'firebase/storage';
-
+import EthicsModal from '../components/EthicsModal';
+import {Checkbox} from 'expo-checkbox';
+import { AntDesign } from '@expo/vector-icons';
 export default function Register() {
 
     // Data vars
@@ -47,6 +49,10 @@ export default function Register() {
     const [showModal, setShowModal] = useState(false);
     const [experienceLevel, setExperienceLevel] = useState(tabs[0]);
     const [profileImg, setProfileImg] = useState();
+    const [ethicsModalVis, setEthicsModalVis] = useState(false);
+    const [streakConsent, setStreakConsent] = useState(true);
+    const [dataConsent, setDataConsent] = useState(true);
+    const [videoConsent, setVideoConsent] = useState(true);
     //Redux Vars
     const dispatch = useDispatch();
 
@@ -85,6 +91,7 @@ export default function Register() {
     }
 
     const handleRegister = () => {
+        setEthicsModalVis(false);
         // Does username already exist
         const userRef = collection(db, "users");
         const q = query(userRef, where('username', '==', username.toLowerCase()));
@@ -111,7 +118,8 @@ export default function Register() {
                     name: name,
                     username: username.toLowerCase(),
                     experienceLevel: experienceLevel,
-                    friends: []
+                    friends: [],
+                    
                 }
             );
             console.log('Additional data stored in Firestore successfully');
@@ -123,7 +131,11 @@ export default function Register() {
                     name: name,
                     username: username,
                     experience: experienceLevel,
-                    friends: []
+                    friends: [],
+                    streak: streakConsent,
+                    data: dataConsent,
+                    video: videoConsent
+
                 }
             ));
 
@@ -144,6 +156,17 @@ export default function Register() {
         })
         if(!result.canceled){
             setProfileImg(result.assets[0].uri);
+        }
+    }
+
+    const scrollViewRef = useRef(null);
+
+    const handleScroll = (e) => {
+        const scrollY = e.nativeEvent.contentOffset.y
+        const threshold = 50
+
+        if(scrollY < -threshold){
+            setEthicsModalVis(false);
         }
     }
 
@@ -208,25 +231,101 @@ export default function Register() {
                                 <Text className="text-stone-50">Upload now!</Text>
                             </Pressable>
                         </View>
-
-
-                            {/* <Pressable onPress={pickImage} className="w-[30%] h-[100%] bg-red-200 rounded-xl flex flex-row justify-center items-center">
-                                <Text>Select profile photo</Text>
-                            </Pressable> */}
-                            {/* {profileImg && (
-                                <Image source={{uri: profileImg}} style={{width:100, height:100}}/>
-                            )} */}
                     </View>
 
-                    <CustomButton text="Register" onPress={handleRegister}/>
+                    {/* <CustomButton text="Register" onPress={handleRegister}/> */}
+                    <CustomButton text="Register" onPress={() => {setEthicsModalVis(true)}}/>
                     <Text className="mb-10 mt-2 text-stone-900 font-medium">
                         Already have an account? <Link className="font-bold" href="./login">Login. </Link>    
                     </Text>
                 </View>
                 
             </SafeAreaView>
+
+            
+            <Modal onBackdropPress={() => {setEthicsModalVis(false)}} isVisible={ethicsModalVis} animationIn="slideInUp" animationOut="slideOutDown" className="w-full  ml-0 mb-0 h-[80%]" style={styles.modal}>
+                <ScrollView ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16} automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white pb-[40px] rounded-lg w-full" >
+                    <View className="w-[100%] h-10 top-[-10%]  flex flex-row justify-center">
+                            <View className="fixed w-2/5 flex flex-row justify-center">
+                                <AntDesign name="arrowup" size={24} color="black" />                            
+                            </View>
+                    </View>
+                    <View className="w-[100%] flex flex-row justify-center">
+                        <View className="w-[95%] flex flex-col justify-start">
+                            <Text className="text-2xl font-semibold">Data and Privacy notice</Text>
+                            <Text className="text-sm">Before you can start using IntelliPutt, it's important you understand the data we process.
+                            You will learn what data about you is collected, how it is processed and what you want to opt out of.</Text>
+                            <Text className="text-2xl font-semibold">Data collection</Text>
+                            <Text className="text-sm">The following are data points that we keep about you. </Text>
+                            <Text className="text-sm">{`\u2022`} Name{`\u00b9`}</Text>
+                            <Text className="text-sm">{`\u2022`} Username{`\u00b9`}</Text>
+                            <Text className="text-sm">{`\u2022`} Email{`\u00b9`}</Text>
+                            <Text className="text-sm">{`\u2022`} Experience Level{`\u00b9`}</Text>
+                            <Text className="text-sm">{`\u2022`} Friends List{`\u00b9`}</Text>
+                            <Text className="text-sm">{`\u2022`} Notification Responses{`\u00b9`}</Text>
+                            <Text className="text-sm">{`\u2022`} Streak{`\u00b2`}</Text>
+                            <Text className="text-sm">{`\u2022`} Putting Data{`\u00b2`}</Text>
+                            <Text className="text-sm">{`\u2022`} Video playback{`\u00b2`}</Text>
+                            <Text className="textsm">You'll have noticed that there are two types of data we collect.</Text>
+                            <Text className="textsm">1)The data we need for core functionality</Text>
+                            <Text className="textsm">2)The type of data you can opt out of.</Text>
+                            <Text className="text-2xl font-semibold">What can I opt out of?</Text>
+                            <Text className="text-sm">You can opt out of our data retrieval service which tracks your putts, your currrent putting streak and videos of you putting.</Text>
+                            <Text className="text-xl font-semibold">What is streak?</Text>
+                            <Text className="text-sm">Streak refers to how many days in a row you have used the system. 
+                            This part functionally aims to promote regular use of the device, a key component in improving.</Text>
+                            <Text className="text-xl font-semibold">What does putting data mean?</Text>
+                            <Text className="text-sm">Putting data refers to your putting statistics when using IntelliPutt. This is broken down into three parts </Text>
+                            <Text className="textsm">1)The date you used the device</Text>
+                            <Text className="textsm">2)How many attempts you made</Text>
+                            <Text className="textsm">3)How many attempts were successful</Text>
+                            <Text className="text-xl font-semibold">What is video playback?</Text>
+                            <Text className="text-sm">Video playback is a feature which allows you to view footage of your putting session. This means we store the following:</Text>
+                            <Text className="textsm">1)A video of your swing (you're face is not visible)</Text>
+                            <Text className="textsm">2)A timestamp associated with the swing</Text>
+                            <Text className="textsm">3)Whether the putt was successful</Text>
+                            <Text className="text-sm">We hope that this feature allows you to self-review your technique as part of a video library.</Text>
+                            <Text className="text-xl font-semibold">Isn't streak inferred by putting data?</Text>
+                            <Text className="text-sm">While technically inspecting the putting data means you can determine a users streak, 
+                            the storage location of both are separate. To achieve this would require query gymnastics. If you choose to opt out of streak, 
+                            then we will not process your streak under any circumstance.</Text>
+                            <Text className="text-2xl font-semibold">And finally...</Text>
+                            <Text className="text-sm">Before you go on to using IntelliPutt, please indicate your choices below on whether you 
+                            allow us to process your data. For full functionality, we reccommend selecting all options.</Text>
+                            <View className="w-full flex flex-row justify-around">
+                                <View className="flex flex-col items-center">
+                                    <Text>Streak Consent</Text>
+                                    <Checkbox style={styles.checkboxStyle} value={streakConsent} onValueChange={setStreakConsent}/>
+                                </View>
+                                <View className="flex flex-col items-center">
+                                    <Text>Data Consent</Text>
+                                    <Checkbox style={styles.checkboxStyle} value={dataConsent} onValueChange={setDataConsent}/>
+                                </View>
+                                <View className="flex flex-col items-center">
+                                    <Text>Video Consent</Text>
+                                    <Checkbox style={styles.checkboxStyle} value={videoConsent} onValueChange={setVideoConsent}/>
+                                </View>
+                            </View>
+
+                            <CustomButton onPress={handleRegister} text={"Complete Sign-up"}/>
+
+
+
+                        </View>
+
+                    </View>
+
+
+
+                    {/* <Pressable onPress={() => {setEthicsModalVis(false)}} className="w-fit h-10 bg-slate-400 rounded-xl">
+                                <Text>close modal (test purposes)</Text>
+                    </Pressable> */}
+                </ScrollView>
+            </Modal>
+            
+
             <Modal isVisible={showModal} animationIn="slideInUp" animationOut="slideOutDown" className="w-full mt-[40%] ml-0 mb-0 h-[90%]" style={styles.modal}>
-                <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white px-[30px] pt-[20px] pb-[40px] rounded-lg w-full">
+                <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white px-[30px] pt-[20px] pb-[40px] rounded-lg w-full" >
                     <Pressable className="w-[40px] h-[50px] my-[10px] mt-[15px] pt-1 border-solid rounded-full justify-center" onPress={() => setShowModal(false)}>
                         <Text className="h-full border-double text-stone-700 rounded-full text-[25px] font-bold px-2"> &lt; </Text>
                     </Pressable>
@@ -285,6 +384,9 @@ const styles = {
     },
     modalWrapper: {
         flexGrow: 1,
-        height: '90%',
+        height: '210%',
+    },
+    checkboxStyle:{
+        margin:8
     }
 };

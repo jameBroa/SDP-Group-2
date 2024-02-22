@@ -14,7 +14,10 @@ export const userSlice = createSlice({
                 email: action.payload["email"],
                 name: action.payload["name"],
                 experience: action.payload["experience"],
-                friends: action.payload["friends"]
+                friends: action.payload["friends"],
+                streak: action.payload["streak"],
+                data: action.payload["data"],
+                video: action.payload["video"]
             };
         },
         logout(state) {
