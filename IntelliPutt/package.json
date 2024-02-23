@@ -26,6 +26,7 @@
     "expo": "^50.0.1",
     "expo-constants": "~15.4.5",
     "expo-haptics": "~12.8.1",
+    "expo-image-picker": "~14.7.1",
     "expo-linear-gradient": "~12.7.1",
     "expo-linking": "~6.2.2",
     "expo-router": "~3.4.3",
@@ -53,9 +54,9 @@
     "redux-thunk": "^3.1.0",
     "tailwindcss": "3.3.2",
     "twrnc": "^4.0.0",
-    "undefined": "@/components/icon",
     "typescript": "^5.3.0",
-    "expo-image-picker": "~14.7.1"
+    "undefined": "@/components/icon",
+    "expo-checkbox": "~2.7.0"
   },
   "resolutions": {
     "react-native-reanimated": "^2.9.1",
