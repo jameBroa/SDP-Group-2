@@ -1,35 +1,26 @@
 from firebase_admin import credentials, firestore, storage, initialize_app
+from datetime import datetime
 
-def main():
-    cred = credentials.Certificate('/Users/lucas/Downloads/intelliputt_credentials.json')
-    initialize_app(cred, {'storageBucket':'intelliputt-2024.appspot.com'})
+cred = credentials.Certificate('/Users/lucas/Downloads/intelliputt_credentials.json')
+initialize_app(cred, {'storageBucket':'intelliputt-2024.appspot.com'})
 
-    ### Test -- connect to DB and get elements from 'devices' collection
+def upload_video(user_id: str, video_path: str):
     db = firestore.client()
 
-    users_ref = db.collection('devices')
-    docs = users_ref.stream()
+    # users_ref = db.collection('videos')
+    # docs = users_ref.stream()
 
-    for doc in docs:
-        print(f'Document ID: {doc.id}, Data: {doc.to_dict()}')
+    # for doc in docs:
+    #     print(f'Document ID: {doc.id}, Data: {doc.to_dict()}')
 
     ### Test -- interacting with storage bucket for images/video
     bucket = storage.bucket()
 
     # Example: Upload test file to bucket
-    local_file_path = '/Users/lucas/Downloads/couple.jpg'
-    destination_blob_name = 'images/golf_couple_test.jpg'
+    destination_blob = f'videos/{video_path}'
 
-    blob = bucket.blob(destination_blob_name)
-    blob.upload_from_filename(local_file_path)
+    blob = bucket.blob(destination_blob)
+    blob.upload_from_filename(video_path)
 
-    print(f'File {local_file_path} uploaded to {destination_blob_name}')
-
-    # Example: Download file from bucket
-    downloaded_file_path = '/Users/lucas/Downloads/newtest.jpg'
-    blob.download_to_filename(downloaded_file_path)
-
-    print(f'File downloaded to {downloaded_file_path}')
-
-if __name__ == "__main__":
-    main()
+    print(f'File {video_path} uploaded to {destination_blob}')
+    
