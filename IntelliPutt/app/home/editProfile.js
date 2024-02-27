@@ -49,10 +49,6 @@ export default function EditProfile() {
     }
 
     const handleEditProfile = async () => {
-        setEthicsModalVis(false);
-        // Does username already exist
-        const userRef = collection(db, "users");
-
         await user.updateEmail(email);
         await user.updatePassword(password);
         
@@ -83,7 +79,8 @@ export default function EditProfile() {
                 video: videoConsent
             }
         ));
-           
+        
+        alert("Profile updated successfully!");
     };
 
     const pickImage = async() => {
