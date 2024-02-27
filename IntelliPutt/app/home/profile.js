@@ -8,9 +8,12 @@ import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 import {useSelector} from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
 import COLOURS from '../../static/design_constants';
+import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import ProfileTab from '../../components/ProfileTab';
+
 export default function Profile() {
-
-
   // Redux var
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
@@ -26,49 +29,43 @@ export default function Profile() {
 
   useEffect(() => {
     const storage = getStorage()
-    const imageRef = ref(storage, `images/${user.uid}`)
+    const imageRef = ref(storage, `images/${user.uid}.png`)
     getDownloadURL(imageRef).then((url) => {
       setProfileImg(url);
-      setLoaded(true);
-    })
+    }).catch((error) => {
+      console.log(error);
+    });
   },[])
 
   return (
-    <View className="w-full h-full flex flex-col items-center">
-        <View className="h-[30%] w-full  ">
-            <DefaultContainer subheading="Let's view your" heading="Profile!"/>
+    <View className="w-full h-full flex flex-col items-center bg-brand-colordark-green">
+        <View className="h-[40%] w-full items-center justify-center ">
+          <Image 
+            style={{height:110, width:110, borderRadius:50, marginTop:50, marginBottom:8}}
+            source={
+              profileImg == null ? require('../../static/images/user_placeholder.jpeg') : { 
+              uri: profileImg 
+            }}
+          />
+            
+          <Text className="text-2xl font-medium mt-2 text-stone-50">{user.name}</Text>
         </View>
-        <View className="h-[70%] w-[90%] flex flex-col justify-start">
-          <View className="w-[100%] flex flex-row justify-between items-center">
-            <Text className="text-gray-400 font-semibold text-xl">Profile info</Text>
-            <FontAwesome name="pencil" size={20} color={COLOURS.BRAND_COLORLIGHT_GREENGRAY} />
+        <View className="h-[60%] w-full flex flex-col justify-start rounded-t-3xl px-[4%] bg-stone-100 pt-5">
+          <View className="my-2 flex flex-row w-[100%] justify-evenly">
+            <ProfileTab icon="golf" text="67%" />
+            <ProfileTab icon="streak" text="2 days" />
+            <ProfileTab icon="friends" text="2 friends" />
           </View>
-          
-            <View className="rounded-2xl bg-brand-colordark-green flex flex-row h-[35%] w-full justify-around items-center">
-              <View className="flex flex-col space-y-2">
-                <Text className="text-white text-3xl">Profile Details</Text>
-                <Text className="text-white text-sm">Name: {user.name}</Text>
-                <Text className="text-white text-sm">Username: {user.username}</Text>
-                <Text className="text-white text-sm">Email: {user.email}</Text>
-                <Text className="text-white text-sm">Skill level: {user.experience}</Text>
 
-              </View>
-              <View className="flex flex-col items-center justify-evenly w-24  h-[100%]">
-              {loaded && (
-                <Image 
-                style={{height:80, width:80, borderRadius:50}}
-                source={{uri:profileImg}}
-                />
-              )}
-              <View className="flex flex-row w-[100%] justify-evenly ">
-                  <Text className="text-xs text-white">hit perc</Text>
-                  <Text className="text-xs text-white">streak</Text>
-              </View>
-              </View>
-            </View>
-            <Text className="text-gray-400 font-semibold text-xl mt-2">Settings</Text>
-              <Text className="text-2xl ">🚧This area is to be completed🚧</Text>
-              <CustomButton text="Logout" onPress={handleLogout} />
+          <CustomButton text="Edit your profile" onPress={handleLogout} />
+          <CustomButton text="Watch your videos" onPress={handleLogout} />
+          <CustomButton text="Recommended guides" onPress={handleLogout} />
+
+          <View className="mb-10">
+
+          </View>
+          <CustomButton text="Privacy settings" onPress={handleLogout} />
+          <CustomButton text="Logout" onPress={handleLogout} />
         </View>
     </View>
   )
