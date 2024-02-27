@@ -16,7 +16,7 @@ import StatsTab from '../../components/StatsTab';
 import { Redirect } from 'expo-router';
 import { FontAwesome6 } from '@expo/vector-icons';
 
-export default function stats() {
+export default function Stats() {
   // Redux vars
   const currUser = useSelector((state) => state.user.user);
 
@@ -41,7 +41,7 @@ export default function stats() {
 
   useEffect(() => {
     const getUserData = async() => {
-      try{
+      try {
         const q = query(userDataCollectionRef);
         const response = await getDocs(q);
         let puttingData = [];
@@ -68,7 +68,6 @@ export default function stats() {
     }
     getUserData();
   }, [currUser]);
-
 
   useEffect(() => {
     if(loading == false) {
