@@ -119,7 +119,9 @@ export default function Register() {
                     username: username.toLowerCase(),
                     experienceLevel: experienceLevel,
                     friends: [],
-                    
+                    streak: streakConsent,
+                    data: dataConsent,
+                    video: videoConsent
                 }
             );
             console.log('Additional data stored in Firestore successfully');
@@ -135,7 +137,6 @@ export default function Register() {
                     streak: streakConsent,
                     data: dataConsent,
                     video: videoConsent
-
                 }
             ));
 

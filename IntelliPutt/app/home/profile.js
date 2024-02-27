@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import DefaultContainer from '../../components/DefaultContainer'
 import { Text, View, Image} from 'react-native'
 import CustomButton from '../../components/CustomButton'
 import { useDispatch } from 'react-redux';
 import { logout } from '../../context/slices/userSlice';
 import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 import {useSelector} from 'react-redux';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import COLOURS from '../../static/design_constants';
 import { ScrollView } from 'react-native';
@@ -48,7 +47,6 @@ export default function Profile() {
               uri: profileImg 
             }}
           />
-            
           <Text className="text-2xl font-medium mt-2 text-stone-50">{user.name}</Text>
         </View>
         <ScrollView contentContainerStyle={styles.wrapper} className="h-[60%] w-full flex flex-col rounded-t-3xl px-[4%] bg-stone-100 pt-5">
@@ -69,7 +67,7 @@ export default function Profile() {
           <View className="mb-[18%]">
             
           </View>
-          <CustomButton text="Edit your profile" onPress={handleLogout} />
+          <CustomButton text="Edit your profile" onPress={() => router.push("/home/editProfile")} />
           <CustomButton text="Privacy settings" onPress={handleLogout} />
           <CustomButton text="Logout" onPress={handleLogout} />
         </ScrollView>
