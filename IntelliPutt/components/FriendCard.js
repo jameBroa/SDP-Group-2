@@ -8,7 +8,7 @@ const FriendCard = ({ friend }) => {
     return (
         <View className="items-center flex-row py-3 my-1 mx-2 w-full rounded-xl" style={styles.customGreen}>
             <View className="px-5">
-                <Image source={require('../static/images/michael.jpg')} className="rounded-full w-16 h-16" />
+                <Image source={require('../static/images/user_placeholder.jpeg')} className="rounded-full w-16 h-16" />
             </View>
             <View className="flex items-center">    
                 <View className="">

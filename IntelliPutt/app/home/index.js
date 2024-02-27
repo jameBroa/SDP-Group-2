@@ -24,7 +24,6 @@ export default function Index() {
 
     // Redux vars
     const user = useSelector((state) => state.user.user);
-    console.log("streak consent",user.streak)
 
     // State management
     const [loaded, setLoaded] = useState(false);
