@@ -1,21 +1,30 @@
 import os
+import subprocess
 from datetime import datetime
 from picamera import PiCamera
 from time import sleep
 
 camera = PiCamera()
 
-def record_local_video(user_id: str, time_seconds: int):
+def record_local_video(user_id: str, time_seconds: int = 5):
     try:
-        new_video_path = generate_new_video_title(user_id)
-        camera.start_recording(f'/home/pi/Desktop/videos/{new_video_path}')
+        new_video_path = generate_new_video_path(user_id)
+        full_video_path = f'/home/pi/Desktop/videos/{new_video_path}'
+
+        camera.start_recording(f"{full_video_path}.h264")
+        print("Recording video...")
         sleep(time_seconds)
         camera.stop_recording()
+        print("Saved video locally...")
+
+        # Convert h264 video to mp4
+        print("Converting video to mp4 format...")
+        subprocess.run(["ffmpeg","-r","30","-i",f"{full_video_path}.mp4", f"{full_video_path}.h264"])
         return new_video_path
     except:
         return RuntimeError("Video recording failed")
 
-def generate_new_video_title(user_id: str):
+def generate_new_video_path(user_id: str):
     user_videos_path = f"/home/pi/Desktop/videos/{user_id}"
     try:
         date_dirs = [d for d in os.listdir(user_videos_path) if os.path.isdir(os.path.join(user_videos_path, d))]
@@ -36,7 +45,7 @@ def generate_new_video_title(user_id: str):
                 next_file_number = 1
 
         # This is the path from the top-level "videos" directory, not the absolute path.
-        new_video_path = f"user_id/curr_date/{next_file_number}_{curr_date}.h264"
+        new_video_path = f"user_id/curr_date/{next_file_number}_{curr_date}"
         return new_video_path
 
 
