@@ -3,6 +3,9 @@ module.exports = {
   content: ["./App.{js,jsx,ts,tsx}", "./app/*.js", "./components/*.js", "./App/test/*.js", "./app/home/*.js"],
   theme: {
     extend: {
+      borderRadius:{
+        'modal':'40px'
+      },
       backgroundImage: {
         'golf': "url('../static/images/background.jpg')",
       },
