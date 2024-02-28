@@ -430,7 +430,7 @@ export default function Register() {
                                             
                                         </View>
                                         <View className="flex flex-col space-y-1  items-center">
-                                            <Pressable onPress={() => {this.viewPager.setPage(3)}} className="h-12 w-48 rounded-xl flex flex-col items-center justify-center bg-brand-colordark-green">
+                                            <Pressable onPress={() => {handleRegister()}} className="h-12 w-48 rounded-xl flex flex-col items-center justify-center bg-brand-colordark-green">
                                                 <Text className="text-white font-light text-lg ">Continue</Text>
                                             </Pressable>
                                             <Text className="text-xs italic text-stone-400 ">Or swipe to continue</Text>

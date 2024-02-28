@@ -4,7 +4,7 @@
 */}
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable } from 'react-native';
 import StatsGraphic1 from '../../static/images/test-image-2.png'
 import StatsGraphic2 from '../../static/images/test-image-3.png';
 import StatsGraphic3 from '../../static/images/test-image-4.png';
@@ -90,7 +90,8 @@ export default function Index() {
         return (
             <View className="h-full w-full flex flex-col">
                 <View className="h-[30%]">
-                    <DefaultContainer subheading="Welcome back!" heading={user.name} number={unreadNotifications}/>
+                    <DefaultContainer session subheading="Welcome back!" heading={user.name} number={unreadNotifications}/>
+                    
                 </View>
 
                 <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1 "
@@ -98,6 +99,10 @@ export default function Index() {
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }>
                     <View className="my-2">
+                    {/* <Pressable onPress={() => console.log('test')} className="w-16 h-8 bg-brand-colordark-green rounded-full">
+                        <Text>hello</Text>
+
+                    </Pressable> */}
                         <Text className="text-xl text-gray-400 pl-3 pt-3 font-medium">Your Friends</Text>
                         <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="/home/social">
                             <Text className="text-sm font-light">View all</Text>
