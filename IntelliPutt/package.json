@@ -56,7 +56,8 @@
     "twrnc": "^4.0.0",
     "typescript": "^5.3.0",
     "undefined": "@/components/icon",
-    "expo-checkbox": "~2.7.0"
+    "expo-checkbox": "~2.7.0",
+    "react-native-pager-view": "6.2.3"
   },
   "resolutions": {
     "react-native-reanimated": "^2.9.1",

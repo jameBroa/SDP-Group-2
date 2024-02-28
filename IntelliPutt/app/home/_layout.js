@@ -76,6 +76,13 @@ export default function Layout() {
                 href:null
             }}
             />
+            <Tabs.Screen
+            name="session"
+            href="/session"
+            options={{
+                href:null
+            }}
+            />
 
         </Tabs>
     );
