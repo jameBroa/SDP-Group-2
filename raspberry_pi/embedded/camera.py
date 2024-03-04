@@ -1,20 +1,20 @@
 import os
 import subprocess
 from datetime import datetime
-from picamera import PiCamera
+# from picamera import PiCamera
 from time import sleep
 
-camera = PiCamera()
+# camera = PiCamera()
 
 def record_local_video(user_id: str, time_seconds: int = 5):
     try:
         new_video_path = generate_new_video_path(user_id)
         full_video_path = f'/home/pi/Desktop/videos/{new_video_path}'
 
-        camera.start_recording(f"{full_video_path}.h264")
+        # camera.start_recording(f"{full_video_path}.h264")
         print("Recording video...")
         sleep(time_seconds)
-        camera.stop_recording()
+        # camera.stop_recording()
         print("Saved video locally...")
 
         # Convert h264 video to mp4

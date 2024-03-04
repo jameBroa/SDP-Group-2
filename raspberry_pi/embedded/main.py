@@ -2,8 +2,7 @@ from webserver import app
 from db import upload_video
 from camera import record_local_video
 
-session_in_progress: bool = False
-current_user: str = ""
+from globals import session_in_progress, current_user
 
 def run():
     while True:
@@ -16,8 +15,9 @@ def run():
                 except:
                     raise RuntimeError("Problem with record and upload, aborting")
             break
-        else:
-            print("Idle, waiting for session to start")
+        # else:
+        #     # print("Idle, waiting for session to start")
 
 if __name__ == "__main__":
+    app.run() # init webserver
     run()
