@@ -88,7 +88,6 @@ export default function Index() {
         }
         
         let response;
-
         try {
             response = await axios.get('http://server-url/session/request_start/' + user.uid);
         } catch (error) {
