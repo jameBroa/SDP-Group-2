@@ -10,7 +10,8 @@ import StatsGraphic2 from '../../static/images/test-image-3.png';
 import StatsGraphic3 from '../../static/images/test-image-4.png';
 import FriendButton from '../../components/FriendButton';
 import StatsButton from '../../components/StatsButton';
-import GuidesButton from '../../components/GuidesButton';
+import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
 import { Link, router } from 'expo-router';
@@ -30,6 +31,7 @@ export default function Index() {
     const [friends, setFriends] = useState(new Map());
     const [refreshing, setRefreshing] = useState(false);
     const [unreadNotifications, setUnreadNotifications] = useState(false);
+    const [sessionOn, setSession] = useState(false);
 
     const getNumNotifications = async() => {
         const q = query(friendRequestCollection, 
@@ -64,6 +66,44 @@ export default function Index() {
         });
     };
 
+    const handleStartSession = async () => {
+        if (sessionOn) {
+            let response;
+
+            try {
+                response = await axios.get('http://server-url/session/request_end/' + user.uid);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return;
+            }
+
+            if (response.status === 200) {
+                console.log(response.data);
+                setSession(false);
+            } else {
+                console.error(response.data);
+            }
+
+            return;
+        }
+        
+        let response;
+
+        try {
+            response = await axios.get('http://server-url/session/request_start/' + user.uid);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            return;
+        }
+
+        if (response.status === 200) {
+            console.log(response.data);
+            setSession(true);
+        } else {
+            console.error(response.data);
+        }
+    };
+
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         ReduxStateUpdater.fetchFriends(user);
@@ -90,26 +130,37 @@ export default function Index() {
         return (
             <View className="h-full w-full flex flex-col">
                 <View className="h-[30%]">
-                    <DefaultContainer session subheading="Welcome back!" heading={user.name} number={unreadNotifications}/>
-                    
+                    <DefaultContainer subheading="Welcome back!" heading={user.name} number={unreadNotifications}/>
                 </View>
 
-                <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1 "
+                <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1"
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }>
+                    <View className="my-2 h-[30%]">
+                        <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
+                            <Pressable className="bg-brand-colordark-green w-[95%] h-full justify-center items-center rounded-xl" onPress={handleStartSession}>
+                                {(sessionOn) ?
+                                 <Ionicons name="stop-circle" size={45} color="white" /> 
+                                 : 
+                                 <Ionicons name="play" size={45} color="white" /> 
+                                }
+                                {(sessionOn) ?
+                                 <Text className="font-semibold text-white mt-1">Stop session</Text>
+                                 : 
+                                 <Text className="font-semibold text-white mt-1">Start session</Text>
+                                }
+                            </Pressable>
+                        </View>
+                    </View>   
                     <View className="my-2">
-                    {/* <Pressable onPress={() => console.log('test')} className="w-16 h-8 bg-brand-colordark-green rounded-full">
-                        <Text>hello</Text>
-
-                    </Pressable> */}
                         <Text className="text-xl text-gray-400 pl-3 pt-3 font-medium">Your Friends</Text>
                         <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="/home/social">
                             <Text className="text-sm font-light">View all</Text>
                         </Link>
                         <View className="mt-2 w-full flex flex-row justify-start ml-2">
                             {Array.from(friends).map(([key, value]) => (
-                                    <FriendButton key={key} friend={value} online />
+                                <FriendButton key={key} friend={value} online />
                             ))}
                         </View>
                     </View>
@@ -123,18 +174,6 @@ export default function Index() {
                             <StatsButton day={"Monday"} numToReview={"12"} imgSrc={StatsGraphic1}/>
                             <StatsButton day={"Tuesday"} numToReview={"5"} imgSrc={StatsGraphic2}/>
                             <StatsButton day={"Wednesday"} numToReview={"8"} imgSrc={StatsGraphic3}/>
-                        </View>
-                    </View>
-                    <View className="my-2">
-                        <Text className="text-xl text-gray-400 pl-3 mt-1 font-medium">Recommended Guides</Text> 
-                        <Link className="absolute mt-2 right-[5%] text-gray-600 text-sm" href="./stats">
-                            <Text className="text-sm font-light">View all</Text>
-                        </Link>
-                        <View className="mt-2 w-full flex flex-row justify-around ">
-                            {/* TODO: Wrap in Pressables */}
-                            <GuidesButton title={"Putting Tutorial"}/>
-                            <GuidesButton title={"Control Tips"}/>
-                            <GuidesButton title={"Staying Consistent"}/>
                         </View>
                     </View>
                 </ScrollView>
