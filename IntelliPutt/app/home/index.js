@@ -10,7 +10,7 @@ import StatsGraphic2 from '../../static/images/test-image-3.png';
 import StatsGraphic3 from '../../static/images/test-image-4.png';
 import FriendButton from '../../components/FriendButton';
 import StatsButton from '../../components/StatsButton';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
@@ -145,34 +145,61 @@ export default function Index() {
                                  <Ionicons name="play" size={45} color="white" /> 
                                 }
                                 {(sessionOn) ?
-                                 <Text className="font-semibold text-white mt-1">Stop session</Text>
+                                 <Text className="text-white mt-1">Stop session</Text>
                                  : 
-                                 <Text className="font-semibold text-white mt-1">Start session</Text>
+                                 <Text className=" text-white mt-1">Start session</Text>
                                 }
                             </Pressable>
                         </View>
                     </View>   
-                    <View className="my-2">
-                        <Text className="text-xl text-gray-400 pl-3 pt-3 font-medium">Your Friends</Text>
+                               
+                    <View className="my-2 h-[20%] mb-5">
+                        <Text className="text-lg text-gray-400 pl-3 mt-1 font-medium mb-1">Last session - Wed 6th</Text>
+                        <View className="h-[90%] justify-evenly items-start flex flex-row">
+                            <View className="bg-stone-400 w-[40%] h-full justify-center items-center flex flex-row rounded-xl">
+                            <FontAwesome6 className="" name="clock" size={30} color="white" />
+                            <View className="pl-4">
+                                <Text className="text-white font-base">Duration</Text>
+                                <Text className="text-base text-white font-semibold">50 min</Text>
+                            </View>
+                            </View>
+                            <View className="bg-stone-400 w-[53.5%] h-full justify-center items-center flex flex-row rounded-xl">
+                            <MaterialCommunityIcons name="golf" size={40} color="white" />
+                            <View className="pl-3">
+                                <Text className="text-white font-base">Successful putts</Text>
+                                <Text className="text-base text-white font-semibold">30%</Text>
+                            </View>
+                            </View>
+                        </View>
+                    </View>
+
+                    <View className="my-2 h-[20%] mb-3">
+                        <Text className="text-lg text-gray-400 pl-3 pt-3 font-medium mt-1">Achievements</Text>
                         <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="/home/social">
-                            <Text className="text-sm font-light">View all</Text>
+                            <Text className="text-sm font-light mt-3">View all</Text>
                         </Link>
-                        <View className="mt-2 w-full flex flex-row justify-start ml-2">
+                        <View className="h-[90%] justify-evenly items-start flex flex-row">
+                            <View className="bg-stone-400 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
+                                <FontAwesome6 name="hourglass-2" size={30} color="white" />
+                            </View>
+                            <View className="bg-stone-400 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
+                                <FontAwesome6 className="" name="hourglass" size={30} color="white" />
+                            </View>
+                            <View className="bg-stone-400 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
+                                <FontAwesome6 className="" name="stopwatch-20" size={30} color="white" />
+                            </View>
+                        </View>
+                    </View>
+
+                    <View className="my-2">
+                        <Text className="text-lg text-gray-400 pl-3 pt-3 font-medium mt-1">Your friends</Text>
+                        <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="/home/social">
+                            <Text className="text-sm font-light mt-3">View all</Text>
+                        </Link>
+                        <View className="mt-1 w-full flex flex-row justify-start ml-2">
                             {Array.from(friends).map(([key, value]) => (
                                 <FriendButton key={key} friend={value} online />
                             ))}
-                        </View>
-                    </View>
-                    <View className="my-2">
-                        <Text className="text-xl text-gray-400 pl-3 mt-1 font-medium">Your Stats</Text>
-                        <Link className="absolute mt-2 right-[5%] text-gray-600 text-sm" href="./stats">
-                            <Text className="text-sm font-light">View all</Text>
-                        </Link>
-                        <View className="mt-2 w-full flex flex-row justify-around">
-                            {/* TODO: Wrap in Pressables */}
-                            <StatsButton day={"Monday"} numToReview={"12"} imgSrc={StatsGraphic1}/>
-                            <StatsButton day={"Tuesday"} numToReview={"5"} imgSrc={StatsGraphic2}/>
-                            <StatsButton day={"Wednesday"} numToReview={"8"} imgSrc={StatsGraphic3}/>
                         </View>
                     </View>
                 </ScrollView>
