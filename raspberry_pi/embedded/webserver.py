@@ -1,6 +1,4 @@
 from flask import Flask, Response
-# from globals import session_in_progress, current_user
-
 import globals
 
 
@@ -12,18 +10,19 @@ def request_session_start(user_id: str):
     if not globals.session_in_progress:
         globals.session_in_progress = True
         globals.current_user = user_id
-        return {200: f"Session successfully started for user_id: {user_id}"}
+        return Response(status=200, response=f"Session successfully started for user_id: {user_id}.")
     else:
-        return {400: "Request denied, session current in progress"}
+        return Response(status=400, response=f"Request denied, session already in progress.")
 
 @app.route("/session/request_end/<user_id>", methods=["GET"])
 def request_session_end(user_id: str):
     if globals.session_in_progress and globals.current_user == user_id:
         globals.session_in_progress = False
         globals.current_user = ""
-        return 200, f"Session successfully ended for user_id: {user_id}"
+        return Response(status=200, response=f"Session successfully ended for user_id: {user_id}.")
     else:
-        return 400, "Request denied, no session in progress or user_id invalid"
+        return Response(status=400, response="Request denied, no session in progress or user_id invalid")
+
 
 @app.route("/stats/putt_percentage/<user_id>/<session_id>")
 def send_putt_percentage(user_id: str, session_id: str):
@@ -32,4 +31,4 @@ def send_putt_percentage(user_id: str, session_id: str):
 @app.route("/test")
 def test_func():
     print("RECEIVED")
-    return {"code":"404"}
+    return Response(status=404, response="Test received")

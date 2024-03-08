@@ -19,5 +19,6 @@ def run():
         #     # print("Idle, waiting for session to start")
 
 if __name__ == "__main__":
-    app.run() # init webserver
+    current_ip = "172.24.37.62" # on visitEd but this will change
+    app.run(host=current_ip, port=5000) # init webserver
     run()
