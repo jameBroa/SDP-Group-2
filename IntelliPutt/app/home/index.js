@@ -67,11 +67,12 @@ export default function Index() {
     };
 
     const handleStartSession = async () => {
+        tempAddress = "172.24.44.218:5000"
+
         if (sessionOn) {
             let response;
-
             try {
-                response = await axios.get('http://server-url/session/request_end/' + user.uid);
+                response = await axios.get('http://' + tempAddress + '/session/request_end/' + user.uid);
             } catch (error) {
                 console.error('Error fetching data:', error);
                 return;
@@ -89,7 +90,7 @@ export default function Index() {
         
         let response;
         try {
-            response = await axios.get('http://server-url/session/request_start/' + user.uid);
+            response = await axios.get('http://' + tempAddress + '/session/request_start/' + user.uid);
         } catch (error) {
             console.error('Error fetching data:', error);
             return;
