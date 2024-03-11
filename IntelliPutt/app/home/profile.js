@@ -6,8 +6,6 @@ import { logout } from '../../context/slices/userSlice';
 import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 import {useSelector} from 'react-redux';
 import { Stack, router } from 'expo-router';
-import { FontAwesome } from '@expo/vector-icons';
-import COLOURS from '../../static/design_constants';
 import { ScrollView } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import ProfileTab from '../../components/ProfileTab';
@@ -24,11 +22,10 @@ export default function Profile() {
 
   // State variables
   const [profileImg, setProfileImg] = useState();
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const storage = getStorage()
-    const imageRef = ref(storage, `images/${user.uid}.png`)
+    const imageRef = ref(storage, `images/${user.uid}`)
     getDownloadURL(imageRef).then((url) => {
       setProfileImg(url);
     }).catch((error) => {

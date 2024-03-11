@@ -1,20 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, Text, View, ScrollView } from 'react-native'
 import DefaultContainer from '../../components/DefaultContainer'
 import { useSelector} from 'react-redux';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
 import COLOURS from '../../static/design_constants';
 import {calculatePercChange, convertUserData, filterByWeek, filterByXMonth, filterByXWeek, getData, getLabels, getPercentage} from '../../logic/stats-logic';
-import {getGlobalPercentage} from '../../logic/stats-logic';
-import {
-  LineChart,
-} from "react-native-chart-kit";
-import { Dimensions } from "react-native";
+import { getGlobalPercentage } from '../../logic/stats-logic';
+import { LineChart } from "react-native-chart-kit";
 import {Svg, Text as TextSVG} from 'react-native-svg';
 import StatsTab from '../../components/StatsTab';
 import { Redirect } from 'expo-router';
 import { FontAwesome6 } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function Stats() {
   // Redux vars
@@ -145,11 +143,11 @@ export default function Stats() {
         <View className="h-[30%]">
             <DefaultContainer subheading="Let's view your" heading="Statistics!"/>
         </View>
-        <View className="h-[70%] w-full flex flex-col bg-stone-100">
+        <ScrollView className="h-[70%] w-full flex flex-col bg-stone-100">
             <View className="w-[100%] pt-3 h-[95%] flex flex-row justify-center items-center">
               <View className="w-[95%] h-[100%] rounded-xl flex flex-col">
-                <View className="h-[10%]">
-                  <Text className="text-xl text-gray-400 pl-1 mt-1 font-medium">Successful Putts</Text>
+                <View className="mt-1 h-[10%]">
+                  <Text className="text-xl text-gray-400 pl-1 mt-1 font-medium">Overall putting</Text>
                   <View className="flex flex-row space-x-5 absolute top-[5%] right-[3%]">
                     {/* Graphic for up or down */}
                     <View className="flex flex-row space-x-1 items-center">
@@ -241,7 +239,7 @@ export default function Stats() {
                 </View>
               </View>
             </View>
-        </View>
+        </ScrollView>
     </View>
   );
 }
