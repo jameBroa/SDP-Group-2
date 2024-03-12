@@ -4,6 +4,7 @@ import globals
 import db
 import execute
 import threading
+import asyncio
 
 app = Flask(__name__, instance_relative_config=True)
 
@@ -16,7 +17,7 @@ def request_session_start(user_id: str):
         
         def do_in_parallel():
             db.start_session()
-            execute.start()
+            asyncio.run(execute.start())
         
         thread = threading.Thread(target=do_in_parallel)
         thread.start()

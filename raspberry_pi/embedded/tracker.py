@@ -1,5 +1,6 @@
 import cv2 as cv
 import math
+import asyncio
 
 class Tracker:
     # For Raspberry pi, XVID works, not mp4v. If need to convert, will do so.
@@ -7,7 +8,7 @@ class Tracker:
         print(cv.__version__)
         self.output_path = output_path
         print('getting here')
-        self.video=cv.VideoCapture(1)
+        self.video=cv.VideoCapture(0)
         #for x in range(13,100):
                 #self.video = cv.VideoCapture(x)
         
