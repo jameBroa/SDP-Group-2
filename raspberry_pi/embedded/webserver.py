@@ -3,6 +3,7 @@ from firebase_admin import firestore
 import globals
 import db
 import execute
+import threading
 
 app = Flask(__name__, instance_relative_config=True)
 
@@ -13,8 +14,13 @@ def request_session_start(user_id: str):
         globals.session_in_progress = True
         globals.current_user = user_id
         
-        db.start_session()
-        execute.start()
+        def do_in_parallel():
+            db.start_session()
+            execute.start()
+        
+        thread = threading.Thread(target=do_in_parallel)
+        thread.start()
+        
         return Response(status=200, response=f"Session successfully started for user_id: {user_id}")
     else:
         return Response(status=400, response="Request denied, session current in progress")
