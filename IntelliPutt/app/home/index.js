@@ -5,11 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable } from 'react-native';
-import StatsGraphic1 from '../../static/images/test-image-2.png'
-import StatsGraphic2 from '../../static/images/test-image-3.png';
-import StatsGraphic3 from '../../static/images/test-image-4.png';
 import FriendButton from '../../components/FriendButton';
-import StatsButton from '../../components/StatsButton';
 import { Ionicons, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import DefaultContainer from '../../components/DefaultContainer';
@@ -67,8 +63,7 @@ export default function Index() {
     };
 
     const handleStartSession = async () => {
-        tempAddress = "172.24.44.218:5000"
-
+        tempAddress = "172.24.38.125:5000"
         if (sessionOn) {
             let response;
             try {
@@ -102,6 +97,17 @@ export default function Index() {
         } else {
             console.error(response.data);
         }
+    };
+
+    const handleGetLastSession = async () => {
+        const session = collection(db, "sessions")
+            .doc(user.uid)
+            .orderBy("sessionEnded", "desc")
+            .limit(1)
+            .get();
+
+        session
+
     };
 
     const onRefresh = React.useCallback(() => {
