@@ -12,20 +12,22 @@ from tracker import Tracker
 
 async def record():
 	try:
-		tracker = Tracker(output_path=f'/Users/james/Desktop/{globals.video_count}.avi')
-		asyncio.run(tracker.start_tracking())
+		tracker = Tracker(output_path=f'/Users/james/Desktop/{globals.video_count}.mp4', encoding="mp4v")
+		# asyncio.get_event_loop().run_until_complete(tracker.start_tracking())
+		(tracker.start_tracking())
+		globals.video_count += 1
 	except Exception as e:
 		print(e)
 
 
-async def start():
+def start():
 	print(cv.__version__)
-	print("Running")
+	print("Running")	
 	while globals.session_in_progress:
 		print("Session in progress")
 		try:
 			print(f"Trying to record video number: {globals.video_count}")
-			await record()
+			asyncio.run(record())
 			# asyncio.run(camera.record_local_video())
 			# video_thread = threading.Thread(target=camera.record_local_video())
 			# video_thread.start()

@@ -17,10 +17,12 @@ def request_session_start(user_id: str):
         
         def do_in_parallel():
             db.start_session()
-            asyncio.run(execute.start())
+            execute.start()
         
         thread = threading.Thread(target=do_in_parallel)
         thread.start()
+        # execute.start()
+        # asyncio.run(execute.start())
         
         return Response(status=200, response=f"Session successfully started for user_id: {user_id}")
     else:
