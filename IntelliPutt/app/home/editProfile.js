@@ -1,8 +1,6 @@
 import { SafeAreaView, Text, View, Image, Pressable, ScrollView } from 'react-native';
 import React, { useRef, useState } from 'react';
-import { createUserWithEmailAndPassword, updateCurrentUser } from "firebase/auth";
 import { setDoc, doc, query, where, collection, getDocs } from "firebase/firestore"; 
-import auth from '../../config/authentication';
 import db from '../../config/database';
 import CustomButton from '../../components/CustomButton';
 import Chip from '../../components/Chip';
@@ -15,7 +13,6 @@ import { login } from '../../context/slices/userSlice';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, uploadBytes } from 'firebase/storage';
 import {ref as refStorage} from 'firebase/storage';
-import { Checkbox } from 'expo-checkbox';
 import { Stack } from 'expo-router';
 
 

@@ -44,8 +44,6 @@ export default function Index() {
         user["friends"].forEach(friendUID => {
             getDoc(doc(db, "users", friendUID))
                 .then((d) => {
-                    console.log("Friend data: ", d.data());
-                    
                     const friendData = {
                         name: d.data()["name"],
                         skill: d.data()["experienceLevel"],
@@ -57,7 +55,6 @@ export default function Index() {
                         friends.set(friendUID, friendData);
 
                         setFriends(new Map(friends));
-                        console.log(new Map(friends))
                     }
                 })
         });

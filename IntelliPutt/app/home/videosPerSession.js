@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { View, StyleSheet, Text, RefreshControl, ScrollView } from 'react-native';
-import VideoPreview from '../../components/VideoPreview';
-import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, listAll } from 'firebase/storage';
 import { useSelector } from 'react-redux';
 import ReduxStateUpdater from '../../context/util/updateState';
 import { Link, Stack, router } from 'expo-router';
 import BackButton from '../../components/BackButton';
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import db from '../../config/database';
 
 export default function VideosPerSession() {
@@ -24,7 +23,6 @@ export default function VideosPerSession() {
         try {
             const storage = getStorage();
             
-            console.log("Session data: ", user.sessions);
             // Iterate over each session       
             await Promise.all(user.sessions.map(async (session) => {
                 const sessionRef = ref(storage, `videos/${user.uid}/${session}`);

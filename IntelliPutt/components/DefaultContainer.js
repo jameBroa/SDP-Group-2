@@ -1,10 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { Link, Redirect, Stack, router } from 'expo-router'
-import React, { useState, useEffect } from 'react'
-import { Button, Image, Pressable, Text, View } from 'react-native'
-import COLOURS from '../static/design_constants'
+import { Stack, router } from 'expo-router'
+import React  from 'react'
+import { Image, Pressable, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { AntDesign } from '@expo/vector-icons';
+
 const DefaultContainer = ({subheading, heading, number, session=false}) => {
     return (
     <View className="h-[100%] w-full flex flex-col justify-start">

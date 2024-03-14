@@ -4,9 +4,8 @@
 
 import React from 'react';
 import { Pressable, Text } from 'react-native';
-import COLOURS from '../static/design_constants';
 
-const NotificationTab = ({ text, selected, setSelected, color=COLOURS.BRAND_COLORDARK_GREEN, bWidth='fit'}) => {
+const NotificationTab = ({ text, selected, setSelected, bWidth='fit'}) => {
         return (
             <Pressable 
                 title = {text}

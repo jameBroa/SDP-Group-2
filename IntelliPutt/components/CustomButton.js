@@ -5,7 +5,6 @@
 import { Link } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, Text } from 'react-native';
-import COLOURS from '../static/design_constants';
 
 const CustomButton = ({ text, onPress=null, goTo=null }) => {
     const [buttonClicked,setButtonClicked] = useState(false);
