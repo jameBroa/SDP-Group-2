@@ -15,7 +15,7 @@ const VideoPlayer = ({ url }) => {
             }}
             useNativeControls
             resizeMode={ResizeMode.CONTAIN}
-            isLooping
+            isLooping={false}
             onPlaybackStatusUpdate={status => setStatus(() => status)}
             />
             <View style={styles.buttons}>
