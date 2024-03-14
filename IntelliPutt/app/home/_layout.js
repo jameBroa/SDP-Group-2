@@ -77,15 +77,15 @@ export default function Layout() {
             }}
             />
             <Tabs.Screen
-            name="session"
-            href="/session"
+            name="videosPerSession"
+            href="/videosPerSession"
             options={{
                 href:null
             }}
             />
             <Tabs.Screen
-            name="videos"
-            href="/videos"
+            name="playback"
+            href="/playback"
             options={{
                 href:null
             }}
