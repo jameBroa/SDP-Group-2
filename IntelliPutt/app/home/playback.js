@@ -3,11 +3,12 @@ import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import VideoPlayer from '../../components/VideoPlayer';
 import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
 import { useSelector } from 'react-redux';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
+import BackButton from '../../components/BackButton';
 
 export default function Playback() {
     const user = useSelector((state) => state.user.user);
-    const { session } = useLocalSearchParams();
+    const { session, date } = useLocalSearchParams();
 
     const [videos, setVideos] = React.useState([]);
 
@@ -17,8 +18,6 @@ export default function Playback() {
         const sessionRef = ref(storage, `videos/${user.uid}/${session}`);
         const items = await listAll(sessionRef); // List all items (videos) in the session directory
         
-        console.log("session: " + session)
-        console.log("items: " + items.items) ;
         await Promise.all(items.items.map(async (item) => {
             const url = await getDownloadURL(item); // Get download URL for each video
             if (videos.includes(url) == false) {
@@ -35,14 +34,25 @@ export default function Playback() {
     }, []);
 
     return (
-      <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1">
-          <View style={styles.container}>
-              {videos.map((url, index) => (
-                  <VideoPlayer key={index} url={url} />
-              ))}
-              {videos.size === 0 && <Text>No videos found</Text>}
-          </View>
-      </ScrollView>
+        <View className="w-full h-full flex flex-col items-center bg-brand-colordark-green">
+            <Stack.Screen options={{headerShown:false}}></Stack.Screen>
+            <View className="h-[30%] w-full items-center justify-center mb-4">
+                <BackButton className="h-[5%]" action={() => router.back()} />
+                <View className="flex-row justify-end items-center mb-10 absolute left-[10%] top-[80%]">
+                    <View className="flex-row mb-2">
+                        <Text className="font-semibold text-3xl text-stone-50">Videos from {date}</Text>
+                    </View>
+                </View>
+            </View>     
+            <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1 rounded-2xl">
+                <View style={styles.container}>
+                    {videos.map((url, index) => (
+                        <VideoPlayer key={index} url={url} />
+                    ))}
+                    {videos.size === 0 && <Text>No videos found</Text>}
+                </View>
+            </ScrollView>
+        </View>
     );
 }
 
@@ -52,6 +62,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         backgroundColor: '#ecf0f1',
+        paddingTop: 50,
+        paddingBottom: 30
     },
     video: {
         alignSelf: 'center',

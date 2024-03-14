@@ -1,21 +1,21 @@
 import * as React from 'react';
-import { View, StyleSheet, Button } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 
 const VideoPreview = ({ url }) => {  
     const video = React.useRef(null);
     return (
-            <Video
-            className="mx-1"
-            ref={video}
-            style={styles.video}
-            source={{
-                uri: url,
-            }}
-            useNativeControls
-            resizeMode={ResizeMode.CONTAIN}
-            isLooping={false}
-            />
+        <Video
+          className="mx-1"
+          ref={video}
+          style={styles.video}
+          source={{
+              uri: url,
+          }}
+          useNativeControls
+          resizeMode={ResizeMode.CONTAIN}
+          isLooping={false}
+        />
     );
 }
 

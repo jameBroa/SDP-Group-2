@@ -76,7 +76,7 @@ export default function VideosPerSession() {
                             
                             <Link href={{
                                 pathname: "/home/playback",
-                                params: { session: id },
+                                params: { session: id, date: started },
                             }}>
                                 <Text className="text-brand-colordark-green font-semibold">View videos</Text>
                             </Link>
