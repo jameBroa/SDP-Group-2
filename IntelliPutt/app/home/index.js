@@ -161,18 +161,18 @@ export default function Index() {
                     <View className="my-2 h-[20%] mb-5">
                         <Text className="text-lg text-gray-400 pl-3 mt-1 font-medium mb-1">Last session - Wed 6th</Text>
                         <View className="h-[90%] justify-evenly items-start flex flex-row">
-                            <View className="bg-stone-400 w-[40%] h-full justify-center items-center flex flex-row rounded-xl">
-                            <FontAwesome6 className="" name="clock" size={30} color="white" />
+                            <View className="bg-stone-200 w-[40%] h-full justify-center items-center flex flex-row rounded-xl">
+                            <FontAwesome6 className="" name="clock" size={30} color="grey" />
                             <View className="pl-4">
-                                <Text className="text-white font-base">Duration</Text>
-                                <Text className="text-base text-white font-semibold">50 min</Text>
+                                <Text className="text-stone-600 font-base font-semibold">Duration</Text>
+                                <Text className="text-base text-stone-600 font-base font-bold">50 min</Text>
                             </View>
                             </View>
-                            <View className="bg-stone-400 w-[53.5%] h-full justify-center items-center flex flex-row rounded-xl">
-                            <MaterialCommunityIcons name="golf" size={40} color="white" />
+                            <View className="bg-stone-200 w-[53.5%] h-full justify-center items-center flex flex-row rounded-xl">
+                            <MaterialCommunityIcons name="golf" size={40} color="grey" />
                             <View className="pl-3">
-                                <Text className="text-white font-base">Successful putts</Text>
-                                <Text className="text-base text-white font-semibold">30%</Text>
+                                <Text className="text-stone-600 font-base font-semibold">Successful putts</Text>
+                                <Text className="text-base text-stone-600 font-base font-bold">30%</Text>
                             </View>
                             </View>
                         </View>
@@ -184,19 +184,19 @@ export default function Index() {
                             <Text className="text-sm font-light mt-3">View all</Text>
                         </Link>
                         <View className="h-[90%] justify-evenly items-start flex flex-row">
-                            <View className="bg-stone-400 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
-                                <FontAwesome6 name="hourglass-2" size={30} color="white" />
+                            <View className="bg-stone-200 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
+                                <FontAwesome6 name="hourglass-2" size={30} color="grey" />
                             </View>
-                            <View className="bg-stone-400 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
-                                <FontAwesome6 className="" name="hourglass" size={30} color="white" />
+                            <View className="bg-stone-200 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
+                                <FontAwesome6 className="" name="hourglass" size={30} color="grey" />
                             </View>
-                            <View className="bg-stone-400 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
-                                <FontAwesome6 className="" name="stopwatch-20" size={30} color="white" />
+                            <View className="bg-stone-200 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
+                                <FontAwesome6 className="" name="stopwatch-20" size={30} color="grey" />
                             </View>
                         </View>
                     </View>
 
-                    <View className="my-2">
+                    <View className="pt-2">
                         <Text className="text-lg text-gray-400 pl-3 pt-3 font-medium mt-1">Your friends</Text>
                         <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="/home/social">
                             <Text className="text-sm font-light mt-3">View all</Text>
