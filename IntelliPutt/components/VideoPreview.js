@@ -24,7 +24,6 @@ const styles = StyleSheet.create({
     alignSelf: 'left',
     width: 160,
     height: 100,
-    borderRadius: 10,
   },
 });
 

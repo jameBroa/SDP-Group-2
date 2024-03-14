@@ -18,7 +18,7 @@ class ReduxStateUpdater {
     }
 
     static async fetchSessions(user) {
-        getDoc(doc(db, "users", user.sessions))
+        getDoc(doc(db, "users", user.uid))
         .then((d) => {
             const listOfSessionIDs = d.data()["sessions"];
             listOfSessionIDs.forEach(sessionID => {
