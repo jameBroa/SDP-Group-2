@@ -81,7 +81,8 @@ export default function Login() {
                         email: userData.email,
                         name: userData.name,
                         experience: userData.experience,
-                        friends: userData.friends
+                        friends: userData.friends,
+                        sessions: userData.sessions
                     }
                 ));
             }).catch((error) => {                        // Data not found
@@ -97,7 +98,8 @@ export default function Login() {
                         email: email,
                         name: "Untitled User",
                         experience: "Not available",
-                        friends: []
+                        friends: [],
+                        sessions: []
                     }
                 ));
             });

@@ -83,6 +83,13 @@ export default function Layout() {
                 href:null
             }}
             />
+            <Tabs.Screen
+            name="videos"
+            href="/videos"
+            options={{
+                href:null
+            }}
+            />
 
         </Tabs>
     );

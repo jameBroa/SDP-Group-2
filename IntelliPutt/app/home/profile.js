@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../../context/slices/userSlice';
 import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 import {useSelector} from 'react-redux';
-import { Stack, router } from 'expo-router';
+import { Stack, router, Link } from 'expo-router';
 import { ScrollView } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import ProfileTab from '../../components/ProfileTab';
@@ -54,7 +54,9 @@ export default function Profile() {
           </View>
           <View className="h-[22%] justify-evenly items-start flex flex-row mt-2">
             <View className="bg-brand-colordark-green w-[46.5%] h-full justify-center items-center rounded-xl">
-              <Entypo name="folder-video" size={45} color="white" />
+              <Link href="/home/videos">
+                <Entypo name="folder-video" size={45} color="white" />
+              </Link>
             </View>
             <View className="bg-brand-colordark-green w-[46.5%] h-full  justify-center items-center rounded-xl">
               <Entypo name="open-book" size={45} color="white" />

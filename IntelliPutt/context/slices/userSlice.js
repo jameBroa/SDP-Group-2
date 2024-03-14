@@ -15,6 +15,7 @@ export const userSlice = createSlice({
                 name: action.payload["name"],
                 experience: action.payload["experience"],
                 friends: action.payload["friends"],
+                sessions: action.payload["sessions"],
                 streak: action.payload["streak"],
                 data: action.payload["data"],
                 video: action.payload["video"]
@@ -28,6 +29,9 @@ export const userSlice = createSlice({
         },
         addFriend(state, action) {
             state.user.friends.push(action.payload);
+        },
+        addSession(state, action) {
+            state.user.sessions.push(action.payload);
         }
     },
 });

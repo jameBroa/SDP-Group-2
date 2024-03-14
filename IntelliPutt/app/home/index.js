@@ -28,6 +28,7 @@ export default function Index() {
     const [refreshing, setRefreshing] = useState(false);
     const [unreadNotifications, setUnreadNotifications] = useState(false);
     const [sessionOn, setSession] = useState(false);
+    const [lastSession, setLastSession] = useState(new Map());
 
     const getNumNotifications = async() => {
         const q = query(friendRequestCollection, 
@@ -60,55 +61,55 @@ export default function Index() {
                     }
                 })
         });
-    };
+    }
 
-    const handleStartSession = async () => {
-        tempAddress = "172.24.38.125:5000"
-        if (sessionOn) {
-            let response;
-            try {
-                response = await axios.get('http://' + tempAddress + '/session/request_end/' + user.uid);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                return;
-            }
-
-            if (response.status === 200) {
-                console.log(response.data);
-                setSession(false);
-            } else {
-                console.error(response.data);
-            }
-
-            return;
-        }
-        
+    const handleSession = async () => {
+        const tempAddress = "172.24.54.250:5000";
         let response;
         try {
-            response = await axios.get('http://' + tempAddress + '/session/request_start/' + user.uid);
+            if (sessionOn) {
+                console.log("Ending session...");
+                response = await axios.get('http://' + tempAddress + '/session/request_end/' + user.uid);
+                if (response.status === 200) {
+                    console.log(response.data);
+                    setSession(false);
+                } else if (response.status === 400) {
+                    alert("There was no session running");
+                } else {
+                    console.error(response.data);
+                }
+            } else {
+                console.log("Starting session...");
+                response = await axios.get('http://' + tempAddress + '/session/request_start/' + user.uid);
+                if (response.status === 200) {
+                    console.log(response.data);
+                    alert("Session started");
+                    setSession(true);
+                } else if (response.status === 400) {
+                    alert("You already have a session running");
+                } else {
+                    alert("Session didn't start because it found a " + response.status);
+                }
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
-            return;
         }
-
-        if (response.status === 200) {
-            console.log(response.data);
-            setSession(true);
-        } else {
-            console.error(response.data);
-        }
-    };
+    };  
 
     const handleGetLastSession = async () => {
-        const session = collection(db, "sessions")
-            .doc(user.uid)
-            .orderBy("sessionEnded", "desc")
-            .limit(1)
-            .get();
+        const q = query(
+            collection(db, "sessions"), 
+            where("uid", "==", user.uid)
+        ).orderBy("sessionStarted", "desc").limit(1).get();;
+        const response = await getDocs(q);
 
-        session
+        d = response.data();
 
-    };
+        setLastSession({
+            "duration": d["sessionStarted"] - d["sessionEnded"],
+            "date": d[sessionStarted]
+        });
+    }
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
@@ -145,7 +146,7 @@ export default function Index() {
                     }>
                     <View className="my-2 h-[30%]">
                         <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
-                            <Pressable className="bg-brand-colordark-green w-[95%] h-full justify-center items-center rounded-xl" onPress={handleStartSession}>
+                            <Pressable className="bg-brand-colordark-green w-[95%] h-full justify-center items-center rounded-xl" onPress={handleSession}>
                                 {(sessionOn) ?
                                  <Ionicons name="stop-circle" size={45} color="white" /> 
                                  : 
