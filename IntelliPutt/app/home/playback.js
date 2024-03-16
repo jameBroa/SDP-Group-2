@@ -115,13 +115,13 @@ const styles = StyleSheet.create({
     },
     videoContainer: {
       width: Dimensions.get('window').width,
-      height: Dimensions.get('window').height - 100,
+      height: Dimensions.get('window').height - 100, // Keep aspect ratio 16:9
       justifyContent: 'center',
     },
     video: {
+        alignSelf: 'center',
         width: "100%",
-        height: "20%",
-        alignItems: 'center',
+        aspectRatio: 16 / 9, // Keep aspect ratio 16:9
     },
     container: {
         flex: 1,
