@@ -77,20 +77,26 @@ export default function Layout() {
             }}
             />
             <Tabs.Screen
-            name="videosPerSession"
-            href="/videosPerSession"
+            name="videos"
+            href="/videos"
             options={{
                 href:null
             }}
             />
             <Tabs.Screen
-            name="playback"
-            href="/playback"
+            name="playbackBySession"
+            href="/playbackBySession"
             options={{
                 href:null
             }}
             />
-
+            <Tabs.Screen
+            name="playbackAllTime"
+            href="/playbackAllTime"
+            options={{
+                href:null
+            }}
+            />
         </Tabs>
     );
 }

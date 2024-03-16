@@ -54,10 +54,10 @@ export default function VideosPerSession() {
         <View className="w-full h-full flex flex-col items-center bg-brand-colordark-green">
             <Stack.Screen options={{headerShown:false}}></Stack.Screen>
             <View className="h-[30%] w-full items-center justify-center mb-4">
-                <BackButton className="h-[5%]" action={() => router.back()} />
+                <BackButton className="h-[5%]" action={() => router.replace("/home/profile")} />
                 <View className="flex-row justify-end items-center mb-10 absolute left-[10%] top-[80%]">
                     <View className="flex-row mb-2">
-                        <Text className="font-semibold text-3xl text-stone-50">Videos per session</Text>
+                        <Text className="font-semibold text-3xl text-stone-50">Watch your videos</Text>
                     </View>
                 </View>
             </View>
@@ -66,6 +66,19 @@ export default function VideosPerSession() {
                             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                         }>
                 <View style={styles.container} className="h-full my-2 py-2">
+                    <View
+                        className="items-center justify-evenlyh-full bg-stone-200 rounded-2xl py-4 mx-3 mb-3">
+                        
+                        <Link href={{
+                            pathname: "/home/playbackAllTime",
+                        }}>
+                            <Text className="text-lg text-brand-colordark-green font-semibold">View all</Text>
+                        </Link>
+
+                        {sessionID.length === 0 && <Text>No videos for this session</Text>}
+                    </View>
+                    
+                    <Text className="text-lg text-gray-400 pl-4 pt-3 font-medium mt-1 mb-2">Per session</Text>
                     {Array.from(sessionID).map(([id, started]) => (
                         <View key={id} 
                             className="items-center justify-evenlyh-full bg-stone-200 rounded-2xl py-5 mx-3">
@@ -73,7 +86,7 @@ export default function VideosPerSession() {
                             <Text className="text-base text-brand-colordark-green font-light mb-1">{id}</Text>
                             
                             <Link href={{
-                                pathname: "/home/playback",
+                                pathname: "/home/playbackBySession",
                                 params: { session: id, date: started },
                             }}>
                                 <Text className="text-brand-colordark-green font-semibold">View videos</Text>

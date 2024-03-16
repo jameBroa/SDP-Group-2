@@ -1,4 +1,3 @@
-import VideoPlayer from '../../components/VideoPlayer';
 import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
 import { useSelector } from 'react-redux';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
@@ -39,24 +38,23 @@ export default function Playback() {
 
     useEffect(() => {
       fetchVideos(); // Fetch videos for the session when component mounts
-      setCurrentViewableItemIndex(0);
     }, []);
 
     return (
-        <View className="w-full h-full flex flex-col items-center bg-black" style={styles.videoContainer}>
+        <View className="w-full h-full flex flex-col items-center bg-[]" style={styles.videoContainer}>
             <Stack.Screen options={{
                 headerShown: true,
                 headerStyle: {
-                    backgroundColor: '#fafaf9',
+                    backgroundColor: '#e7e5e4',
                 },
                 headerBackButtonMenuEnabled: true,
-                headerLeft: () => <Pressable onPress={() => router.replace("/home/videosPerSession") && setCurrentViewableItemIndex(0)} >
+                headerLeft: () => <Pressable onPress={() => router.replace("/home/videos")} >
                     <Text className="pl-5 text-base">Back</Text>
                 </Pressable>,
-                title: `Videos from ${date}`,
+                title: `${currentViewableItemIndex + 1} of ${videos.length} from ${date.slice(0, 5)}`,
                 headerTintColor: '#000000',
                 headerTitleStyle: {
-                    fontSize: 16,
+                    fontSize: 18,
                 },
                 headerBackTitleVisible: true,
             }

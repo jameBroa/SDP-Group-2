@@ -54,7 +54,7 @@ export default function Profile() {
           </View>
           <View className="h-[22%] justify-evenly items-start flex flex-row mt-2">
             <View className="bg-brand-colordark-green w-[46.5%] h-full justify-center items-center rounded-xl">
-              <Link href="/home/videosPerSession">
+              <Link href="/home/videos">
                 <Entypo name="folder-video" size={45} color="white" />
               </Link>
             </View>
