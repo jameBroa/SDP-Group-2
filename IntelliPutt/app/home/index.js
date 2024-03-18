@@ -16,6 +16,8 @@ import { collection, doc, getDoc, getDocs, query, where, and } from 'firebase/fi
 import ReduxStateUpdater from '../../context/util/updateState';
 
 export default function Index() {
+    const serverAddress = "172.24.49.226:5000";
+
     // Firebase vars
     const friendRequestCollection = collection(db, "friendRequests");
 
@@ -29,6 +31,7 @@ export default function Index() {
     const [unreadNotifications, setUnreadNotifications] = useState(false);
     const [sessionOn, setSession] = useState(false);
     const [lastSession, setLastSession] = useState(new Map());
+    const [isServerOnline, setServerOnline] = useState(false);
 
     const getNumNotifications = async() => {
         const q = query(friendRequestCollection, 
@@ -61,12 +64,11 @@ export default function Index() {
     }
 
     const handleSession = async () => {
-        const tempAddress = "172.24.54.250:5000";
         let response;
         try {
             if (sessionOn) {
                 console.log("Ending session...");
-                response = await axios.get('http://' + tempAddress + '/session/request_end/' + user.uid);
+                response = await axios.get('http://' + serverAddress + '/session/request_end/' + user.uid);
                 if (response.status === 200) {
                     console.log(response.data);
                     setSession(false);
@@ -77,7 +79,7 @@ export default function Index() {
                 }
             } else {
                 console.log("Starting session...");
-                response = await axios.get('http://' + tempAddress + '/session/request_start/' + user.uid);
+                response = await axios.get('http://' + serverAddress + '/session/request_start/' + user.uid);
                 if (response.status === 200) {
                     console.log(response.data);
                     alert("Session started");
@@ -89,9 +91,23 @@ export default function Index() {
                 }
             }
         } catch (error) {
+            if (error.request)
             console.error('Error fetching data:', error);
         }
     };  
+
+    const checkServerStatus = async () => {
+        try {
+            let response = await axios.get("http://" + serverAddress + "/isAlive");
+            if (response.status === 200) {
+                setServerOnline(true);
+            } else {
+                setServerOnline(false);
+            }
+        } catch {
+            setServerOnline(false);
+        }
+    }
 
     const handleGetLastSession = async () => {
         const q = query(
@@ -111,6 +127,7 @@ export default function Index() {
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         ReduxStateUpdater.fetchFriends(user);
+        checkServerStatus();
         updateFriends();
         getNumNotifications();
         setTimeout(() => setRefreshing(false), 1000);
@@ -127,6 +144,7 @@ export default function Index() {
     if (user) {
         if (!loaded) {
             setLoaded(true);
+            checkServerStatus();
             updateFriends();
             getNumNotifications();
         };
@@ -143,6 +161,7 @@ export default function Index() {
                     }>
                     <View className="my-2 h-[30%]">
                         <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
+                            {(isServerOnline) ?
                             <Pressable className="bg-brand-colordark-green w-[95%] h-full justify-center items-center rounded-xl" onPress={handleSession}>
                                 {(sessionOn) ?
                                  <Ionicons name="stop-circle" size={45} color="white" /> 
@@ -154,7 +173,12 @@ export default function Index() {
                                  : 
                                  <Text className=" text-white mt-1">Start session</Text>
                                 }
-                            </Pressable>
+                            </Pressable> :
+                            <View className="bg-stone-400 w-[95%] h-full justify-center items-center rounded-xl" onPress={checkServerStatus}>
+                                <Ionicons name="cloud-offline" size={45} color="white" />
+                                <Text className="text-white mt-1 font-medium text-base">Server is offline</Text>
+                            </View>
+                            }
                         </View>
                     </View>   
                                
