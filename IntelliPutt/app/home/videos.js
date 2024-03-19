@@ -20,9 +20,7 @@ export default function VideosPerSession() {
     }, [])
 
     const fetchSessionsWithVideos = async () => {
-        console.log("User sessions " + user.sessions);
         ReduxStateUpdater.fetchSessions(user);
-        console.log("User sessions after fetching " + user.sessions);
 
         try {
             const storage = getStorage();

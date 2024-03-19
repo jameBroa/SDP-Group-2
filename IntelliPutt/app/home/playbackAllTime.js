@@ -6,11 +6,11 @@ import { Stack, router } from 'expo-router';
 import { View, Dimensions, FlatList, StyleSheet, Pressable, Text } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import React, { useEffect, useRef, useState } from 'react';
+import ReduxStateUpdater from '../../context/util/updateState';
 
-export default function Playback() {
+const Playback = () => {
     const user = useSelector((state) => state.user.user);
-    const [allVideos, setAllVideos] = React.useState([]);
-    const [videos, setVideos] = React.useState([{}]);
+    const [videos, setVideos] = React.useState([]);
 
     const [currentViewableItemIndex, setCurrentViewableItemIndex] = useState(0);
     const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 }
@@ -23,45 +23,39 @@ export default function Playback() {
     
     const fetchVideos = async () => {
       try {
+        ReduxStateUpdater.fetchSessions(user);
         const storage = getStorage();
         
-        // Iterate over each session       
+        // For each session
+        let currentVideoURLs = []       
         await Promise.all(user.sessions.map(async (session) => {
             const sessionRef = ref(storage, `videos/${user.uid}/${session}`);
-            const items = await listAll(sessionRef); // List all items (videos) in the session directory
-            
-            // If there are videos in the session, add the session to the state
-            if (items.items.length > 0) {
-                getDoc(doc(db, `sessions`, session))
-                .then((d) => {                
-                    let currentVideoURLs = []
-                    const date = new Date((d.data().sessionStarted.seconds * 1000)).toLocaleDateString();
-                    
-                    // If the session is not already in the state, add it
-                    if (!videos.some(e => e.session === session)) {
-                        // Iterate over each video in the session
-                        Promise.all(items.items.map(async (item) => {
-                            const url = await getDownloadURL(item); // Get download URL for each video
-                            // If the URL is not already in the state, add it
-                            if (currentVideoURLs.includes(url) == false) {
-                                currentVideoURLs.push(url);
-                            }
-                        }));
 
-                        setVideos(prevVideos => [...prevVideos, {
-                            key: prevVideos.length + 1,
-                            session: session,
-                            date: date,
-                            videoURLs: currentVideoURLs,
-                        }]); // Push URL to videoURLs array
-                    }
+            // List all items (videos) in the session directory
+            const items = await listAll(sessionRef); 
+            
+            // If there are videos in the session
+            if (items.items.length > 0) {
+                await getDoc(doc(db, `sessions`, session))
+                .then(async (d) => {                
+                    
+                    // For each video in the session
+                    await Promise.all(items.items.map(async (item) => {
+
+                        const url = await getDownloadURL(item);
+
+                        // If the URL is not already in the state, add it
+                        if (!videos.includes(url) && !currentVideoURLs.includes(url)) {
+                            currentVideoURLs.push(url);
+                        }
+                    }));
                 }).catch(error => {
                     console.error('Error sending request: ', error);
                 });
             };
         }));
-        // Put all videos in one list
-        setAllVideos(videos.map((video) => video.videoURLs).flat());
+        console.log("Current video URLs: " + currentVideoURLs);
+        setVideos(prevVideos => [...prevVideos, currentVideoURLs]); // Push URL to videos array
     } catch (error) {
         console.error('Error fetching videos:', error);
     }
@@ -82,7 +76,7 @@ export default function Playback() {
                 headerLeft: () => <Pressable onPress={() => router.replace("/home/videos")} >
                     <Text className="pl-5 text-base">Back</Text>
                 </Pressable>,
-                title: `${currentViewableItemIndex + 1} of ${allVideos.length}`,
+                title: `${currentViewableItemIndex + 1} of ${videos.length}`,
                 headerTintColor: '#000000',
                 headerTitleStyle: {
                     fontSize: 18,
@@ -92,7 +86,7 @@ export default function Playback() {
             } 
             />
             <FlatList
-                data={allVideos}
+                data={videos}
                 renderItem={({ item, index }) => (
                     <Item item={item} shouldPlay={index === currentViewableItemIndex} />
                 )}
@@ -173,3 +167,5 @@ const styles = StyleSheet.create({
         justifyContent: 'between',
     },
 });
+
+export default Playback;

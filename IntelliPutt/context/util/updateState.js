@@ -1,7 +1,7 @@
 import { getDoc, doc } from "firebase/firestore";
 import { addFriend, addSession } from "../slices/userSlice";
 import db from "../../config/database";
-import useDispatch from "react-redux";
+import { useDispatch } from 'react-redux';
 
 class ReduxStateUpdater {
     static async fetchFriends(user) {
