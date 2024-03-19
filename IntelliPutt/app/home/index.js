@@ -91,7 +91,10 @@ export default function Index() {
                 }
             }
         } catch (error) {
-            if (error.request)
+            if (error.request) {
+                alert("Server is offline, refresh to check.");
+                isServerOnline(false);
+            }
             console.error('Error fetching data:', error);
         }
     };  
@@ -113,15 +116,16 @@ export default function Index() {
         const q = query(
             collection(db, "sessions"), 
             where("uid", "==", user.uid)
-        ).orderBy("sessionStarted", "desc").limit(1).get();;
-        const response = await getDocs(q);
+        );
 
-        d = response.data();
+        const querySnapshot = await getDocs(q);
+
+      const d = querySnapshot.docs[0].data();
 
         setLastSession({
-            "duration": d["sessionStarted"] - d["sessionEnded"],
-            "date": d[sessionStarted]
-        });
+            "duration": d.sessionEnded.seconds - d.sessionStarted.seconds,
+            "date": new Date(d.sessionStarted.seconds * 1000).toLocaleDateString()
+        })
     }
 
     const onRefresh = React.useCallback(() => {
@@ -130,6 +134,7 @@ export default function Index() {
         checkServerStatus();
         updateFriends();
         getNumNotifications();
+        handleGetLastSession();
         setTimeout(() => setRefreshing(false), 1000);
     }, [])
 
@@ -146,6 +151,7 @@ export default function Index() {
             setLoaded(true);
             checkServerStatus();
             updateFriends();
+            handleGetLastSession();
             getNumNotifications();
         };
 
@@ -183,13 +189,13 @@ export default function Index() {
                     </View>   
                                
                     <View className="my-2 h-[20%] mb-5">
-                        <Text className="text-lg text-gray-400 pl-3 mt-1 font-medium mb-1">Last session - Wed 6th</Text>
+                        <Text className="text-lg text-gray-400 pl-3 mt-1 font-medium mb-1">Last session - {lastSession.date}</Text>
                         <View className="h-[90%] justify-evenly items-start flex flex-row">
                             <View className="bg-stone-200 w-[40%] h-full justify-center items-center flex flex-row rounded-xl">
                             <FontAwesome6 className="" name="clock" size={30} color="grey" />
                             <View className="pl-4">
                                 <Text className="text-stone-600 font-base font-semibold">Duration</Text>
-                                <Text className="text-base text-stone-600 font-base font-bold">50 min</Text>
+                                <Text className="text-base text-stone-600 font-base font-bold">{lastSession.duration}</Text>
                             </View>
                             </View>
                             <View className="bg-stone-200 w-[53.5%] h-full justify-center items-center flex flex-row rounded-xl">

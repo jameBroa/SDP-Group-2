@@ -25,6 +25,7 @@ export default function Playback() {
         const sessionRef = ref(storage, `videos/${user.uid}/${session}`);
         const items = await listAll(sessionRef); // List all items (videos) in the session directory
         
+        console.log("Session " + session + "has " + items);
         await Promise.all(items.items.map(async (item) => {
             const url = await getDownloadURL(item); // Get download URL for each video
             if (videos.includes(url) == false) {
@@ -37,9 +38,11 @@ export default function Playback() {
     };
 
     useEffect(() => {
-      fetchVideos(); // Fetch videos for the session when component mounts
-    }, []);
-
+      setVideos([]);
+      setCurrentViewableItemIndex(0);
+      fetchVideos();
+    }, [session]);
+    
     return (
         <View className="w-full h-full flex flex-col items-center bg-[]" style={styles.videoContainer}>
             <Stack.Screen options={{

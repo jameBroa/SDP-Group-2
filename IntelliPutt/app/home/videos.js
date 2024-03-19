@@ -15,11 +15,15 @@ export default function VideosPerSession() {
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        ReduxStateUpdater.fetchSessions(user);
+        fetchSessionsWithVideos();
         setTimeout(() => setRefreshing(false), 1000);
     }, [])
 
     const fetchSessionsWithVideos = async () => {
+        console.log("User sessions " + user.sessions);
+        ReduxStateUpdater.fetchSessions(user);
+        console.log("User sessions after fetching " + user.sessions);
+
         try {
             const storage = getStorage();
             
@@ -79,9 +83,12 @@ export default function VideosPerSession() {
                     </View>
                     
                     <Text className="text-lg text-gray-400 pl-4 pt-3 font-medium mt-1 mb-2">Per session</Text>
-                    {Array.from(sessionID).map(([id, started]) => (
+                    {Array
+                    .from(sessionID.entries())
+                    .sort((a, b) => new Date(b[1].split('/').reverse().join('-')) - new Date(a[1].split('/').reverse().join('-')))
+                    .map(([id, started]) => (
                         <View key={id} 
-                            className="items-center justify-evenlyh-full bg-stone-200 rounded-2xl py-5 mx-3">
+                            className="items-center justify-evenlyh-full bg-stone-200 rounded-2xl py-5 mx-3 mb-3">
                             <Text className="text-base text-brand-colordark-green font-semibold">Session on {started}</Text>
                             <Text className="text-base text-brand-colordark-green font-light mb-1">{id}</Text>
                             
@@ -95,7 +102,12 @@ export default function VideosPerSession() {
                             {sessionID.length === 0 && <Text>No videos for this session</Text>}
                         </View>
                     ))}
-                    {sessionID.size === 0 && <Text>No videos found</Text>}
+                    {sessionID.size === 0 && 
+                    <View 
+                    className="items-center justify-evenlyh-full bg-stone-200 rounded-2xl py-5 mx-3">
+                        <Text>No sessions with videos found</Text>
+                    </View>
+                    }
                 </View>
             </ScrollView>
         </View>
