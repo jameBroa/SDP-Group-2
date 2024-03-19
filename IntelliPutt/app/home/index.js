@@ -124,7 +124,7 @@ export default function Index() {
 
         setLastSession({
             "duration": d.sessionEnded.seconds - d.sessionStarted.seconds,
-            "date": new Date(d.sessionStarted.seconds * 1000).toLocaleDateString()
+            "date": new Date(d.sessionStarted.seconds * 1000).toDateString()
         })
     }
 

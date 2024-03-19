@@ -4,6 +4,7 @@ import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { View, Dimensions, FlatList, StyleSheet, Pressable, Text } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import React, { useEffect, useRef, useState } from 'react';
+import VideoMenu from '../../components/VideoMenu.js';
 
 export default function Playback() {
     const user = useSelector((state) => state.user.user);
@@ -54,6 +55,7 @@ export default function Playback() {
                 headerLeft: () => <Pressable onPress={() => router.replace("/home/videos")} >
                     <Text className="pl-5 text-base">Back</Text>
                 </Pressable>,
+                headerRight: () => <VideoMenu />,
                 title: `${currentViewableItemIndex + 1} of ${videos.length} from ${date.slice(0, 5)}`,
                 headerTintColor: '#000000',
                 headerTitleStyle: {

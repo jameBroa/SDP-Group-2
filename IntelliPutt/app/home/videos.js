@@ -34,7 +34,7 @@ export default function VideosPerSession() {
                 if (items.items.length > 0) {
                     getDoc(doc(db, `sessions`, session))
                     .then((d) => {                
-                        const date = new Date((d.data().sessionStarted.seconds * 1000)).toLocaleDateString();
+                        const date = new Date((d.data().sessionStarted.seconds * 1000)).toDateString();
                         if (!sessionID.has(session)) {
                             setSessionID(prevSessions => new Map(prevSessions).set(session, date));
                         }
