@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import { Link, router } from 'expo-router';
 import db from '../../config/database';
 import { collection, doc, getDoc, getDocs, query, where, and } from 'firebase/firestore';
-import ReduxStateUpdater from '../../context/util/updateState';
+import { useReduxStateUpdater } from '../../context/util/updateState';
 
 export default function Index() {
     const serverAddress = "172.24.49.226:5000";
@@ -23,6 +23,7 @@ export default function Index() {
 
     // Redux vars
     const user = useSelector((state) => state.user.user);
+    const { fetchFriends } = useReduxStateUpdater();
 
     // State management
     const [loaded, setLoaded] = useState(false);
@@ -124,13 +125,14 @@ export default function Index() {
 
         setLastSession({
             "duration": d.sessionEnded.seconds - d.sessionStarted.seconds,
-            "date": new Date(d.sessionStarted.seconds * 1000).toDateString()
+            "date": new Date(d.sessionStarted.seconds * 1000).toDateString().split(" ").slice(0, 3).join(" "),
+            "time": new Date(d.sessionStarted.seconds * 1000).toLocaleTimeString().split(":").slice(0, 2).join(":")
         })
     }
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        ReduxStateUpdater.fetchFriends(user);
+        fetchFriends();
         checkServerStatus();
         updateFriends();
         getNumNotifications();
@@ -158,7 +160,7 @@ export default function Index() {
         return (
             <View className="h-full w-full flex flex-col">
                 <View className="h-[30%]">
-                    <DefaultContainer subheading="Welcome back!" heading={user.name} number={unreadNotifications}/>
+                    <DefaultContainer subheading="Welcome back," heading={user.name + "!"} number={unreadNotifications}/>
                 </View>
 
                 <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1"
@@ -189,7 +191,7 @@ export default function Index() {
                     </View>   
                                
                     <View className="my-2 h-[20%] mb-5">
-                        <Text className="text-lg text-gray-400 pl-3 mt-1 font-medium mb-1">Last session - {lastSession.date}</Text>
+                        <Text className="text-lg text-gray-400 pl-3 mt-1 font-medium mb-1">Last session - {lastSession.date} at {lastSession.time}</Text>
                         <View className="h-[90%] justify-evenly items-start flex flex-row">
                             <View className="bg-stone-200 w-[40%] h-full justify-center items-center flex flex-row rounded-xl">
                             <FontAwesome6 className="" name="clock" size={30} color="grey" />

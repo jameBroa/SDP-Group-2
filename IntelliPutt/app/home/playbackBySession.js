@@ -5,7 +5,6 @@ import { View, Dimensions, FlatList, StyleSheet, Pressable, Text, Alert } from '
 import { Video, ResizeMode } from 'expo-av';
 import React, { useEffect, useRef, useState } from 'react';
 import { Fontisto } from '@expo/vector-icons';
-import { current } from '@reduxjs/toolkit';
 
 export default function Playback() {
     const user = useSelector((state) => state.user.user);
@@ -64,7 +63,7 @@ export default function Playback() {
         }
     }
 
-    const downloadVideo = async (video) => {
+    const downloadVideo =  () => {
       
     }
 

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, StyleSheet, Text, RefreshControl, ScrollView } from 'react-native';
 import { getStorage, ref, listAll } from 'firebase/storage';
 import { useSelector } from 'react-redux';
-import ReduxStateUpdater from '../../context/util/updateState';
+import { useReduxStateUpdater } from '../../context/util/updateState';
 import { Link, Stack, router } from 'expo-router';
 import BackButton from '../../components/BackButton';
 import { doc, getDoc } from 'firebase/firestore';
@@ -13,6 +13,8 @@ export default function VideosPerSession() {
     const [sessionID, setSessionID] = React.useState(new Map());
     const [refreshing, setRefreshing] = React.useState(false);
 
+    const { fetchSessions } = useReduxStateUpdater();
+
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         fetchSessionsWithVideos();
@@ -20,7 +22,7 @@ export default function VideosPerSession() {
     }, [])
 
     const fetchSessionsWithVideos = async () => {
-        ReduxStateUpdater.fetchSessions(user);
+        fetchSessions();
 
         try {
             const storage = getStorage();
@@ -34,7 +36,7 @@ export default function VideosPerSession() {
                 if (items.items.length > 0) {
                     getDoc(doc(db, `sessions`, session))
                     .then((d) => {                
-                        const date = new Date((d.data().sessionStarted.seconds * 1000)).toDateString();
+                        const date = new Date((d.data().sessionStarted.seconds * 1000)).toDateString().split(' ').slice(1).join(' ');
                         if (!sessionID.has(session)) {
                             setSessionID(prevSessions => new Map(prevSessions).set(session, date));
                         }
@@ -49,6 +51,7 @@ export default function VideosPerSession() {
     };
 
     React.useEffect(() => {
+        console.log("Fetching sessions with videos");
         fetchSessionsWithVideos(); // Fetch videos for the session when component mounts
     }, []);
 
@@ -76,9 +79,8 @@ export default function VideosPerSession() {
                         }}>
                             <Text className="text-base text-brand-colordark-green font-semibold">View all</Text>
                         </Link>
-
-                        {sessionID.length === 0 && <Text>No videos for this session</Text>}
                     </View>
+
                     
                     <Text className="text-lg text-gray-400 pl-4 pt-3 font-medium mt-1 mb-2">Per session</Text>
                     {Array
@@ -96,8 +98,6 @@ export default function VideosPerSession() {
                             }}>
                                 <Text className="text-brand-colordark-green font-semibold">View videos</Text>
                             </Link>
-
-                            {sessionID.length === 0 && <Text>No videos for this session</Text>}
                         </View>
                     ))}
                     {sessionID.size === 0 && 
