@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export function useReduxStateUpdater() {
     const dispatch = useDispatch();
-    const user = useSelector((state) => state.user.user);
+    const user = useSelector((state) => state.user.user); 
 
     const fetchFriends = () => {
         // gets friends from database
@@ -35,12 +35,6 @@ export function useReduxStateUpdater() {
             });
         });
     }
-
-    useEffect(() => {
-        // Fetch friends and sessions when component mounts
-        fetchFriends(user);
-        fetchSessions(user);
-    }, []);
 
     return { fetchFriends, fetchSessions };
 }

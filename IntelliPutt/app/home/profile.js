@@ -33,45 +33,47 @@ export default function Profile() {
     });
   },[])
 
-  return (
-    <View className="w-full h-full flex flex-col items-center bg-brand-colordark-green">
-        <Stack.Screen options={{headerShown:false}}></Stack.Screen>
-        <View className="h-[40%] w-full items-center justify-center ">
-          <Image 
-            style={{height:110, width:110, borderRadius:50, marginTop:50, marginBottom:8}}
-            source={
-              profileImg == null ? require('../../static/images/user_placeholder.jpeg') : { 
-              uri: profileImg 
-            }}
-          />
-          <Text className="text-2xl font-medium mt-2 text-stone-50">{user.name}</Text>
-        </View>
-        <ScrollView contentContainerStyle={styles.wrapper} className="h-[60%] w-full flex flex-col rounded-t-3xl px-[4%] bg-stone-100 pt-5">
-          <View className="my-2 flex flex-row w-[100%] justify-evenly">
-            <ProfileTab icon="golf" text="67%" />
-            <ProfileTab icon="streak" text="2 days" />
-            <ProfileTab icon="friends" text="2 friends" />
+  if (user) {
+    return (
+      <View className="w-full h-full flex flex-col items-center bg-brand-colordark-green">
+          <Stack.Screen options={{headerShown:false}}></Stack.Screen>
+          <View className="h-[40%] w-full items-center justify-center ">
+            <Image 
+              style={{height:110, width:110, borderRadius:50, marginTop:50, marginBottom:8}}
+              source={
+                profileImg == null ? require('../../static/images/user_placeholder.jpeg') : { 
+                uri: profileImg 
+              }}
+            />
+            <Text className="text-2xl font-medium mt-2 text-stone-50">{user.name}</Text>
           </View>
-          <View className="h-[22%] justify-evenly items-start flex flex-row mt-2">
-            <View className="bg-brand-colordark-green w-[46.5%] h-full justify-center items-center rounded-xl">
-              <Link href="/home/videos">
-                <Entypo name="folder-video" size={45} color="white" />
-              </Link>
+          <ScrollView contentContainerStyle={styles.wrapper} className="h-[60%] w-full flex flex-col rounded-t-3xl px-[4%] bg-stone-100 pt-5">
+            <View className="my-2 flex flex-row w-[100%] justify-evenly">
+              <ProfileTab icon="golf" text="67%" />
+              <ProfileTab icon="streak" text="2 days" />
+              <ProfileTab icon="friends" text="2 friends" />
             </View>
-            <View className="bg-brand-colordark-green w-[46.5%] h-full  justify-center items-center rounded-xl">
-              <Entypo name="open-book" size={45} color="white" />
+            <View className="h-[22%] justify-evenly items-start flex flex-row mt-2">
+              <View className="bg-brand-colordark-green w-[46.5%] h-full justify-center items-center rounded-xl">
+                <Link href="/home/videos">
+                  <Entypo name="folder-video" size={45} color="white" />
+                </Link>
+              </View>
+              <View className="bg-brand-colordark-green w-[46.5%] h-full  justify-center items-center rounded-xl">
+                <Entypo name="open-book" size={45} color="white" />
+              </View>
             </View>
-          </View>
-          
-          <View className="mb-[18%]">
             
-          </View>
-          <CustomButton text="Edit your profile" onPress={() => router.push("/home/editProfile")} />
-          <CustomButton text="Privacy settings" onPress={handleLogout} />
-          <CustomButton text="Logout" onPress={handleLogout} />
-        </ScrollView>
-    </View>
-  )
+            <View className="mb-[18%]">
+              
+            </View>
+            <CustomButton text="Edit your profile" onPress={() => router.push("/home/editProfile")} />
+            <CustomButton text="Privacy settings" onPress={handleLogout} />
+            <CustomButton text="Logout" onPress={handleLogout} />
+          </ScrollView>
+      </View>
+    )
+  }
 }
 
 const styles = {
