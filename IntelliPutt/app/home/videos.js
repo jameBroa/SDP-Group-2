@@ -74,7 +74,7 @@ export default function VideosPerSession() {
                         <Link href={{
                             pathname: "/home/playbackAllTime",
                         }}>
-                            <Text className="text-lg text-brand-colordark-green font-semibold">View all</Text>
+                            <Text className="text-base text-brand-colordark-green font-semibold">View all</Text>
                         </Link>
 
                         {sessionID.length === 0 && <Text>No videos for this session</Text>}

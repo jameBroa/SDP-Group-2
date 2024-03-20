@@ -1,10 +1,11 @@
-import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, listAll, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useSelector } from 'react-redux';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
-import { View, Dimensions, FlatList, StyleSheet, Pressable, Text } from 'react-native';
+import { View, Dimensions, FlatList, StyleSheet, Pressable, Text, Alert } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import React, { useEffect, useRef, useState } from 'react';
-import VideoMenu from '../../components/VideoMenu.js';
+import { Fontisto } from '@expo/vector-icons';
+import { current } from '@reduxjs/toolkit';
 
 export default function Playback() {
     const user = useSelector((state) => state.user.user);
@@ -38,6 +39,54 @@ export default function Playback() {
       }
     };
 
+    const deleteVideo = () => {
+      const storage = getStorage();
+
+      const regex = /F(\d+)\.mp4/;
+
+      const match = videos[currentViewableItemIndex].match(regex);
+        if (match) {
+          const videoNum = match[1];
+          console.log(videoNum);
+
+          // Create a reference to the file to delete
+          const desertRef = ref(storage, 'videos/' + user.uid + '/' + session + '/' + videoNum + '.mp4');
+
+          // Delete the file
+          deleteObject(desertRef).then(() => {
+            alert("Video deleted successfully");
+            
+            // Remove video from videos array
+            setVideos(prevVideos => prevVideos.filter(video => video !== videos[currentViewableItemIndex]));
+          }).catch((error) => {
+            alert("Error deleting video: " + error);
+          });
+        }
+    }
+
+    const downloadVideo = async (video) => {
+      
+    }
+
+    const videoOptions = () => {
+      Alert.alert('Video options', "", [
+        {
+          text: 'Download video',
+          onPress: () => console.log('Ask me later pressed'),
+        },
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'Delete video',
+          onPress: () => deleteVideo(),
+          style: 'destructive',
+        }
+      ]);
+    }
+
     useEffect(() => {
       setVideos([]);
       setCurrentViewableItemIndex(0);
@@ -53,9 +102,11 @@ export default function Playback() {
                 },
                 headerBackButtonMenuEnabled: true,
                 headerLeft: () => <Pressable onPress={() => router.replace("/home/videos")} >
-                    <Text className="pl-5 text-base">Back</Text>
+                    <Text className="pl-5 text-base font-medium text-stone-700">Back</Text>
                 </Pressable>,
-                headerRight: () => <VideoMenu />,
+                headerRight: () => <Pressable onPress={videoOptions} className="pr-5 mb-1">
+                    <Fontisto name="more-v-a" size={22} color="black" />
+                </Pressable>,
                 title: `${currentViewableItemIndex + 1} of ${videos.length} from ${date.slice(0, 5)}`,
                 headerTintColor: '#000000',
                 headerTitleStyle: {
