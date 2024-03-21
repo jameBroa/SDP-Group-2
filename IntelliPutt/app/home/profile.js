@@ -9,6 +9,8 @@ import { Stack, router, Link } from 'expo-router';
 import { ScrollView } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import ProfileTab from '../../components/ProfileTab';
+import { FontAwesome6 } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function Profile() {
   // Redux var
@@ -20,12 +22,16 @@ export default function Profile() {
     dispatch(logout());
   }
 
+  const handlePrivacyChanges = () => {
+    console.log('Privacy settings');
+  }
+
   // State variables
   const [profileImg, setProfileImg] = useState();
 
   useEffect(() => {
     const storage = getStorage()
-    const imageRef = ref(storage, `images/${user.uid}`)
+    const imageRef = ref(storage, `images/${user.uid}.png`)
     getDownloadURL(imageRef).then((url) => {
       setProfileImg(url);
     }).catch((error) => {
@@ -53,22 +59,23 @@ export default function Profile() {
               <ProfileTab icon="streak" text="2 days" />
               <ProfileTab icon="friends" text="2 friends" />
             </View>
-            <View className="h-[22%] justify-evenly items-start flex flex-row mt-2">
-              <View className="bg-brand-colordark-green w-[46.5%] h-full justify-center items-center rounded-xl">
+            <View className="h-[22%] justify-evenly items-start flex flex-row mt-2 mb-[55px]">
+              <View className="bg-brand-colordark-green w-[46.5%] h-full justify-center items-center rounded-xl py-5">
                 <Link href="/home/videos">
                   <Entypo name="folder-video" size={45} color="white" />
                 </Link>
+                <Text className="text-stone-100 font-medium mt-2">Videos</Text>
               </View>
-              <View className="bg-brand-colordark-green w-[46.5%] h-full  justify-center items-center rounded-xl">
-                <Entypo name="open-book" size={45} color="white" />
+              <View className="bg-brand-colordark-green w-[46.5%] h-full  justify-center items-center rounded-xl py-5">
+                <Link href="/home/videos">
+                  <MaterialCommunityIcons name="trophy-award" size={50} color="white" />
+                </Link>
+                <Text className="text-stone-100 font-medium my-2">Achievements</Text>
               </View>
             </View>
-            
-            <View className="mb-[18%]">
               
-            </View>
-            <CustomButton text="Edit your profile" onPress={() => router.push("/home/editProfile")} />
-            <CustomButton text="Privacy settings" onPress={handleLogout} />
+            <CustomButton text="Edit your profile" onPress={() => router.replace("/home/editProfile")} />
+            <CustomButton text="Privacy settings" onPress={() => router.replace("/home/privacy")} />
             <CustomButton text="Logout" onPress={handleLogout} />
           </ScrollView>
       </View>
