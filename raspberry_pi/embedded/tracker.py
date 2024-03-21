@@ -15,49 +15,52 @@ class OutputProps:
 class Tracker:
     # For Raspberry pi, XVID works, not mp4v. If need to convert, will do so.
     def __init__(self, output_path="/home/pi/Desktop/new.avi", encoding="XVID"):
-        print(cv.__version__)
         self.output_path = output_path
-        print('getting here')
-        self.video=cv.VideoCapture(0)
-        #for x in range(13,100):
-                #self.video = cv.VideoCapture(x)
+
+
+        self.video = cv.VideoCapture(1)
         
         if not self.video.isOpened():
                 print("Cannot open camera")
+        else:
+                print("- OPENED CAMERA")
 
-        print('or getting here')
         # Output video settings
-        output_props = OutputProps(int(self.video.get(cv.CAP_PROP_FRAME_WIDTH)) // 2, 
+        output_props = OutputProps(
+                                   int(self.video.get(cv.CAP_PROP_FRAME_WIDTH)) // 2, 
                                    int(self.video.get(cv.CAP_PROP_FRAME_HEIGHT)) // 2,
                                    int(self.video.get(cv.CAP_PROP_FPS))
                                    )
-        # self.width = int(self.video.get(cv.CAP_PROP_FRAME_WIDTH)) // 2
-        # self.height = int(self.video.get(cv.CAP_PROP_FRAME_HEIGHT)) // 2
-        # self.fps = int(self.video.get(cv.CAP_PROP_FPS))
-        # self.video.set(cv.CAP_PROP_BUFFERSIZE, 1)
-        # self.text = ""
-
-
-        # self.out = cv.VideoWriter(self.output_path, self.fourcc, 10, (self.width, self.height))
+                                   
         # Encoding info
         self.fourcc = cv.VideoWriter_fourcc(*encoding)
         self.out = cv.VideoWriter(self.output_path, self.fourcc, 10, (int(self.video.get(3)), int(self.video.get(4))))
 
         # Reading input initialization
         self.ok, self.frame = self.video.read()
-        self.tracker = cv.TrackerCSRT_create()
-        self.initial_bbox = (420,450,150,150) #Bounding box where the ball will be (needs to be adjusted to frame)
+        if self.ok: 
+                print("Read first frame:", self.frame.shape) 
+        else: 
+                print("Read first frame failed")
+        
+        # Tracker init
+        self.tracker = cv.legacy.TrackerCSRT_create()
+        self.initial_bbox = (420,450,100,100) # Bounding box where the ball will be (needs to be adjusted to frame)
         self.curr_bbox = self.initial_bbox
         self.ok = self.tracker.init(self.frame, self.curr_bbox)
-        # self.frame_count = 0 # Used to find initial center of ball and distance threshold compared to this
+        if self.ok: 
+                print("Tracker init ok") 
+        else: 
+                print("Tracker init failed")
 
         # Tracking variables
+        self.frame_count = 0 # Used to find initial center of ball and distance threshold compared to this
         self.distance_thresh = 100
         p1 = (int(self.curr_bbox[0]), int(self.curr_bbox[1]))
         p2 = (int(self.curr_bbox[0] + self.curr_bbox[2]), int(self.curr_bbox[1] + self.curr_bbox[3]))
         center = ((p1[0] + p2[0]) // 2, (p1[1] + p2[1]) // 2)
         self.initial_center = center
-        self.done = False
+        self.calculated_swing_angle = False
         self.in_frame = True
 
     def calculate_swing_angle(self, center):
@@ -70,7 +73,7 @@ class Tracker:
             swing_direction="left"
             swing_angle = math.degrees(angle_radians) % 180
         self.text = f"swing angle: {swing_angle:.2f} to the {swing_direction}"
-        self.done = True
+        self.calculated_swing_angle = True
 
     def check_in_frame(self, p1, p2):
         # Logic for checking if ball is in frame or not
@@ -79,19 +82,30 @@ class Tracker:
         return True     
 
     def start_tracking(self):
-        print("Started tracking")
+        print("\n- STARTED TRACKING")
+        cv.namedWindow("Tracking")
         counter = 0
 
         while True:
+            if not(globals.session_in_progress):
+                print("\n- STOPPED TRACKING")
+                break
+                
             counter += 1
             self.ok, self.frame = self.video.read()
 
             if not self.ok:
+                print("Could not read frame")
                 break
+                
+            print("Trying to show frame...")
+            cv.imshow("Tracking", self.frame)
+            cv.waitKey(10)
 
             self.ok, self.curr_bbox = self.tracker.update(self.frame)
 
             if self.ok:
+                print("Updated tracker on frame")
                 p1 = (int(self.curr_bbox[0]), int(self.curr_bbox[1]))
                 p2 = (int(self.curr_bbox[0] + self.curr_bbox[2]), int(self.curr_bbox[1] + self.curr_bbox[3]))
                 cv.rectangle(self.frame, p1, p2, (255, 0, 0), 2, 1)
@@ -100,20 +114,20 @@ class Tracker:
                 in_frame = self.check_in_frame(p1, p2)
 
                 if not in_frame:
-                    self.video.release()
-                    self.out.release()
-                    return 1
+                    print("Not in frame")
+                    break
 
-            
                 distance = math.sqrt((center[0] - self.initial_center[0]) ** 2 + (center[1] - self.initial_center[1]) ** 2)
+                
                 if(distance > self.distance_thresh):
                     self.calculate_swing_angle(center)
                     
-            self.out.write(self.frame)
 
-            if(self.done == True):
-                cv.putText(self.frame, self.text, (20,50), cv.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2, cv.LINE_AA)
-        
+
+                if self.calculated_swing_angle:
+                        cv.putText(self.frame, self.text, (20,50), cv.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2, cv.LINE_AA)
+                self.out.write(self.frame)
+                
         self.video.release()
         self.out.release()
         cv.destroyAllWindows() 
@@ -140,6 +154,6 @@ class Tracker:
         print('stopped looping')
         self.video.release()
         self.out.release()
-
+        
 #tracker = Tracker()
 #tracker.start_tracking()

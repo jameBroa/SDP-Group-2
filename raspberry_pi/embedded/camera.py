@@ -10,13 +10,13 @@ import globals
 
 
 async def record_local_video():
-    print("Running record local video")
+    
     try:
         new_video_path = generate_new_video_path()
-        full_video_path = f'/Users/james/Desktop/videos/{new_video_path}'
+        full_video_path = f'/home/pi/Desktop/videos/{new_video_path}'
         
         if not os.path.exists(full_video_path):
-            os.makedirs(f"/Users/james/Desktop/videos/{new_video_path}")
+            os.makedirs(f"/home/pi/Desktop/videos/{new_video_path}")
             
         tracker = Tracker(output_path=f'{full_video_path}/{globals.video_count}.avi')
         # subprocess.run(tracker.start_tracking())
@@ -32,7 +32,7 @@ async def record_local_video():
         # convert h264 video to mp4
         #print("Converting video to mp4 format...")
         #subprocess.run(["ffmpeg","-r","30","-i",f"{full_video_path}.mp4", f"{full_video_path}.h264"])
-        return 1
+        return 0
         #return upload_video(full_video_path)
     except Exception as error:
         print("Video recording failed", error)

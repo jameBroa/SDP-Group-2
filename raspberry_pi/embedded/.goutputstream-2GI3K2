@@ -1,36 +1,29 @@
 from db import upload_video
 import camera
 import globals
-import cv2
+import cv2 as cv
 import subprocess
 import time
 import threading
 import asyncio
-#from tracker import Tracker
-from thresh import Tracker
-from thresh import ROI
+from tracker import Tracker
 import os
 
 
 async def record():
 	try:
 		globals.uploaded_video = False
-		print('getting here')
 		
 		file_path = f'/home/pi/Desktop/videos/{globals.current_user}/{globals.session_id}'
 		if not os.path.exists(file_path):
 			os.makedirs(file_path)
-			
-			
-		tracker = Tracker(output_path=f"{file_path}/{globals.video_count}.avi", encoding="XVID")
-		tracker.start_tracking()		
 		
-		# <--- Below uses tracker.py --->
-		#tracker = Tracker(output_path=f"{file_path}/{globals.video_count}.mp4", encoding="h264")		
-		#(tracker.start_tracking())
+		tracker = Tracker(output_path=f"{file_path}/{globals.video_count}.mp4", encoding="h264")
 		
+		# asyncio.get_event_loop().run_until_complete(tracker.start_tracking())
 		
-		upload_video(f"{file_path}/{globals.video_count}.avi")
+		(tracker.start_tracking())
+		upload_video(f"{file_path}/{globals.video_count}.mp4")
 		globals.uploaded_video = True
 		
 		globals.video_count += 1
