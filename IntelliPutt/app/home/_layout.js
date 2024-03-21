@@ -70,6 +70,14 @@ export default function Layout() {
             />
 
             <Tabs.Screen
+            name="achievements"
+            href="/achievements"
+            options={{
+                href:null
+            }}
+            />
+
+            <Tabs.Screen
             name="notifications"
             href="/notifications"
             options={{

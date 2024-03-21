@@ -67,7 +67,7 @@ export default function Profile() {
                 <Text className="text-stone-100 font-medium mt-2">Videos</Text>
               </View>
               <View className="bg-brand-colordark-green w-[46.5%] h-full  justify-center items-center rounded-xl py-5">
-                <Link href="/home/videos">
+                <Link href="/home/achievements">
                   <MaterialCommunityIcons name="trophy-award" size={50} color="white" />
                 </Link>
                 <Text className="text-stone-100 font-medium my-2">Achievements</Text>
