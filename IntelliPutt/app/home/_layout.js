@@ -62,6 +62,14 @@ export default function Layout() {
             />
 
             <Tabs.Screen
+            name="privacy"
+            href="/privacy"
+            options={{
+                href:null
+            }}
+            />
+
+            <Tabs.Screen
             name="notifications"
             href="/notifications"
             options={{
