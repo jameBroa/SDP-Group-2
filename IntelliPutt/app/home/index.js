@@ -5,17 +5,15 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable, TextInput } from 'react-native';
-import FriendButton from '../../components/FriendButton';
-import { Ionicons, FontAwesome, Feather } from '@expo/vector-icons';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import db from '../../config/database';
 import { collection, doc, getDoc, getDocs, query, where, and } from 'firebase/firestore';
 import { useReduxStateUpdater } from '../../context/util/updateState';
 import session from 'redux-persist/lib/storage/session';
-import CustomButton from '../../components/CustomButton';
 
 export default function Index() {
     const serverAddress = "charmander:5000";
@@ -79,10 +77,10 @@ export default function Index() {
 
             if (response.status === 200) {
                 console.log(response.data);
-                connectedToFrame(true);
+                setConnectedToFrame(true);
             } else if (response.status === 400) {
                 alert("Frame not found.", "Frame " + frameID + " doesn't seem to be in the network.");
-                connectedToFrame(false);
+                setConnectedToFrame(false);
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -92,31 +90,18 @@ export default function Index() {
     const startSoloSession = async () => {
         let response;
         try {
-            if (sessionOn) {
-                console.log("Ending session...");
-                response = await axios.get('http://' + serverAddress + '/session/solo/request_end/' + user.uid);
-                if (response.status === 200) {
-                    console.log(response.data);
-                    setSession(false);
-                    setSessionType("");
-                } else if (response.status === 400) {
-                    alert("There was no session running");
-                } else {
-                    console.error(response.data);
-                }
+            console.log("Starting session...");
+            response = await axios.get('http://' + serverAddress + '/session/solo/request_start/' + user.uid);
+            if (response.status === 200) {
+                console.log(response.data);
+                alert("Session started");
+                setSession(true);
+                setSessionType("solo");
+                setGameOn(true);
+            } else if (response.status === 400) {
+                alert("You already have a session running");
             } else {
-                console.log("Starting session...");
-                response = await axios.get('http://' + serverAddress + '/session/solo/request_start/' + user.uid);
-                if (response.status === 200) {
-                    console.log(response.data);
-                    alert("Session started");
-                    setSession(true);
-                    setSessionType("solo");
-                } else if (response.status === 400) {
-                    alert("You already have a session running");
-                } else {
-                    alert("Session didn't start because it found a " + response.status);
-                }
+                alert("Session didn't start because it found a " + response.status);
             }
         } catch (error) {
             if (error.request) {
@@ -130,31 +115,18 @@ export default function Index() {
     const startGroupSession = async () => {
         let response;
         try {
-            if (sessionOn) {
-                console.log("Ending session...");
-                response = await axios.get('http://' + serverAddress + '/session/group/request_end/' + user.uid);
-                if (response.status === 200) {
-                    console.log(response.data);
-                    setSession(false);
-                    setSessionType("");
-                } else if (response.status === 400) {
-                    alert("There was no session running");
-                } else {
-                    console.error(response.data);
-                }
+            console.log("Starting session...");
+            response = await axios.get('http://' + serverAddress + '/session/group/request_start/' + user.uid);
+            if (response.status === 200) {
+                console.log(response.data);
+                alert("Session started");
+                setSession(true);
+                setSessionType("group");
+                setGameOn(true);
+            } else if (response.status === 400) {
+                alert("You already have a session running");
             } else {
-                console.log("Starting session...");
-                response = await axios.get('http://' + serverAddress + '/session/group/request_start/' + user.uid);
-                if (response.status === 200) {
-                    console.log(response.data);
-                    alert("Session started");
-                    setSession(true);
-                    setSessionType("group");
-                } else if (response.status === 400) {
-                    alert("You already have a session running");
-                } else {
-                    alert("Session didn't start because it found a " + response.status);
-                }
+                alert("Session didn't start because it found a " + response.status);
             }
         } catch (error) {
             if (error.request) {
@@ -175,6 +147,23 @@ export default function Index() {
             }
         } catch {
             setServerOnline(false);
+        }
+    }
+
+    const stopSession = async () => {
+        if (sessionOn) {
+            console.log("Ending session...");
+            response = await axios.get('http://' + serverAddress + '/session/request_end/' + user.uid);
+            if (response.status === 200) {
+                console.log(response.data);
+                setSession(false);
+                setSessionType("");
+                setGameOn(false);
+            } else if (response.status === 400) {
+                alert("There was no session running");
+            } else {
+                console.error(response.data);
+            }
         }
     }
 
@@ -254,18 +243,18 @@ export default function Index() {
                                     <TextInput 
                                         placeholder='Frame ID'
                                         onChangeText={setFrameID}
-                                        style={{borderWidth: 1, borderColor: 'black', borderRadius: 5, width: 200, height: 50, color: 'black', backgroundColor: 'white', paddingHorizontal: 10, fontSize: 16}}
+                                        style={{borderWidth: 1, borderColor: 'black', borderRadius: 5, width: 250, height: 50, color: 'black', backgroundColor: 'white', paddingHorizontal: 10, fontSize: 16}}
                                         maxLength={10}
                                     />
-                                    <Pressable className="mt-3 py-2 items-center rounded-lg bg-stone-200 w-[30%]" onPress={connectToFrame}>
-                                        <Text className="text-stone-600 font-medium">Connect</Text>
+                                    <Pressable className="mt-4 py-2 items-center rounded-lg bg-stone-200 w-[25%]" onPress={connectToFrame}>
+                                        <Text className="font-medium text-sm font-brand-colordark-green">Connect</Text>
                                     </Pressable> 
                                 </View>
                             </View>
                         </View> 
                     }
 
-                    {(connectedToFrame) && (!sessionOn) &&
+                    {(connectedToFrame && !sessionOn) &&
                         <View className="my-2 h-[180px] flex flex-col ">
                             <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
                                 <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green">
@@ -289,7 +278,7 @@ export default function Index() {
                         </View>              
                     } 
 
-                    {(connectToFrame) && sessionOn &&
+                    {(connectToFrame && sessionOn) &&
                         <View className="my-2 h-[100px] flex flex-col">
                         <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
                             <View className="w-[90%] h-[100px] justify-center items-center rounded-xl bg-stone-200">
@@ -303,7 +292,7 @@ export default function Index() {
                     }
 
 
-                    {(sessionType === "group") && (!sessionOn) && 
+                    {(sessionType === "group" && sessionOn && !isGameOn) && 
                         <View className="my-2 h-[180px] flex flex-col">
                             <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
                                 <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green">
@@ -322,7 +311,7 @@ export default function Index() {
                         </View>
                     }
 
-                    {(sessionType === "group") && (sessionOn) && 
+                    {(sessionType === "group" && sessionOn && isGameOn) && 
                         <View className="my-2 h-[100px] flex flex-col">
                             <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
                             <View className="w-[90%] h-[100px] justify-center items-center rounded-xl bg-stone-200">
@@ -344,7 +333,7 @@ export default function Index() {
                                 </View>
 
                                 <View className="flex flex-row justify-evenly">
-                                    <Pressable className="pt-2 mt-5 mb-5 items-center w-[60%] h-[70px] rounded-lg" onPress={startSoloSession}>
+                                    <Pressable className="pt-2 mt-5 mb-5 items-center w-[60%] h-[70px] rounded-lg" onPress={stopSession}>
                                         <FontAwesome name="pause" size={30} color="white" />
                                         <Text className="text-stone-100 font-medium mt-1 text-sm">Stop session</Text>
                                     </Pressable>
