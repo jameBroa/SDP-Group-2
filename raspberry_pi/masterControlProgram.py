@@ -5,7 +5,7 @@ import time
 code = """from PicoRobotics import KitronikPicoRobotics\n
 import utime
 board=KitronikPicoRobotics()
-directions=['f','r']
+directions=['f','r'] 
 dc_motor=1
 solenoid=4
 motor_speed=30
@@ -29,9 +29,9 @@ def push(solenoid, solenoid_speed):
 	board.motorOff(solenoid)
 	
 def spin():
-	board.servoWrite(1,180)
+	board.servoWrite(1, 100)
 	utime.sleep(1)
-	board.servoWrite(1,100)
+	board.servoWrite(1, 180)
 
 def main():
 	lift_down(dc_motor, motor_speed)
@@ -59,7 +59,8 @@ class Lift():
 	def __init__(s):
 		setup = """from PicoRobotics import KitronikPicoRobotics\r
 		from mainRunner import lift_down, lift_up, push, spin, main\r
-		import utime\r"""
+		import utime\r
+		board=KitronikPicoRobotics()\r"""
 		s.solenoid = 4
 		s.solenoid_speed = 200
 		s.dc_motor = 1
@@ -81,11 +82,12 @@ class Lift():
 		s.ser.write(push.encode())
 		
 	def spin(s):
-		spin = """board.servoWrite(1,180)\r
-		utime.sleep(1)\r
-		board.servoWrite(1,100)\r"""
+		spinn = """
+		board.servoWrite(1,0)\r
+	utime.sleep(2)\r
+	board.servoWrite(1, 80)\r"""
 		
-		s.ser.write(spin.encode())
+		s.ser.write(spinn.encode())
 	
 	# from top position
 	def up_mainloop(s):
@@ -96,6 +98,7 @@ class Lift():
 	
 	# from bottom position
 	def mainloop(s):
+		s.spin()
 		s.lift_up()
 		s.push()
 		s.lift_down()
