@@ -66,7 +66,7 @@ class Tracker:
     def calculate_swing_angle(self, center):
         angle_radians = math.atan2(center[1] - self.initial_center[1], center[0] - self.initial_center[0])
         swing_angle = 0
-        if(self.curr_bbox[0] < (int(self.video.get(3))//2)): #the value should be half of the width of the video frame
+        if(self.curr_bbox[0] < (int(self.video.get(3))//2)): # the value should be half of the width of the video frame
             swing_direction = "right"
             swing_angle = 180 - math.degrees(angle_radians)
         else:
