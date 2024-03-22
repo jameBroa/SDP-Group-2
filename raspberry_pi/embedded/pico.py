@@ -3,7 +3,6 @@ import time
 
 
 try:
-	
 	ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
 	print('before sleep')
 	time.sleep(2)

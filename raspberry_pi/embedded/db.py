@@ -45,4 +45,4 @@ def start_session():
         "sessions": firestore.ArrayUnion([globals.session_id])
     })
     
-    print(f"- STARTED SESSION {globals.session_id} FOR {globals.current_user}")
+    print(f"- STARTED SESSION {globals.session_id} FOR {globals.current_user[0]}")

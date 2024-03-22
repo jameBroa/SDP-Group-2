@@ -87,12 +87,14 @@ class Lift():
 		
 		s.ser.write(spin.encode())
 	
+	# from top position
 	def up_mainloop(s):
 		s.lift_down()
 		s.lift_up()
 		s.push()
 		s.lift_down()
 	
+	# from bottom position
 	def mainloop(s):
 		s.lift_up()
 		s.push()
@@ -103,4 +105,4 @@ class Lift():
 
 
 lift = Lift()
-lift.spin()
+lift.mainloop()
