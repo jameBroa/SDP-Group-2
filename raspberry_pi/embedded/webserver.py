@@ -37,6 +37,8 @@ def request_group_session_start(user_id: str):
         globals.current_user.append(user_id)
         globals.session_type = "group"
         
+        db.start_session()
+        
         return Response(status=200, response=f"Group session {globals.session_id} successfully started by user {globals.current_user}")
     else:
         return Response(status=400, response="Request denied, session current in progress")
@@ -44,22 +46,35 @@ def request_group_session_start(user_id: str):
         
 @app.route("/session/group/join/<session_id>", methods=["GET"])
 def request_group_session_join(session_id: str):
-    if globals.session_in_progress and globals.session_type == "group" and globals.session_id == session_id:
+    if globals.session_in_progress and globals.session_type == "group" and globals.session_id[::7] == session_id:
         print("\n -- JOINED GROUP SESSION")
         globals.current_user.append(user_id)
+        db.join_session(user_id)
         
         return Response(status=200, response=f"{user_id} successfully joined {globals.session_id}")
     else:
         return Response(status=400, response="Request denied, session has either ended or is not group")
         
 
-@app.route("/session/group/<session_id>/players", methods=["GET"])
-def request_group_session_number_of_players(session_id: str):
-    if globals.session_in_progress and globals.session_id == session_id:
+@app.route("/session/group/players/<user_id>", methods=["GET"])
+def request_group_session_number_of_players(user_id: str):
+    if globals.session_in_progress and user_id in globals.current_user:
         return Response(status=200, response=f"{len(globals.current_user)}")
     else:
         return Response(status=400, response="Request denied, session has either ended or is not group")
 
+
+@app.route("/session/group/start_game/<user_id>", methods=["GET"])
+def request_group_session_start_game(user_id: str):
+    if globals.session_in_progress and user_id in globals.current_user:
+        def do_in_parallel():
+            execute.start()
+        
+        thread = threading.Thread(target=do_in_parallel)
+        thread.start()
+        return Response(status=200, response=f"Game started for {globals.session_id}")
+    else:
+        return Response(status=400, response="Request denied, session has either ended or is not group")
 
 @app.route("/session/request_end/<user_id>", methods=["GET"])
 def request_session_end(user_id: str):

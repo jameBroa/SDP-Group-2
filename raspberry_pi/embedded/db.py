@@ -23,11 +23,19 @@ def ended_session():
     db = firestore.client()
     users_ref = db.collection('sessions').document(globals.session_id)
     users_ref.update({
+        "uid": globals.current_user,
         "sessionEnded": firestore.SERVER_TIMESTAMP
     })
     
     print(f"- UPLOADED SESSION FOR {globals.current_user}")
 
+def join_session(uid):
+    user_ref = db.collection('users').document(uid)
+    user_ref.update({
+        "sessions": firestore.ArrayUnion([globals.session_id])
+    })
+    
+    print(f"User {uid} joined {globals.session_id}")
 
 def start_session():
     db = firestore.client()
@@ -40,9 +48,10 @@ def start_session():
     
     
     globals.session_id = sessions_ref[1].id
-    user_ref = db.collection('users').document(globals.current_user)
-    user_ref.update({
-        "sessions": firestore.ArrayUnion([globals.session_id])
-    })
+    for uid in globals.current_user:
+        user_ref = db.collection('users').document(uid)
+        user_ref.update({
+            "sessions": firestore.ArrayUnion([globals.session_id])
+        })
     
     print(f"- STARTED SESSION {globals.session_id} FOR {globals.current_user[0]}")
