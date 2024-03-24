@@ -13,10 +13,9 @@ import { router } from 'expo-router';
 import db from '../../config/database';
 import { collection, doc, getDoc, getDocs, query, where, and } from 'firebase/firestore';
 import { useReduxStateUpdater } from '../../context/util/updateState';
-import session from 'redux-persist/lib/storage/session';
 
 export default function Index() {
-    const serverAddress = "charmander:5000";
+    const serverAddress = "172.24.61.25:5000";
 
     // Firebase vars
     const friendRequestCollection = collection(db, "friendRequests");
@@ -32,11 +31,21 @@ export default function Index() {
     const [unreadNotifications, setUnreadNotifications] = useState(false);
     const [sessionOn, setSession] = useState(false);
     const [lastSession, setLastSession] = useState(new Map());
+
+    // Step 1
     const [isServerOnline, setServerOnline] = useState(true);
     const [connectedToFrame, setConnectedToFrame] = useState(false);
-    const [sessionType, setSessionType] = useState("");
-    const [isGameOn, setGameOn] = useState(false);
     const [frameID, setFrameID] = useState("");
+
+    // Step 2
+    const [sessionType, setSessionType] = useState("");
+    const [sessionID, setSessionID] = useState("");
+
+    // Step 3
+    const [numPlayers, setNumPlayers] = useState(1);
+
+    // Step 4
+    const [isGameOn, setGameOn] = useState(false);
 
     const getNumNotifications = async() => {
         const q = query(friendRequestCollection, 
@@ -84,6 +93,32 @@ export default function Index() {
             }
         } catch (error) {
             console.error('Error fetching data:', error);
+            // check for [AxiosError: Request failed with status code 400]
+            if (error.response.status === 400) {
+                alert("Frame not found.", "Frame " + frameID + " doesn't seem to be in the network.");
+                setConnectedToFrame(false);
+            }
+        }
+    }
+
+    const getNumberOfPlayers = async () => {
+        let response;
+        try {
+            console.log("Getting number of players...");
+            response = await axios.get('http://' + serverAddress + '/session/group/players/' + user.uid);
+            if (response.status === 200) {
+                console.log(response.data);
+                setNumPlayers(response.data);
+                return response.data;
+            } else {
+                console.error(response.data);
+            }
+        } catch (error) {
+            if (error.request) {
+                alert("Server is offline, refresh to check.");
+                isServerOnline(false);
+            }
+            console.error('Error fetching data:', error);
         }
     }
 
@@ -119,9 +154,34 @@ export default function Index() {
             response = await axios.get('http://' + serverAddress + '/session/group/request_start/' + user.uid);
             if (response.status === 200) {
                 console.log(response.data);
+
+                // Get sessionID from "Group session 4DOkXxBzRnTCZXpe911f successfully started by user"
+                setSessionID(response.data.split(" ")[2]);
                 alert("Session started");
                 setSession(true);
                 setSessionType("group");
+            } else if (response.status === 400) {
+                alert("You already have a session running");
+            } else {
+                alert("Session didn't start because it found a " + response.status);
+            }
+        } catch (error) {
+            if (error.request) {
+                alert("Server is offline, refresh to check.");
+                isServerOnline(false);
+            }
+            console.error('Error fetching data:', error);
+        }
+    }; 
+
+    const startGame = async () => {
+        let response;
+        try {
+            console.log("Starting game...");
+            response = await axios.get('http://' + serverAddress + '/session/group/start_game/' + user.uid);
+            if (response.status === 200) {
+                console.log(response.data);
+                alert("Game started");
                 setGameOn(true);
             } else if (response.status === 400) {
                 alert("You already have a session running");
@@ -135,18 +195,25 @@ export default function Index() {
             }
             console.error('Error fetching data:', error);
         }
-    };
+    }
 
-    const checkServerStatus = async () => {
+    const joinSession = async () => {
+        let response;
         try {
-            let response = await axios.get("http://" + serverAddress + "/isAlive");
+            console.log("Joining session...");
+            response = await axios.get('http://' + serverAddress + '/session/group/join/' + sessionID + '/' + user.uid);
             if (response.status === 200) {
-                setServerOnline(true);
+                console.log(response.data);
+                alert("Session joined");
+                setSession(true);
+                setSessionType("group");
+            } else if (response.status === 400) {
+                alert("Session not found");
             } else {
-                setServerOnline(false);
+                alert("Session didn't start because it found a " + response.status);
             }
-        } catch {
-            setServerOnline(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
     }
 
@@ -187,7 +254,6 @@ export default function Index() {
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         fetchFriends();
-        checkServerStatus();
         updateFriends();
         getNumNotifications();
         handleGetLastSession();
@@ -205,7 +271,6 @@ export default function Index() {
     if (user) {
         if (!loaded) {
             setLoaded(true);
-            checkServerStatus();
             updateFriends();
             handleGetLastSession();
             getNumNotifications();
@@ -222,6 +287,7 @@ export default function Index() {
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }>
                     
+                    {/* STEP 1 - CONNECT TO FRAME */}
                     {(connectedToFrame) ? 
                         <View className="mt-2 h-[100px]">
                             <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
@@ -254,8 +320,9 @@ export default function Index() {
                         </View> 
                     }
 
+                    {/* STEP 2 - START OR CONNECT TO SESSION */}
                     {(connectedToFrame && !sessionOn) &&
-                        <View className="my-2 h-[180px] flex flex-col ">
+                        <View className="my-2 h-[350px] flex flex-col ">
                             <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
                                 <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green">
                                     <View className="flex flex-row justify-evenly">
@@ -273,6 +340,20 @@ export default function Index() {
                                             <Text className="text-stone-600 font-medium mt-1 text-sm">Group</Text>
                                         </Pressable>
                                     </View>
+                                    
+                                    <View className="flex flex-row  mt-5 pb-2">
+                                        <Text className=" text-stone-200 mt-1 font-semibold text-base mr-2">Or connect to an existing one</Text>
+                                    </View>
+
+                                    <TextInput 
+                                        placeholder='Session ID'
+                                        onChangeText={setSessionID}
+                                        style={{borderWidth: 1, borderColor: 'black', borderRadius: 5, width: 300, height: 50, color: 'black', backgroundColor: 'white', paddingHorizontal: 10, fontSize: 16}}
+                                        maxLength={6}
+                                    />
+                                    <Pressable className="mt-4 py-2 items-center rounded-lg bg-stone-200 w-[25%]" onPress={joinSession}>
+                                        <Text className="font-medium text-sm font-brand-colordark-green">Connect</Text>
+                                    </Pressable> 
                                 </View>    
                             </View>                    
                         </View>              
@@ -283,7 +364,7 @@ export default function Index() {
                         <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
                             <View className="w-[90%] h-[100px] justify-center items-center rounded-xl bg-stone-200">
                                 <View className="flex flex-row justify-evenly">
-                                    <Text className=" text-stone-600 mt-1 font-semibold text-base mr-2">Step 2: Start a session</Text>
+                                    <Text className=" text-stone-600 mt-1 font-semibold text-base mr-2">Step 2: Start or connect to session</Text>
                                         <Ionicons name="checkmark-circle" size={28} color="grey" />  
                                 </View>
                             </View>
@@ -291,7 +372,7 @@ export default function Index() {
                     </View>
                     }
 
-
+                    {/* STEP 3 - GROUP SESSION WAIT FOR PLAYERS */}
                     {(sessionType === "group" && sessionOn && !isGameOn) && 
                         <View className="my-2 h-[180px] flex flex-col">
                             <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
@@ -299,10 +380,14 @@ export default function Index() {
                                     <View className="flex flex-row justify-evenly">
                                         <Text className=" text-stone-200 mt-1 font-semibold text-base mr-2">Step 3: Wait for friends to join</Text>
                                     </View>
+                                    <View className="flex flex-row justify-evenly">
+                                    <Text className=" text-stone-200 mt-1 font-regular text-base mr-2">Give them</Text><Text className="text-stone-200 mt-1 font-bold text-base mr-2">{sessionID.substring(0,6)}</Text>
+                                    </View>
+                                    
 
                                     <View className="flex flex-row justify-evenly pt-5">
-                                        <Text className=" text-stone-200 mt-2 font-semibold text-base mx-2">3 people in session</Text>
-                                        <Pressable className="ml-5 items-center mr-5 w-[20%] bg-stone-200 py-2 rounded-lg" onPress={startGroupSession}>
+                                        <Text className=" text-stone-200 mt-2 font-semibold text-base mx-2">{numPlayers} people in session</Text>
+                                        <Pressable className="ml-5 items-center mr-5 w-[20%] bg-stone-200 py-2 rounded-lg" onPress={startGame}>
                                                 <Text className="text-stone-600 font-medium mt-1 text-sm">Start</Text>
                                         </Pressable>
                                     </View>
@@ -324,12 +409,17 @@ export default function Index() {
                         </View>
                     }
 
+                    {/* STEP 3/4 - PLAY */}
                     {(isGameOn) &&
                     <View className="my-4 h-[160px] flex flex-col">
                         <View className="h-full justify-evenly items-start flex flex-row mt-2">
                             <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green pt-5">
                                 <View className="flex flex-row justify-evenly pt-2">
+                                {(sessionType === "group") ? 
                                     <Text className=" text-stone-200 font-semibold text-base mr-2">Step 4: Play</Text>
+                                    :
+                                    <Text className=" text-stone-200 font-semibold text-base mr-2">Step 3: Play</Text>
+                                }
                                 </View>
 
                                 <View className="flex flex-row justify-evenly">
