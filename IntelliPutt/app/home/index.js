@@ -92,12 +92,10 @@ export default function Index() {
                 setConnectedToFrame(false);
             }
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.log('Error fetching data:', error);
             // check for [AxiosError: Request failed with status code 400]
-            if (error.response.status === 400) {
-                alert("Frame not found.", "Frame " + frameID + " doesn't seem to be in the network.");
-                setConnectedToFrame(false);
-            }
+            alert("Frame not found. Frame " + frameID + " doesn't seem to be in the network.");
+            setConnectedToFrame(false);
         }
     }
 
@@ -261,6 +259,23 @@ export default function Index() {
     }, [])
 
     useEffect(() => {
+        // Define a variable to store the interval id
+        let intervalId;
+    
+        // Check if the specific case is true
+        if (sessionType === "group" && sessionOn && !isGameOn) {
+            // If true, set up the interval to fetch the number of players
+            intervalId = setInterval(() => {
+                // Call your function to get the number of players
+                getNumberOfPlayers();
+            }, 1000); // Fetch the number of players every second
+        }
+    
+        // Cleanup function to clear interval when component unmounts or when the specific case is no longer true
+        return () => clearInterval(intervalId);
+    }, [sessionType, sessionOn, isGameOn]);
+
+    useEffect(() => {
         // Check if user is logged in
         // If not, redirect to login page
         if (!user && loaded) {
@@ -384,7 +399,6 @@ export default function Index() {
                                     <Text className=" text-stone-200 mt-1 font-regular text-base mr-2">Give them</Text><Text className="text-stone-200 mt-1 font-bold text-base mr-2">{sessionID.substring(0,6)}</Text>
                                     </View>
                                     
-
                                     <View className="flex flex-row justify-evenly pt-5">
                                         <Text className=" text-stone-200 mt-2 font-semibold text-base mx-2">{numPlayers} people in session</Text>
                                         <Pressable className="ml-5 items-center mr-5 w-[20%] bg-stone-200 py-2 rounded-lg" onPress={startGame}>
@@ -432,26 +446,6 @@ export default function Index() {
                         </View>                                       
                     </View>
                     }
-                               
-                    {/* <View className="my-2 h-[50%] mb-5">
-                        <Text className="text-lg text-gray-400 pl-3 mt-1 font-medium mb-1">Last session - {lastSession.date} at {lastSession.time}</Text>
-                        <View className="h-[90%] justify-evenly items-start flex flex-row">
-                            <View className="bg-stone-200 w-[40%] h-full justify-center items-center flex flex-row rounded-xl">
-                            <FontAwesome6 className="" name="clock" size={30} color="grey" />
-                            <View className="pl-4">
-                                <Text className="text-stone-600 font-base font-semibold">Duration</Text>
-                                <Text className="text-base text-stone-600 font-base font-bold">{lastSession.duration}</Text>
-                            </View>
-                            </View>
-                            <View className="bg-stone-200 w-[53.5%] h-full justify-center items-center flex flex-row rounded-xl">
-                            <MaterialCommunityIcons name="golf" size={40} color="grey" />
-                            <View className="pl-3">
-                                <Text className="text-stone-600 font-base font-semibold">Successful putts</Text>
-                                <Text className="text-base text-stone-600 font-base font-bold">30%</Text>
-                            </View>
-                            </View>
-                        </View>
-                    </View> */}
                 </ScrollView>
             </View>
         );
