@@ -1,6 +1,8 @@
 import serial
 import time
 import RPi.GPIO as GPIO
+from motion import Motion
+from motion import VideoWriter
 
 code = """from PicoRobotics import KitronikPicoRobotics\n
 import utime
@@ -76,6 +78,8 @@ class Lift():
 		s.ser.write(b'\x04')
 		s.ser.write(s.setup.encode())
 		
+		s.camera = Motion(motion_frame_count_thresh=6)
+		
 	def reset_pico(s):
 		s.ser.close()
 		s.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
@@ -132,6 +136,8 @@ class Lift():
 		while True:
 			try:
 				s.reset_pico()
+				# Record until motion detected, presumably from ball
+				s.camera.start()
 				s.wait_ir_trigger()
 				s.spin()
 				s.lift_up()

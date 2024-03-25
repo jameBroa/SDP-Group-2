@@ -30,6 +30,7 @@ def ended_session():
     print(f"- UPLOADED SESSION FOR {globals.current_user}")
 
 def join_session(uid):
+    db = firestore.client()
     user_ref = db.collection('users').document(uid)
     user_ref.update({
         "sessions": firestore.ArrayUnion([globals.session_id])

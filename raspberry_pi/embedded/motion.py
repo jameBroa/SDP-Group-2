@@ -2,43 +2,39 @@ import cv2
 import numpy as np
 import time
 
-
-
-
-
-
 class VideoWriter():
-    def __init__(self, width, height):
-        self.out_low_res = cv2.VideoWriter('/home/pi/Desktop/motion2.avi', cv2.VideoWriter_fourcc(*'XVID'), 10, (320, 240))
-        self.out_org_res = cv2.VideoWriter('/home/pi/Desktop/motion3.avi', cv2.VideoWriter_fourcc(*'XVID'), 10, (width, height))
+    def __init__(self, output_path="/home/pi/Desktop/motion2.avi", output_path_org="/home/pi/Desktop/motion3.avi"):
+        self.out_low_res = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*'XVID'), 10, (320, 240))
+        self.out_org_res = cv2.VideoWriter(output_path_org, cv2.VideoWriter_fourcc(*'XVID'), 10, (640, 480))
         
     def write_from_edges(self, edges):
         self.out_low_res.write(cv2.merge([edges, edges, edges]))
         
 
-
-
-
-#cap = cv2.VideoCapture(1)
-# tracker = cv2.legacy.TrackerCSRT_create()
-#out = cv2.VideoWriter('/home/pi/Desktop/motion.avi', cv2.VideoWriter_fourcc(*'XVID'), 10, (320, 240))  # Decreased resolution for processing
-#out_original_resolution = cv2.VideoWriter('/home/pi/Desktop/test_original_resolution.avi', cv2.VideoWriter_fourcc(*'XVID'), 10, (int(cap.get(3)), int(cap.get(4))))  # Original resolution for output
-
-#ok, frame = cap.read()
-#curr_bbox = initial_bbox
-#fps, cnt_frame = 0, 0
-
 class Motion():
     
-    def __init__(self, motion_thresh=5):
+    def __init__(self, motion_thresh=5, motion_frame_count_thresh=10, residual_frame_count_thresh=10):
         # Video capture device by ID (default is 0, webcam is 1)
         self.cap = cv2.VideoCapture(1)
         # Reading first frame
         self.ok, self.frame = self.cap.read()
         # Technical vars for testing / calculations
         self.fps, self.cnt_frame = 0, 0
-        self.writer = VideoWriter(int(self.cap.get(3)), int(self.cap.get(4)))
+        self.writer = VideoWriter()
+        
+        # Controls how sensitive motion detection is
         self.motion_thresh = motion_thresh
+        
+        # A way to counter noise 
+        self.motion_frame_count = 0
+        self.motion_frame_count_thresh = motion_frame_count_thresh
+        
+        # count a number frames after motion thresh reached, to capture ball
+        # going to hole or whereever.
+        self.residual_frame_count = 0
+        self.residual_frame_count_thresh = residual_frame_count_thresh
+        
+        
 
     def mse(self, image_a, image_b):
         # the 'Mean Squared Error' between the two images is the
@@ -105,13 +101,27 @@ class Motion():
             '''
             is_motion = False
             
-            roi = frame_gray[frame_height//3*2 : frame_height, :]
+            # Considers bottom third for movement
+            #roi = frame_gray[frame_height//3*2 : frame_height, :]
+            
+            roi = frame_gray[frame_height//5*2 : frame_height, :]
+            
             
             if(self.cnt_frame > 0):
                 is_motion = self.check_motion(roi, roi_p)
-                
+                print(f'motion: {is_motion}')
                 if is_motion:
-                    print(f"Frame {self.cnt_frame}: motion detected!")
+                    #print(f"Frame {self.cnt_frame}: motion detected!")
+                    self.motion_frame_count += 1
+                    print(f'motion counter: {self.motion_frame_count}')
+                    
+                    # If number of motion frames exceeds threshold
+                    # Prevents breaking as soon as motion detected
+                if self.motion_frame_count > self.motion_frame_count_thresh:
+                    self.residual_frame_count += 1
+                    if self.residual_frame_count > self.residual_frame_count_thresh:
+                        self.writer.out_org_res.write(cv2.resize(self.frame, (640, 480)))
+                        break
             
             # -------------------------------------------------------------
             # record end time
@@ -124,8 +134,10 @@ class Motion():
             roi_p = roi 
             
             
-            self.writer.write_from_edges(edges)
-            self.writer.out_org_res.write(self.frame)
+            # Uncomment if you want to see the edges
+            # Commented to improve performance
+            #self.writer.write_from_edges(edges)
+            self.writer.out_org_res.write(cv2.resize(self.frame, (640, 480)))
             
             
             # uncomment if you want to test with cv2.imshow
@@ -133,18 +145,15 @@ class Motion():
             # for displaying mask and normal image
             edges = cv2.Canny(frame_gray,100,200)
             cv2.imshow('gray', frame_gray)
-            cv2.imshow('mask', cv2.merge([edges, edges, edges]))
+            #cv2.imshow('mask', cv2.merge([edges, edges, edges]))
         
             # For breaking loop
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
         self.cap.release()
-        self.writer.out_low_res.release()
+        #self.writer.out_low_res.release()
         self.writer.out_org_res.release()
         # uncomment if you want to test with cv2.imshow
         cv2.destroyAllWindows()
 
-motion = Motion()
-
-motion.start()

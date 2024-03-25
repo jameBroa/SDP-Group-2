@@ -44,11 +44,14 @@ def request_group_session_start(user_id: str):
         return Response(status=400, response="Request denied, session current in progress")
         
         
-@app.route("/session/group/join/<session_id>", methods=["GET"])
-def request_group_session_join(session_id: str):
-    if globals.session_in_progress and globals.session_type == "group" and globals.session_id[::7] == session_id:
+@app.route("/session/group/join/<session_id>/<user_id>", methods=["GET"])
+def request_group_session_join(session_id: str, user_id: str):
+    if user_id in globals.current_user:
+        print("User already in session")
+    elif globals.session_in_progress and globals.session_type == "group" and globals.session_id[0:6] == session_id:
         print("\n -- JOINED GROUP SESSION")
         globals.current_user.append(user_id)
+        
         db.join_session(user_id)
         
         return Response(status=200, response=f"{user_id} successfully joined {globals.session_id}")
@@ -67,6 +70,7 @@ def request_group_session_number_of_players(user_id: str):
 @app.route("/session/group/start_game/<user_id>", methods=["GET"])
 def request_group_session_start_game(user_id: str):
     if globals.session_in_progress and user_id in globals.current_user:
+        globals.game_started = True
         def do_in_parallel():
             execute.start()
         
@@ -75,6 +79,14 @@ def request_group_session_start_game(user_id: str):
         return Response(status=200, response=f"Game started for {globals.session_id}")
     else:
         return Response(status=400, response="Request denied, session has either ended or is not group")
+        
+@app.route("/session/group/has_game_started/<user_id>", methods=["GET"])
+def request_group_session_check_start_game(user_id: str):
+    if globals.session_in_progress and user_id in globals.current_user and globals.game_started:
+        
+        return Response(status=200, response=f"Game started for {globals.session_id}")
+    else:
+        return Response(status=400, response="Game has not yet started")
 
 @app.route("/session/request_end/<user_id>", methods=["GET"])
 def request_session_end(user_id: str):
