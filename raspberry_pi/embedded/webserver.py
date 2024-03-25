@@ -1,117 +1,115 @@
-from flask import Flask, Response
-from firebase_admin import firestore
+from flask import Flask
 import globals
 import db
 import execute
 import threading
-import asyncio
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, instance_relative_config=True)
+socketio = SocketIO(app)
 
-@app.route("/session/solo/request_start/<user_id>", methods=["GET"])
+
+@socketio.on('start_solo_session')
 def request_solo_session_start(user_id: str):
     if not globals.session_in_progress:
         print("\n -- STARTED SOLO SESSION")
         globals.session_in_progress = True
         globals.current_user.append(user_id)
         globals.session_type = "solo"
-        
+
         def do_in_parallel():
             db.start_session()
             execute.start()
-        
+
         thread = threading.Thread(target=do_in_parallel)
         thread.start()
-        # execute.start()
-        # asyncio.run(execute.start())
-        
-        return Response(status=200, response=f"Solo session successfully started for user_id: {user_id}")
+
+        emit('session_started', {'user_id': user_id})
     else:
-        return Response(status=400, response="Request denied, session current in progress")
-        
-@app.route("/session/group/request_start/<user_id>", methods=["GET"])
+        emit('session_denied', {'message': 'Session already in progress'})
+
+
+@socketio.on('request_group_session_start')
 def request_group_session_start(user_id: str):
     if not globals.session_in_progress:
         print("\n -- STARTED GROUP SESSION")
         globals.session_in_progress = True
         globals.current_user.append(user_id)
         globals.session_type = "group"
-        
+
         db.start_session()
-        
-        return Response(status=200, response=f"Group session {globals.session_id} successfully started by user {globals.current_user}")
+
+        emit('group_session_started', {'session_id': globals.session_id, 'user_id': user_id})
     else:
-        return Response(status=400, response="Request denied, session current in progress")
-        
-        
-@app.route("/session/group/join/<session_id>/<user_id>", methods=["GET"])
-def request_group_session_join(session_id: str, user_id: str):
+        emit('session_denied', {'message': 'Request denied, session current in progress'})
+
+
+@socketio.on('join_group_session')
+def request_group_session_join(data):
+    user_id = data['user_id']
+    session_id = data['session_id']
+
     if user_id in globals.current_user:
         print("User already in session")
     elif globals.session_in_progress and globals.session_type == "group" and globals.session_id[0:6] == session_id:
         print("\n -- JOINED GROUP SESSION")
         globals.current_user.append(user_id)
-        
+
         db.join_session(user_id)
-        
-        return Response(status=200, response=f"{user_id} successfully joined {globals.session_id}")
+
+        emit('session_joined', {'user_id': user_id, 'session_id': globals.session_id}, broadcast=True)
     else:
-        return Response(status=400, response="Request denied, session has either ended or is not group")
-        
-
-@app.route("/session/group/players/<user_id>", methods=["GET"])
-def request_group_session_number_of_players(user_id: str):
-    if globals.session_in_progress and user_id in globals.current_user:
-        return Response(status=200, response=f"{len(globals.current_user)}")
-    else:
-        return Response(status=400, response="Request denied, session has either ended or is not group")
+        emit('session_denied', {'message': 'Request denied, session has either ended or is not group'})
 
 
-@app.route("/session/group/start_game/<user_id>", methods=["GET"])
+@socketio.on('start_group_game')
 def request_group_session_start_game(user_id: str):
     if globals.session_in_progress and user_id in globals.current_user:
         globals.game_started = True
+
         def do_in_parallel():
             execute.start()
-        
+
         thread = threading.Thread(target=do_in_parallel)
         thread.start()
-        return Response(status=200, response=f"Game started for {globals.session_id}")
-    else:
-        return Response(status=400, response="Request denied, session has either ended or is not group")
-        
-@app.route("/session/group/has_game_started/<user_id>", methods=["GET"])
-def request_group_session_check_start_game(user_id: str):
-    if globals.session_in_progress and user_id in globals.current_user and globals.game_started:
-        
-        return Response(status=200, response=f"Game started for {globals.session_id}")
-    else:
-        return Response(status=400, response="Game has not yet started")
 
-@app.route("/session/request_end/<user_id>", methods=["GET"])
+        emit('game_started', {'session_id': globals.session_id}, broadcast=True)
+    else:
+        emit('game_start_denied', {'message': 'Request denied, session has either ended or is not group'},
+             broadcast=True)
+
+
+@socketio.on('end_session')
 def request_session_end(user_id: str):
     if globals.session_in_progress and user_id in globals.current_user:
         print("\n -- ENDED SESSION")
         db.ended_session()
         globals.reset()
-        return Response(status=200, response=f"Session successfully ended for user_id: {user_id}")
+
+        emit('session_ended', {'user_id': user_id}, broadcast=True)
     else:
-        return Response(status=400, response="Request denied, no session in progress or uid invalid")
+        emit('session_end_denied', {'message': 'Request denied, no session in progress or uid invalid'},
+             broadcast=True)
 
 
-@app.route("/stats/putt_percentage/<user_id>/<session_id>")
-def send_putt_percentage(user_id: str, session_id: str):
-    return None
-    
+@socketio.on('request_putt_percentage')
+def send_putt_percentage(data):
+    user_id = data['user_id']
+    session_id = data['session_id']
+    # Logic to calculate putt percentage
+    putt_percentage = 75  # Example value, replace with actual calculation
+    emit('putt_percentage', {'user_id': user_id, 'session_id': session_id, 'putt_percentage': putt_percentage})
 
-@app.route("/connect/<frame_id>")
+
+@socketio.on('connect_to_frame')
 def request_connect_to_frame(frame_id: str):
     if globals.device_id == frame_id:
-        return Response(status=200, response=f"Server alive")
+        emit('connection_response', {'status': 'success', 'message': 'Server alive'})
     else:
-        return Response(status=400, response=f"Frame ID not found")
+        emit('connection_response', {'status': 'failure', 'message': 'Frame ID not found'})
 
-@app.route("/test")
+
+@socketio.on('test_event')
 def test_func():
     print("RECEIVED")
-    return Response(response="received", status=200)
+    emit('test_response', {'status': 'success', 'message': 'Received'})
