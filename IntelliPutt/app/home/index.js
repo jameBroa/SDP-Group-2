@@ -6,16 +6,17 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable, TextInput } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
-import axios from 'axios';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
 import { router } from 'expo-router';
 import db from '../../config/database';
 import { collection, doc, getDoc, getDocs, query, where, and } from 'firebase/firestore';
 import { useReduxStateUpdater } from '../../context/util/updateState';
+import { socket } from '../../logic/socket';
 
 export default function Index() {
-    const serverAddress = "172.24.61.25:5000";
+    const serverAddress = "http://172.24.37.110:5000";
+    const [clientAddress, setClientAddress] = useState("");
 
     // Firebase vars
     const friendRequestCollection = collection(db, "friendRequests");
@@ -30,16 +31,15 @@ export default function Index() {
     const [refreshing, setRefreshing] = useState(false);
     const [unreadNotifications, setUnreadNotifications] = useState(false);
     const [sessionOn, setSession] = useState(false);
-    const [lastSession, setLastSession] = useState(new Map());
 
     // Step 1
-    const [isServerOnline, setServerOnline] = useState(true);
     const [connectedToFrame, setConnectedToFrame] = useState(false);
     const [frameID, setFrameID] = useState("");
 
     // Step 2
     const [sessionType, setSessionType] = useState("");
     const [sessionID, setSessionID] = useState("");
+    const [joinedOrStarted, setJoinedOrStarted] = useState("");
 
     // Step 3
     const [numPlayers, setNumPlayers] = useState(1);
@@ -77,203 +77,101 @@ export default function Index() {
         });
     }
 
-    const connectToFrame = async () => {
-        let response;
-        
-        try {
-            console.log("Requesting to connect with frame...");
-            response = await axios.get('http://' + serverAddress + '/connect/' + frameID);
-
-            if (response.status === 200) {
-                console.log(response.data);
-                setConnectedToFrame(true);
-            } else if (response.status === 400) {
-                alert("Frame not found.", "Frame " + frameID + " doesn't seem to be in the network.");
-                setConnectedToFrame(false);
-            }
-        } catch (error) {
-            console.log('Error fetching data:', error);
-            // check for [AxiosError: Request failed with status code 400]
-            alert("Frame not found. Frame " + frameID + " doesn't seem to be in the network.");
-            setConnectedToFrame(false);
-        }
-    }
-
-    const getNumberOfPlayers = async () => {
-        let response;
-        try {
-            console.log("Getting number of players...");
-            response = await axios.get('http://' + serverAddress + '/session/group/players/' + user.uid);
-            if (response.status === 200) {
-                console.log(response.data);
-                setNumPlayers(response.data);
-                return response.data;
-            } else {
-                console.error(response.data);
-            }
-        } catch (error) {
-            if (error.request) {
-                alert("Server is offline, refresh to check.");
-                isServerOnline(false);
-            }
-            console.error('Error fetching data:', error);
-        }
-    }
-
-    const startSoloSession = async () => {
-        let response;
-        try {
-            console.log("Starting session...");
-            response = await axios.get('http://' + serverAddress + '/session/solo/request_start/' + user.uid);
-            if (response.status === 200) {
-                console.log(response.data);
-                alert("Session started");
-                setSession(true);
-                setSessionType("solo");
-                setGameOn(true);
-            } else if (response.status === 400) {
-                alert("You already have a session running");
-            } else {
-                alert("Session didn't start because it found a " + response.status);
-            }
-        } catch (error) {
-            if (error.request) {
-                alert("Server is offline, refresh to check.");
-                isServerOnline(false);
-            }
-            console.error('Error fetching data:', error);
-        }
-    };  
-
-    const startGroupSession = async () => {
-        let response;
-        try {
-            console.log("Starting session...");
-            response = await axios.get('http://' + serverAddress + '/session/group/request_start/' + user.uid);
-            if (response.status === 200) {
-                console.log(response.data);
-
-                // Get sessionID from "Group session 4DOkXxBzRnTCZXpe911f successfully started by user"
-                setSessionID(response.data.split(" ")[2]);
-                alert("Session started");
-                setSession(true);
-                setSessionType("group");
-            } else if (response.status === 400) {
-                alert("You already have a session running");
-            } else {
-                alert("Session didn't start because it found a " + response.status);
-            }
-        } catch (error) {
-            if (error.request) {
-                alert("Server is offline, refresh to check.");
-                isServerOnline(false);
-            }
-            console.error('Error fetching data:', error);
-        }
-    }; 
-
-    const startGame = async () => {
-        let response;
-        try {
-            console.log("Starting game...");
-            response = await axios.get('http://' + serverAddress + '/session/group/start_game/' + user.uid);
-            if (response.status === 200) {
-                console.log(response.data);
-                alert("Game started");
-                setGameOn(true);
-            } else if (response.status === 400) {
-                alert("You already have a session running");
-            } else {
-                alert("Session didn't start because it found a " + response.status);
-            }
-        } catch (error) {
-            if (error.request) {
-                alert("Server is offline, refresh to check.");
-                isServerOnline(false);
-            }
-            console.error('Error fetching data:', error);
-        }
-    }
-
-    const joinSession = async () => {
-        let response;
-        try {
-            console.log("Joining session...");
-            response = await axios.get('http://' + serverAddress + '/session/group/join/' + sessionID + '/' + user.uid);
-            if (response.status === 200) {
-                console.log(response.data);
-                alert("Session joined");
-                setSession(true);
-                setSessionType("group");
-            } else if (response.status === 400) {
-                alert("Session not found");
-            } else {
-                alert("Session didn't start because it found a " + response.status);
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
-
-    const stopSession = async () => {
-        if (sessionOn) {
-            console.log("Ending session...");
-            response = await axios.get('http://' + serverAddress + '/session/request_end/' + user.uid);
-            if (response.status === 200) {
-                console.log(response.data);
-                setSession(false);
-                setSessionType("");
-                setGameOn(false);
-            } else if (response.status === 400) {
-                alert("There was no session running");
-            } else {
-                console.error(response.data);
-            }
-        }
-    }
-
-    const handleGetLastSession = async () => {
-        const q = query(
-            collection(db, "sessions"), 
-            where("uid", "==", user.uid)
-        );
-
-        const querySnapshot = await getDocs(q);
-
-      const d = querySnapshot.docs[0].data();
-
-        setLastSession({
-            "duration": d.sessionEnded.seconds - d.sessionStarted.seconds,
-            "date": new Date(d.sessionStarted.seconds * 1000).toDateString().split(" ").slice(0, 3).join(" "),
-            "time": new Date(d.sessionStarted.seconds * 1000).toLocaleTimeString().split(":").slice(0, 2).join(":")
-        })
-    }
-
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         fetchFriends();
         updateFriends();
         getNumNotifications();
-        handleGetLastSession();
         setTimeout(() => setRefreshing(false), 1000);
     }, [])
 
+    const fetchClientIP = async() => {
+        const response = await fetch("https://ipapi.co/json/")
+        const data = await response.json()
+
+        // Set the IP address to the constant `ip`
+        setClientAddress(data.ip);
+        console.log("Client IP:", data.ip);
+    }
+
+    const handleConnectToFrame = () => {
+        fetchClientIP();
+        socket.connect();
+        console.log("Socket connected " + socket.connected);
+    }
+
     useEffect(() => {
-        // Define a variable to store the interval id
-        let intervalId;
-    
-        // Check if the specific case is true
-        if (sessionType === "group" && sessionOn && !isGameOn) {
-            // If true, set up the interval to fetch the number of players
-            intervalId = setInterval(() => {
-                // Call your function to get the number of players
-                getNumberOfPlayers();
-            }, 1000); // Fetch the number of players every second
-        }
-    
-        // Cleanup function to clear interval when component unmounts or when the specific case is no longer true
-        return () => clearInterval(intervalId);
-    }, [sessionType, sessionOn, isGameOn]);
+        socket.on('frame_connected', () => {
+            console.log("Frame connected");
+            setConnectedToFrame(true);
+        });
+
+        socket.on('frame_not_found', () => {
+            console.log("Frame not found");
+            alert("Frame not found.");
+            setConnectedToFrame(false);
+        });
+
+        socket.on('solo_session_started', ({ user_id, session_id }) => {
+            console.log("Solo session started:", user_id, session_id);
+            setSession(true);
+            setSessionType("solo");
+            setSessionID(session_id);
+            setJoinedOrStarted("started");
+            setGameOn(true);
+        });
+
+        socket.on('group_session_started', ({ user_id, session_id }) => {
+            console.log("Group session started:", user_id, session_id);
+            setSession(true);
+            setSessionType("group");
+            setSessionID(session_id);
+            setJoinedOrStarted("started");
+        });
+
+        socket.on('session_denied', ({ message }) => {
+            console.log("Session denied:" + message);
+            alert(message);
+        });
+
+        socket.on('group_game_started', () => {
+            console.log("Game started");
+            setGameOn(true);
+        });
+
+        socket.on('num_players_updated', ({ numPlayers }) => {
+            console.log("Number of players updated:" + numPlayers);
+            setNumPlayers(numPlayers);
+        });
+
+        socket.on('session_ended', () => {
+            console.log("Session ended");
+            setSession(false);
+            setSessionType("");
+            setSessionID("");
+            setJoinedOrStarted("");
+            setNumPlayers(1);
+            setGameOn(false);
+        });
+
+        socket.on('group_session_joined', ({ user_id, session_id }) => {
+            console.log("Group session joined:", user_id, session_id);
+            setSession(true);
+            setSessionType("group");
+            setSessionID(session_id);
+            setJoinedOrStarted("joined");
+        });
+
+        return () => {
+            // Clean up event listeners when unmounting
+            socket.off('session_started');
+            socket.off('session_denied');
+            socket.off('game_started');
+            socket.off('num_players_updated');
+            socket.off('session_ended');
+            socket.off('session_joined');
+        };
+    }, []);
 
     useEffect(() => {
         // Check if user is logged in
@@ -287,7 +185,6 @@ export default function Index() {
         if (!loaded) {
             setLoaded(true);
             updateFriends();
-            handleGetLastSession();
             getNumNotifications();
         };
 
@@ -298,6 +195,7 @@ export default function Index() {
                 </View>
 
                 <ScrollView contentContainerStyle={styles.wrapper} className="flex flex-col space-y-1"
+                    automaticallyAdjustKeyboardInsets={true}
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }>
@@ -306,8 +204,8 @@ export default function Index() {
                     {(connectedToFrame) ? 
                         <View className="mt-2 h-[100px]">
                             <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
-                                <Pressable className="w-[90%] h-full justify-center items-center rounded-xl bg-stone-200" onPress={connectToFrame}>
-                                <View className="flex flex-row justify-evenly">
+                                <Pressable className="w-[90%] h-full justify-center items-center rounded-xl bg-stone-200" onPress={() => socket.emit('connect_to_frame', frameID)}>
+                                    <View className="flex flex-row justify-evenly">
                                         <Text className="text-stone-600 mt-1 font-semibold text-base mr-2">Step 1: Connect to frame</Text>
                                         <Ionicons name="checkmark-circle" size={28} color="grey" /> 
                                     </View>
@@ -327,7 +225,10 @@ export default function Index() {
                                         style={{borderWidth: 1, borderColor: 'black', borderRadius: 5, width: 250, height: 50, color: 'black', backgroundColor: 'white', paddingHorizontal: 10, fontSize: 16}}
                                         maxLength={10}
                                     />
-                                    <Pressable className="mt-4 py-2 items-center rounded-lg bg-stone-200 w-[25%]" onPress={connectToFrame}>
+                                    <Pressable className="mt-4 py-2 items-center rounded-lg bg-stone-200 w-[25%]" onPress={() => {
+                                        handleConnectToFrame();
+                                        socket.emit('connect_to_frame', frameID);
+                                        }}>
                                         <Text className="font-medium text-sm font-brand-colordark-green">Connect</Text>
                                     </Pressable> 
                                 </View>
@@ -345,12 +246,12 @@ export default function Index() {
                                     </View>
 
                                     <View className="flex flex-row justify-evenly pt-5">
-                                        <Pressable className="ml-5 items-center w-[40%] bg-stone-200 py-2 rounded-lg" onPress={startSoloSession}>
+                                        <Pressable className="ml-5 items-center w-[40%] bg-stone-200 py-2 rounded-lg" onPress={() => socket.emit('start_solo_session', user.uid)}>
                                             <FontAwesome name="user" size={30} color="grey" />
                                             <Text className="text-stone-600 font-medium mt-1 text-sm">Solo</Text>
                                         </Pressable>
                                         <Text className="text-base font-medium pt-5 text-stone-200 pl-2">or</Text>
-                                        <Pressable className="ml-3 items-center mr-5 w-[40%] bg-stone-200 py-2 rounded-lg" onPress={startGroupSession}>
+                                        <Pressable className="ml-3 items-center mr-5 w-[40%] bg-stone-200 py-2 rounded-lg" onPress={() => socket.emit('start_group_session', user.uid)}>
                                             <FontAwesome name="group" size={30} color="grey" />
                                             <Text className="text-stone-600 font-medium mt-1 text-sm">Group</Text>
                                         </Pressable>
@@ -366,15 +267,15 @@ export default function Index() {
                                         style={{borderWidth: 1, borderColor: 'black', borderRadius: 5, width: 300, height: 50, color: 'black', backgroundColor: 'white', paddingHorizontal: 10, fontSize: 16}}
                                         maxLength={6}
                                     />
-                                    <Pressable className="mt-4 py-2 items-center rounded-lg bg-stone-200 w-[25%]" onPress={joinSession}>
+                                    <Pressable className="mt-4 py-2 items-center rounded-lg bg-stone-200 w-[25%]" onPress={() => socket.emit('join_group_session', { session_id: sessionID, user_id: user.uid })}>
                                         <Text className="font-medium text-sm font-brand-colordark-green">Connect</Text>
                                     </Pressable> 
                                 </View>    
                             </View>                    
                         </View>              
-                    } 
+                    }
 
-                    {(connectToFrame && sessionOn) &&
+                    {(connectedToFrame && sessionOn) &&
                         <View className="my-2 h-[100px] flex flex-col">
                         <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
                             <View className="w-[90%] h-[100px] justify-center items-center rounded-xl bg-stone-200">
@@ -401,9 +302,11 @@ export default function Index() {
                                     
                                     <View className="flex flex-row justify-evenly pt-5">
                                         <Text className=" text-stone-200 mt-2 font-semibold text-base mx-2">{numPlayers} people in session</Text>
-                                        <Pressable className="ml-5 items-center mr-5 w-[20%] bg-stone-200 py-2 rounded-lg" onPress={startGame}>
+                                        {(joinedOrStarted === "started") &&
+                                            <Pressable className="ml-5 items-center mr-5 w-[20%] bg-stone-200 py-2 rounded-lg" onPress={() => socket.emit('start_group_game', user.uid)}>
                                                 <Text className="text-stone-600 font-medium mt-1 text-sm">Start</Text>
-                                        </Pressable>
+                                            </Pressable>
+                                        }
                                     </View>
                                 </View>  
                             </View>                    
@@ -424,7 +327,7 @@ export default function Index() {
                     }
 
                     {/* STEP 3/4 - PLAY */}
-                    {(isGameOn) &&
+                    {(isGameOn && joinedOrStarted === "started") &&
                     <View className="my-4 h-[160px] flex flex-col">
                         <View className="h-full justify-evenly items-start flex flex-row mt-2">
                             <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green pt-5">
@@ -437,7 +340,7 @@ export default function Index() {
                                 </View>
 
                                 <View className="flex flex-row justify-evenly">
-                                    <Pressable className="pt-2 mt-5 mb-5 items-center w-[60%] h-[70px] rounded-lg" onPress={stopSession}>
+                                    <Pressable className="pt-2 mt-5 mb-5 items-center w-[60%] h-[70px] rounded-lg" onPress={() => socket.emit('end_session', user.uid)}>
                                         <FontAwesome name="pause" size={30} color="white" />
                                         <Text className="text-stone-100 font-medium mt-1 text-sm">Stop session</Text>
                                     </Pressable>
@@ -445,6 +348,18 @@ export default function Index() {
                             </View>    
                         </View>                                       
                     </View>
+                    }
+
+                    {(isGameOn && joinedOrStarted == "joined") &&
+                    <View className="my-4 h-[160px] flex flex-col">
+                        <View className="h-full justify-evenly items-start flex flex-row mt-2">
+                            <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green pt-5">
+                               <View className="flex flex-row justify-evenly pt-2">
+                                <Text className=" text-stone-200 font-semibold text-base mr-2">Step 4: Play</Text>
+                               </View>
+                            </View>    
+                        </View>                                       
+                    </View> 
                     }
                 </ScrollView>
             </View>
