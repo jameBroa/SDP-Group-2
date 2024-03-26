@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import { Text, View, Image} from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
+import { Text, View, Modal, Pressable } from 'react-native'
+import {Checkbox} from 'expo-checkbox';
 import { useDispatch } from 'react-redux';
-import { logout } from '../../context/slices/userSlice';
-import { getDownloadURL, getStorage, ref } from 'firebase/storage';
+import { login } from '../../context/slices/userSlice';
 import {useSelector} from 'react-redux';
-import { Stack, router, Link } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { ScrollView } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
-import ProfileTab from '../../components/ProfileTab';
+import { FontAwesome6, FontAwesome5 } from '@expo/vector-icons';
+import COLOURS from '../../static/design_constants';
+import PagerView from 'react-native-pager-view'
+import { setDoc, doc } from 'firebase/firestore';
+import db from '../../config/database';
 
 export default function Privacy() {
   // Redux var
@@ -17,20 +20,27 @@ export default function Privacy() {
   const [streakConsent, setStreakConsent] = useState(false);
   const [dataConsent, setDataConsent] = useState(false);
   const [videoConsent, setVideoConsent] = useState(false);
+  const [ethicsModalVis, setEthicsModalVis] = useState(true);
 
-  const handleLogout = () => {
-    console.log('Logging out');
-    dispatch(logout());
-  }
+  const scrollViewRef = useRef(null);
 
-  const handlePrivacyChanges = async () => {    
+  const handleScroll = (e) => {
+    const scrollY = e.nativeEvent.contentOffset.y
+    const threshold = 50
+
+    if(scrollY < -threshold){
+        setEthicsModalVis(false);
+    }
+}
+
+  const handlePrivacyChanges = () => {   
     setDoc(doc(db, "users", user.uid), 
         {
             uid: user.uid,
             email: user.email,
             name: user.name,
-            username: user.username.toLowerCase(),
-            experienceLevel: user.experienceLevel,
+            username: (user.username == null) ? "" : user.username,
+            experience: (user.experience == null) ? "" : user.experience,
             friends: user.friends,
             streak: streakConsent,
             data: dataConsent,
@@ -41,10 +51,10 @@ export default function Privacy() {
     dispatch(login(
         {
             uid: user.uid,
-            email: email,
-            name: name,
-            username: username,
-            experience: experienceLevel,
+            email: user.email,
+            name: user.name,
+            username: (user.username == null) ? "" : user.username,
+            experience: (user.experience == null) ? "" : user.experience,
             friends: user.friends,
             streak: streakConsent,
             data: dataConsent,
@@ -53,6 +63,8 @@ export default function Privacy() {
     ));
     
     alert("Profile updated successfully!");
+    setEthicsModalVis(false);
+    router.replace("/home");
 };
 
   if (user) {
@@ -60,60 +72,18 @@ export default function Privacy() {
         <View className="w-full h-full flex flex-col items-center bg-brand-colordark-green">
         <Stack.Screen options={{headerShown:false}}></Stack.Screen>
         <View className="h-[30%] w-full items-center justify-center mb-4">
-            <BackButton className="h-[5%]" action={() => router.replace("/home/profile")} />
+            
             <View className="flex-row justify-end items-center mb-10 absolute left-[10%] top-[80%]">
                 <View className="flex-row mb-2">
-                    <Text className="font-semibold text-3xl text-stone-50">Watch your videos</Text>
+                    <Text className="font-semibold text-3xl text-stone-50">Privacy</Text>
                 </View>
             </View>
         </View>
-        <ScrollView contentContainerStyle={styles.wrapper} className="h-[60%] w-full flex flex-col rounded-t-3xl px-[4%] bg-stone-100 pt-5"
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                    }>
-            <View style={styles.container} className="h-full my-2 py-2">
-                <View
-                    className="items-center justify-evenlyh-full bg-stone-200 rounded-2xl py-4 mx-3 mb-3">
-                    
-                    <Link href={{
-                        pathname: "/home/playbackAllTime",
-                    }}>
-                        <Text className="text-base text-brand-colordark-green font-semibold">View all</Text>
-                    </Link>
-                </View>
-
-                
-                <Text className="text-lg text-gray-400 pl-4 pt-3 font-medium mt-1 mb-2">Per session</Text>
-                {Array
-                .from(sessionID.entries())
-                .sort((a, b) => new Date(b[1].split('/').reverse().join('-')) - new Date(a[1].split('/').reverse().join('-')))
-                .map(([id, started]) => (
-                    <View key={id} 
-                        className="items-center justify-evenlyh-full bg-stone-200 rounded-2xl py-5 mx-3 mb-3">
-                        <Text className="text-base text-brand-colordark-green font-semibold">Session on {started}</Text>
-                        <Text className="text-base text-brand-colordark-green font-light mb-1">{id}</Text>
-                        
-                        <Link href={{
-                            pathname: "/home/playbackBySession",
-                            params: { session: id, date: started },
-                        }}>
-                            <Text className="text-brand-colordark-green font-semibold">View videos</Text>
-                        </Link>
-                    </View>
-                ))}
-                {sessionID.size === 0 && 
-                <View 
-                className="items-center justify-evenlyh-full bg-stone-200 rounded-2xl py-5 mx-3">
-                    <Text>No sessions with videos found</Text>
-                </View>
-                }
-            </View>
-          </ScrollView>
-
             <Modal onBackdropPress={() => {setEthicsModalVis(false)}} isVisible={ethicsModalVis} animationIn="slideInUp" animationOut="slideOutDown" className="w-full  ml-0 mb-0 h-[80%]" style={styles.modal}>
                 {/* <ScrollView ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16} automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white pb-[40px] rounded-lg w-full" > */}
-
+                
                     <PagerView ref={(viewPager) => {this.viewPager = viewPager}} style={{flex:1,height:100, width:'100%'}}  initialPAge={0}>
+                    
                         <View key="1" className="flex flex-col w-full h-full">
                             <ScrollView ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16} automaticallyAdjustKeyboardInsets={true} contentContainerStyle={styles.modalWrapper} className="bg-white pb-[40px] rounded-t-modal w-full" >
                                 <View className="flex flex-row w-full h-full justify-center">
@@ -293,7 +263,11 @@ export default function Privacy() {
                                             
                                         </View>
                                         <View className="flex flex-col space-y-1  items-center">
-                                            <Pressable onPress={() => {handleRegister()}} className="h-12 w-48 rounded-xl flex flex-col items-center justify-center bg-brand-colordark-green">
+                                            <Pressable onPress={() => {
+                                                handlePrivacyChanges();
+                                                router.replace("/home/profile");
+                                            }
+                                                } className="h-12 w-48 rounded-xl flex flex-col items-center justify-center bg-brand-colordark-green">
                                                 <Text className="text-white font-light text-lg ">Continue</Text>
                                             </Pressable>
                                             <Text className="text-xs italic text-stone-400 ">Or swipe to continue</Text>

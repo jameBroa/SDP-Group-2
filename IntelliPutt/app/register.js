@@ -71,26 +71,6 @@ export default function Register() {
         uploadBytes(imageRef, blob).then((snapshot) => {
             console.log('image uploaded???')
         })
-        // const blob = await new Promise((resolve, reject) => {
-        //     const xhr = new XMLHttpRequest();
-        //     xhr.onload = function () {
-        //       resolve(xhr.response);
-        //     };
-        //     xhr.onerror = function (e) {
-        //       console.log(e);
-        //       reject(new TypeError("Network request failed"));
-        //     };
-        //     xhr.responseType = "blob";
-        //     xhr.open("GET", profileImg, true);
-        //     xhr.send(null);
-        //   });
-        
-        //   const fileRef = ref(getStorage(), uid);
-        //   const result = await uploadBytes(fileRef, blob);
-        
-        //   // We're done with the blob, close and release it
-        //   blob.close();
-
     }
 
     const handleRegister = () => {
@@ -120,7 +100,7 @@ export default function Register() {
                     email: email,
                     name: name,
                     username: username.toLowerCase(),
-                    experienceLevel: experienceLevel,
+                    experience: experienceLevel,
                     friends: [],
                     streak: streakConsent,
                     data: dataConsent,
