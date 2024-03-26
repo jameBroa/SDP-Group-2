@@ -77,6 +77,7 @@ def request_group_session_start_game(user_id: str):
         thread.start()
 
         emit('group_game_started', {'user_id': user_id, 'session_id': globals.session_id}, broadcast=True)
+        emit("group_game_whose_turn", {'user_id': user_id}, broadcast=True)
     else:
         emit('group_game_start_denied', {'message': 'Request denied, session has either ended or is not group'},
              broadcast=True)
