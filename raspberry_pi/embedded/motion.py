@@ -104,7 +104,7 @@ class Motion():
             # Considers bottom third for movement
             #roi = frame_gray[frame_height//3*2 : frame_height, :]
             
-            roi = frame_gray[frame_height//5*2 : frame_height, :]
+            roi = frame_gray[frame_height//3*2 : frame_height, :]
             
             
             if(self.cnt_frame > 0):
@@ -157,3 +157,5 @@ class Motion():
         # uncomment if you want to test with cv2.imshow
         cv2.destroyAllWindows()
 
+motion = Motion(motion_frame_count_thresh=6)
+motion.start()
