@@ -4,7 +4,7 @@
 */}
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable, TextInput, Vibration } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
@@ -15,9 +15,6 @@ import { useReduxStateUpdater } from '../../context/util/updateState';
 import { socket } from '../../logic/socket';
 
 export default function Index() {
-    const serverAddress = "http://172.24.37.110:5000";
-    const [clientAddress, setClientAddress] = useState("");
-
     // Firebase vars
     const friendRequestCollection = collection(db, "friendRequests");
 
@@ -46,6 +43,9 @@ export default function Index() {
 
     // Step 4
     const [isGameOn, setGameOn] = useState(false);
+    
+    // Step 5
+    const [userTurn, setUserTurn] = useState("");
 
     const getNumNotifications = async() => {
         const q = query(friendRequestCollection, 
@@ -85,35 +85,26 @@ export default function Index() {
         setTimeout(() => setRefreshing(false), 1000);
     }, [])
 
-    const fetchClientIP = async() => {
-        const response = await fetch("https://ipapi.co/json/")
-        const data = await response.json()
-
-        // Set the IP address to the constant `ip`
-        setClientAddress(data.ip);
-        console.log("Client IP:", data.ip);
-    }
-
     const handleConnectToFrame = () => {
-        fetchClientIP();
         socket.connect();
         console.log("Socket connected " + socket.connected);
     }
 
     useEffect(() => {
         socket.on('frame_connected', () => {
-            console.log("Frame connected");
+            console.log("WEBSOCKET: Frame connected");
+            alert("Connected to frame successfully.")
             setConnectedToFrame(true);
         });
 
         socket.on('frame_not_found', () => {
-            console.log("Frame not found");
+            console.log("WEBSOCKET: Frame not found");
             alert("Frame not found.");
             setConnectedToFrame(false);
         });
 
         socket.on('solo_session_started', ({ user_id, session_id }) => {
-            console.log("Solo session started:", user_id, session_id);
+            console.log("WEBSOCKET: Solo session started:", user_id, session_id);
             setSession(true);
             setSessionType("solo");
             setSessionID(session_id);
@@ -122,7 +113,7 @@ export default function Index() {
         });
 
         socket.on('group_session_started', ({ user_id, session_id }) => {
-            console.log("Group session started:", user_id, session_id);
+            console.log("WEBSOCKET: Group session started:", user_id, session_id);
             setSession(true);
             setSessionType("group");
             setSessionID(session_id);
@@ -130,22 +121,22 @@ export default function Index() {
         });
 
         socket.on('session_denied', ({ message }) => {
-            console.log("Session denied:" + message);
+            console.log("WEBSOCKET: Session denied:" + message);
             alert(message);
         });
 
         socket.on('group_game_started', () => {
-            console.log("Game started");
+            console.log("WEBSOCKET: Game started");
             setGameOn(true);
         });
 
         socket.on('num_players_updated', ({ numPlayers }) => {
-            console.log("Number of players updated:" + numPlayers);
+            console.log("WEBSOCKET: Number of players updated to " + numPlayers);
             setNumPlayers(numPlayers);
         });
 
         socket.on('session_ended', () => {
-            console.log("Session ended");
+            console.log("WEBSOCKET: Session ended");
             setSession(false);
             setSessionType("");
             setSessionID("");
@@ -155,11 +146,21 @@ export default function Index() {
         });
 
         socket.on('group_session_joined', ({ user_id, session_id }) => {
-            console.log("Group session joined:", user_id, session_id);
+            console.log("WEBSOCKET: Group session joined by ", user_id, session_id);
             setSession(true);
             setSessionType("group");
             setSessionID(session_id);
             setJoinedOrStarted("joined");
+        });
+
+        socket.on('group_game_whose_turn', ({ user_id }) => {
+            console.log("WEBSOCKET: " + user_id + "'s turn");
+
+            if (user_id === user.uid) {
+                Vibration.vibrate();
+            }
+
+            setUserTurn(user_id);
         });
 
         return () => {
@@ -170,6 +171,7 @@ export default function Index() {
             socket.off('num_players_updated');
             socket.off('session_ended');
             socket.off('session_joined');
+            socket.off('group_game_whose_turn');
         };
     }, []);
 
@@ -328,10 +330,10 @@ export default function Index() {
 
                     {/* STEP 3/4 - PLAY */}
                     {(isGameOn && joinedOrStarted === "started") &&
-                    <View className="my-4 h-[160px] flex flex-col">
+                    <View className="my-4 h-[200px] flex flex-col">
                         <View className="h-full justify-evenly items-start flex flex-row mt-2">
                             <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green pt-5">
-                                <View className="flex flex-row justify-evenly pt-2">
+                                <View className="flex flex-row justify-evenly pt-1 mb-2">
                                 {(sessionType === "group") ? 
                                     <Text className=" text-stone-200 font-semibold text-base mr-2">Step 4: Play</Text>
                                     :
@@ -339,10 +341,16 @@ export default function Index() {
                                 }
                                 </View>
 
-                                <View className="flex flex-row justify-evenly">
-                                    <Pressable className="pt-2 mt-5 mb-5 items-center w-[60%] h-[70px] rounded-lg" onPress={() => socket.emit('end_session', user.uid)}>
-                                        <FontAwesome name="pause" size={30} color="white" />
-                                        <Text className="text-stone-100 font-medium mt-1 text-sm">Stop session</Text>
+                                {(sessionType === "group" && userTurn === user.uid) ?
+                                    <Text className=" text-stone-100 font-semibold text-base mr-2">It's your turn</Text>
+                                    :
+                                    <Text className=" text-stone-200 font-semibold text-base mr-2">Waiting for {userTurn} to play</Text>
+                                }
+
+                                <View className="flex flex-row justify-evenly mb-2">
+                                    <Pressable className="ml-5 mt-2 items-center mr-5 w-[30%] bg-stone-200 py-3 rounded-lg" onPress={() => socket.emit('end_session', user.uid)}>
+                                        <FontAwesome name="pause" size={30} color="grey" />
+                                        <Text className="text-stone-600 font-medium mt-1 text-sm">Stop session</Text>
                                     </Pressable>
                                 </View>
                             </View>    
@@ -356,6 +364,12 @@ export default function Index() {
                             <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green pt-5">
                                <View className="flex flex-row justify-evenly pt-2">
                                 <Text className=" text-stone-200 font-semibold text-base mr-2">Step 4: Play</Text>
+
+                                {(userTurn === user.uid) ?
+                                    <Text className=" text-stone-200 font-semibold text-base mr-2">Your turn</Text>
+                                    :
+                                    <Text className=" text-stone-200 font-semibold text-base mr-2">Waiting for {userTurn} to play</Text>
+                                }
                                </View>
                             </View>    
                         </View>                                       
