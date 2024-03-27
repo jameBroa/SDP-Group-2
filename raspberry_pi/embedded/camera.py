@@ -1,33 +1,39 @@
 import os
 import subprocess
 from datetime import datetime
-from picamera import PiCamera
 from time import sleep
 from db import upload_video
+from tracker import Tracker
+import asyncio
+
 import globals
 
-cam = PiCamera()
 
-def record_local_video():
-    print("Running record local video")
+async def record_local_video():
+    
     try:
         new_video_path = generate_new_video_path()
         full_video_path = f'/home/pi/Desktop/videos/{new_video_path}'
         
         if not os.path.exists(full_video_path):
             os.makedirs(f"/home/pi/Desktop/videos/{new_video_path}")
+            
+        tracker = Tracker(output_path=f'{full_video_path}/{globals.video_count}.avi')
+        # subprocess.run(tracker.start_tracking())
+        asyncio.run(tracker.start_tracking())
+        # sleep(30)
 
-        cam.start_recording(f"{full_video_path}/{globals.video_count}.h264", resize=(1920, 1080))
-        print("Recording video...")
-        sleep(10)
-        cam.stop_recording()
-        print("Saved video locally...")
+        #cam.start_recording(f"{full_video_path}/{globals.video_count}.h264", resize=(1920, 1080))
+        #print("Recording video...")
+        #sleep(10)
+        #cam.stop_recording()
+        #print("Saved video locally...")
 
         # convert h264 video to mp4
-        print("Converting video to mp4 format...")
-        subprocess.run(["ffmpeg","-r","30","-i",f"{full_video_path}.mp4", f"{full_video_path}.h264"])
-        
-        return upload_video(full_video_path)
+        #print("Converting video to mp4 format...")
+        #subprocess.run(["ffmpeg","-r","30","-i",f"{full_video_path}.mp4", f"{full_video_path}.h264"])
+        return 0
+        #return upload_video(full_video_path)
     except Exception as error:
         print("Video recording failed", error)
         return RuntimeError("Video recording failed")

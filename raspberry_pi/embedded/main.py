@@ -1,5 +1,4 @@
-from webserver import app
+from webserver import app, socketio
 
 if __name__ == "__main__":
-    app.run(host="172.24.44.218", port=5000) # init webserver
-
+    socketio.run(app, host="172.24.52.121", port=5000, debug=True)
