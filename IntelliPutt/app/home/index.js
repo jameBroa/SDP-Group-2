@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable, TextInput, Vibration } from 'react-native';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
 import { router } from 'expo-router';
@@ -97,6 +97,11 @@ export default function Index() {
             setConnectedToFrame(true);
         });
 
+        socket.on('released_ball', () => {
+            console.log("WEBSOCKET: Ball released");
+            alert("Ball released.");
+        });
+
         socket.on('frame_not_found', () => {
             console.log("WEBSOCKET: Frame not found");
             alert("Frame not found.");
@@ -172,6 +177,8 @@ export default function Index() {
             socket.off('session_ended');
             socket.off('session_joined');
             socket.off('group_game_whose_turn');
+            socket.off('frame_connected');
+            socket.off('released_ball');
         };
     }, []);
 
@@ -330,7 +337,7 @@ export default function Index() {
 
                     {/* STEP 3/4 - PLAY */}
                     {(isGameOn && joinedOrStarted === "started") &&
-                    <View className="my-4 h-[200px] flex flex-col">
+                    <View className="my-4 h-[180px] flex flex-col">
                         <View className="h-full justify-evenly items-start flex flex-row mt-2">
                             <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green pt-5">
                                 <View className="flex flex-row justify-evenly pt-1 mb-2">
@@ -340,17 +347,23 @@ export default function Index() {
                                     <Text className=" text-stone-200 font-semibold text-base mr-2">Step 3: Play</Text>
                                 }
                                 </View>
-
-                                {(sessionType === "group" && userTurn === user.uid) ?
+                                
+                                {(sessionType === "group" && userTurn === user.uid) &&
                                     <Text className=" text-stone-100 font-semibold text-base mr-2">It's your turn</Text>
-                                    :
+                                }
+
+                                {(sessionType === "group" && userTurn != user.uid) &&
                                     <Text className=" text-stone-200 font-semibold text-base mr-2">Waiting for {userTurn} to play</Text>
                                 }
 
                                 <View className="flex flex-row justify-evenly mb-2">
-                                    <Pressable className="ml-5 mt-2 items-center mr-5 w-[30%] bg-stone-200 py-3 rounded-lg" onPress={() => socket.emit('end_session', user.uid)}>
+                                    <Pressable className="ml-5 mt-2 items-center mr-5 w-[30%] bg-stone-200 py-3 pt-4 rounded-lg" onPress={() => socket.emit('end_session', user.uid)}>
                                         <FontAwesome name="pause" size={30} color="grey" />
                                         <Text className="text-stone-600 font-medium mt-1 text-sm">Stop session</Text>
+                                    </Pressable>
+                                    <Pressable className="ml-5 mt-2 items-center mr-5 w-[30%] bg-stone-200 py-3 rounded-lg" onPress={() => socket.emit('release_ball')}>
+                                        <MaterialIcons name="report-gmailerrorred" size={35} color="grey" />
+                                        <Text className="text-stone-600 font-medium mt-1 text-sm">Release ball</Text>
                                     </Pressable>
                                 </View>
                             </View>    
