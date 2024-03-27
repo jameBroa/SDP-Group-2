@@ -4,20 +4,15 @@
 */}
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable } from 'react-native';
-import StatsGraphic1 from '../../static/images/test-image-2.png'
-import StatsGraphic2 from '../../static/images/test-image-3.png';
-import StatsGraphic3 from '../../static/images/test-image-4.png';
-import FriendButton from '../../components/FriendButton';
-import StatsButton from '../../components/StatsButton';
-import { Ionicons, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
-import axios from 'axios';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Pressable, TextInput, Vibration } from 'react-native';
+import { Ionicons, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import DefaultContainer from '../../components/DefaultContainer';
 import { useSelector } from 'react-redux';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import db from '../../config/database';
 import { collection, doc, getDoc, getDocs, query, where, and } from 'firebase/firestore';
-import ReduxStateUpdater from '../../context/util/updateState';
+import { useReduxStateUpdater } from '../../context/util/updateState';
+import { socket } from '../../logic/socket';
 
 export default function Index() {
     // Firebase vars
@@ -25,6 +20,7 @@ export default function Index() {
 
     // Redux vars
     const user = useSelector((state) => state.user.user);
+    const { fetchFriends } = useReduxStateUpdater();
 
     // State management
     const [loaded, setLoaded] = useState(false);
@@ -32,6 +28,24 @@ export default function Index() {
     const [refreshing, setRefreshing] = useState(false);
     const [unreadNotifications, setUnreadNotifications] = useState(false);
     const [sessionOn, setSession] = useState(false);
+
+    // Step 1
+    const [connectedToFrame, setConnectedToFrame] = useState(false);
+    const [frameID, setFrameID] = useState("");
+
+    // Step 2
+    const [sessionType, setSessionType] = useState("");
+    const [sessionID, setSessionID] = useState("");
+    const [joinedOrStarted, setJoinedOrStarted] = useState("");
+
+    // Step 3
+    const [numPlayers, setNumPlayers] = useState(1);
+
+    // Step 4
+    const [isGameOn, setGameOn] = useState(false);
+    
+    // Step 5
+    const [userTurn, setUserTurn] = useState("");
 
     const getNumNotifications = async() => {
         const q = query(friendRequestCollection, 
@@ -47,8 +61,6 @@ export default function Index() {
         user["friends"].forEach(friendUID => {
             getDoc(doc(db, "users", friendUID))
                 .then((d) => {
-                    console.log("Friend data: ", d.data());
-                    
                     const friendData = {
                         name: d.data()["name"],
                         skill: d.data()["experienceLevel"],
@@ -60,57 +72,115 @@ export default function Index() {
                         friends.set(friendUID, friendData);
 
                         setFriends(new Map(friends));
-                        console.log(new Map(friends))
                     }
                 })
         });
-    };
-
-    const handleStartSession = async () => {
-        tempAddress = "172.24.44.218:5000"
-
-        if (sessionOn) {
-            let response;
-            try {
-                response = await axios.get('http://' + tempAddress + '/session/request_end/' + user.uid);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                return;
-            }
-
-            if (response.status === 200) {
-                console.log(response.data);
-                setSession(false);
-            } else {
-                console.error(response.data);
-            }
-
-            return;
-        }
-        
-        let response;
-        try {
-            response = await axios.get('http://' + tempAddress + '/session/request_start/' + user.uid);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            return;
-        }
-
-        if (response.status === 200) {
-            console.log(response.data);
-            setSession(true);
-        } else {
-            console.error(response.data);
-        }
-    };
+    }
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        ReduxStateUpdater.fetchFriends(user);
+        fetchFriends();
         updateFriends();
         getNumNotifications();
         setTimeout(() => setRefreshing(false), 1000);
     }, [])
+
+    const handleConnectToFrame = () => {
+        socket.connect();
+        console.log("Socket connected " + socket.connected);
+    }
+
+    useEffect(() => {
+        socket.on('frame_connected', () => {
+            console.log("WEBSOCKET: Frame connected");
+            alert("Connected to frame successfully.")
+            setConnectedToFrame(true);
+        });
+
+        socket.on('released_ball', () => {
+            console.log("WEBSOCKET: Ball released");
+            alert("Ball released.");
+        });
+
+        socket.on('frame_not_found', () => {
+            console.log("WEBSOCKET: Frame not found");
+            alert("Frame not found.");
+            setConnectedToFrame(false);
+        });
+
+        socket.on('solo_session_started', ({ user_id, session_id }) => {
+            console.log("WEBSOCKET: Solo session started:", user_id, session_id);
+            setSession(true);
+            setSessionType("solo");
+            setSessionID(session_id);
+            setJoinedOrStarted("started");
+            setGameOn(true);
+        });
+
+        socket.on('group_session_started', ({ user_id, session_id }) => {
+            console.log("WEBSOCKET: Group session started:", user_id, session_id);
+            setSession(true);
+            setSessionType("group");
+            setSessionID(session_id);
+            setJoinedOrStarted("started");
+        });
+
+        socket.on('session_denied', ({ message }) => {
+            console.log("WEBSOCKET: Session denied:" + message);
+            alert(message);
+        });
+
+        socket.on('group_game_started', () => {
+            console.log("WEBSOCKET: Game started");
+            setGameOn(true);
+        });
+
+        socket.on('num_players_updated', ({ numPlayers }) => {
+            console.log("WEBSOCKET: Number of players updated to " + numPlayers);
+            setNumPlayers(numPlayers);
+        });
+
+        socket.on('session_ended', () => {
+            console.log("WEBSOCKET: Session ended");
+            setSession(false);
+            setSessionType("");
+            setSessionID("");
+            setJoinedOrStarted("");
+            setNumPlayers(1);
+            setGameOn(false);
+        });
+
+        socket.on('group_session_joined', ({ user_id, session_id }) => {
+            console.log("WEBSOCKET: Group session joined by ", user_id, session_id);
+            setSession(true);
+            setSessionType("group");
+            setSessionID(session_id);
+            setJoinedOrStarted("joined");
+        });
+
+        socket.on('group_game_whose_turn', ({ user_id }) => {
+            console.log("WEBSOCKET: " + user_id + "'s turn");
+
+            if (user_id === user.uid) {
+                Vibration.vibrate();
+            }
+
+            setUserTurn(user_id);
+        });
+
+        return () => {
+            // Clean up event listeners when unmounting
+            socket.off('session_started');
+            socket.off('session_denied');
+            socket.off('game_started');
+            socket.off('num_players_updated');
+            socket.off('session_ended');
+            socket.off('session_joined');
+            socket.off('group_game_whose_turn');
+            socket.off('frame_connected');
+            socket.off('released_ball');
+        };
+    }, []);
 
     useEffect(() => {
         // Check if user is logged in
@@ -130,79 +200,194 @@ export default function Index() {
         return (
             <View className="h-full w-full flex flex-col">
                 <View className="h-[30%]">
-                    <DefaultContainer subheading="Welcome back!" heading={user.name} number={unreadNotifications}/>
+                    <DefaultContainer subheading="Welcome back," heading={user.name + "!"} number={unreadNotifications}/>
                 </View>
 
-                <ScrollView contentContainerStyle={styles.wrapper} className="w-full flex flex-col space-y-1"
+                <ScrollView contentContainerStyle={styles.wrapper} className="flex flex-col space-y-1"
+                    automaticallyAdjustKeyboardInsets={true}
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }>
-                    <View className="my-2 h-[30%]">
+                    
+                    {/* STEP 1 - CONNECT TO FRAME */}
+                    {(connectedToFrame) ? 
+                        <View className="mt-2 h-[100px]">
+                            <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
+                                <Pressable className="w-[90%] h-full justify-center items-center rounded-xl bg-stone-200" onPress={() => socket.emit('connect_to_frame', frameID)}>
+                                    <View className="flex flex-row justify-evenly">
+                                        <Text className="text-stone-600 mt-1 font-semibold text-base mr-2">Step 1: Connect to frame</Text>
+                                        <Ionicons name="checkmark-circle" size={28} color="grey" /> 
+                                    </View>
+                                </Pressable>
+                            </View>
+                        </View> 
+                        :
+                        <View className="mt-2 h-[200px]">
+                            <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
+                                <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green">
+                                    <View className="flex flex-row justify-evenly mb-5">
+                                        <Text className="text-stone-100 mt-1 font-semibold text-base mr-2">Step 1: Connect to frame</Text>
+                                    </View>
+                                    <TextInput 
+                                        placeholder='Frame ID'
+                                        onChangeText={setFrameID}
+                                        style={{borderWidth: 1, borderColor: 'black', borderRadius: 5, width: 250, height: 50, color: 'black', backgroundColor: 'white', paddingHorizontal: 10, fontSize: 16}}
+                                        maxLength={10}
+                                    />
+                                    <Pressable className="mt-4 py-2 items-center rounded-lg bg-stone-200 w-[25%]" onPress={() => {
+                                        handleConnectToFrame();
+                                        socket.emit('connect_to_frame', frameID);
+                                        }}>
+                                        <Text className="font-medium text-sm font-brand-colordark-green">Connect</Text>
+                                    </Pressable> 
+                                </View>
+                            </View>
+                        </View> 
+                    }
+
+                    {/* STEP 2 - START OR CONNECT TO SESSION */}
+                    {(connectedToFrame && !sessionOn) &&
+                        <View className="my-2 h-[350px] flex flex-col ">
+                            <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
+                                <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green">
+                                    <View className="flex flex-row justify-evenly">
+                                        <Text className=" text-stone-200 mt-1 font-semibold text-base mr-2">Step 2: Start a session</Text>
+                                    </View>
+
+                                    <View className="flex flex-row justify-evenly pt-5">
+                                        <Pressable className="ml-5 items-center w-[40%] bg-stone-200 py-2 rounded-lg" onPress={() => socket.emit('start_solo_session', user.uid)}>
+                                            <FontAwesome name="user" size={30} color="grey" />
+                                            <Text className="text-stone-600 font-medium mt-1 text-sm">Solo</Text>
+                                        </Pressable>
+                                        <Text className="text-base font-medium pt-5 text-stone-200 pl-2">or</Text>
+                                        <Pressable className="ml-3 items-center mr-5 w-[40%] bg-stone-200 py-2 rounded-lg" onPress={() => socket.emit('start_group_session', user.uid)}>
+                                            <FontAwesome name="group" size={30} color="grey" />
+                                            <Text className="text-stone-600 font-medium mt-1 text-sm">Group</Text>
+                                        </Pressable>
+                                    </View>
+                                    
+                                    <View className="flex flex-row  mt-5 pb-2">
+                                        <Text className=" text-stone-200 mt-1 font-semibold text-base mr-2">Or connect to an existing one</Text>
+                                    </View>
+
+                                    <TextInput 
+                                        placeholder='Session ID'
+                                        onChangeText={setSessionID}
+                                        style={{borderWidth: 1, borderColor: 'black', borderRadius: 5, width: 300, height: 50, color: 'black', backgroundColor: 'white', paddingHorizontal: 10, fontSize: 16}}
+                                        maxLength={6}
+                                    />
+                                    <Pressable className="mt-4 py-2 items-center rounded-lg bg-stone-200 w-[25%]" onPress={() => socket.emit('join_group_session', { session_id: sessionID, user_id: user.uid })}>
+                                        <Text className="font-medium text-sm font-brand-colordark-green">Connect</Text>
+                                    </Pressable> 
+                                </View>    
+                            </View>                    
+                        </View>              
+                    }
+
+                    {(connectedToFrame && sessionOn) &&
+                        <View className="my-2 h-[100px] flex flex-col">
                         <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
-                            <Pressable className="bg-brand-colordark-green w-[95%] h-full justify-center items-center rounded-xl" onPress={handleStartSession}>
-                                {(sessionOn) ?
-                                 <Ionicons name="stop-circle" size={45} color="white" /> 
-                                 : 
-                                 <Ionicons name="play" size={45} color="white" /> 
-                                }
-                                {(sessionOn) ?
-                                 <Text className="text-white mt-1">Stop session</Text>
-                                 : 
-                                 <Text className=" text-white mt-1">Start session</Text>
-                                }
-                            </Pressable>
-                        </View>
-                    </View>   
-                               
-                    <View className="my-2 h-[20%] mb-5">
-                        <Text className="text-lg text-gray-400 pl-3 mt-1 font-medium mb-1">Last session - Wed 6th</Text>
-                        <View className="h-[90%] justify-evenly items-start flex flex-row">
-                            <View className="bg-stone-400 w-[40%] h-full justify-center items-center flex flex-row rounded-xl">
-                            <FontAwesome6 className="" name="clock" size={30} color="white" />
-                            <View className="pl-4">
-                                <Text className="text-white font-base">Duration</Text>
-                                <Text className="text-base text-white font-semibold">50 min</Text>
-                            </View>
-                            </View>
-                            <View className="bg-stone-400 w-[53.5%] h-full justify-center items-center flex flex-row rounded-xl">
-                            <MaterialCommunityIcons name="golf" size={40} color="white" />
-                            <View className="pl-3">
-                                <Text className="text-white font-base">Successful putts</Text>
-                                <Text className="text-base text-white font-semibold">30%</Text>
-                            </View>
+                            <View className="w-[90%] h-[100px] justify-center items-center rounded-xl bg-stone-200">
+                                <View className="flex flex-row justify-evenly">
+                                    <Text className=" text-stone-600 mt-1 font-semibold text-base mr-2">Step 2: Start or connect to session</Text>
+                                        <Ionicons name="checkmark-circle" size={28} color="grey" />  
+                                </View>
                             </View>
                         </View>
                     </View>
+                    }
 
-                    <View className="my-2 h-[20%] mb-3">
-                        <Text className="text-lg text-gray-400 pl-3 pt-3 font-medium mt-1">Achievements</Text>
-                        <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="/home/social">
-                            <Text className="text-sm font-light mt-3">View all</Text>
-                        </Link>
-                        <View className="h-[90%] justify-evenly items-start flex flex-row">
-                            <View className="bg-stone-400 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
-                                <FontAwesome6 name="hourglass-2" size={30} color="white" />
-                            </View>
-                            <View className="bg-stone-400 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
-                                <FontAwesome6 className="" name="hourglass" size={30} color="white" />
-                            </View>
-                            <View className="bg-stone-400 w-[30%] h-[95%] justify-center items-center flex flex-row rounded-xl">
-                                <FontAwesome6 className="" name="stopwatch-20" size={30} color="white" />
-                            </View>
+                    {/* STEP 3 - GROUP SESSION WAIT FOR PLAYERS */}
+                    {(sessionType === "group" && sessionOn && !isGameOn) && 
+                        <View className="my-2 h-[180px] flex flex-col">
+                            <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
+                                <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green">
+                                    <View className="flex flex-row justify-evenly">
+                                        <Text className=" text-stone-200 mt-1 font-semibold text-base mr-2">Step 3: Wait for friends to join</Text>
+                                    </View>
+                                    <View className="flex flex-row justify-evenly">
+                                    <Text className=" text-stone-200 mt-1 font-regular text-base mr-2">Give them</Text><Text className="text-stone-200 mt-1 font-bold text-base mr-2">{sessionID.substring(0,6)}</Text>
+                                    </View>
+                                    
+                                    <View className="flex flex-row justify-evenly pt-5">
+                                        <Text className=" text-stone-200 mt-2 font-semibold text-base mx-2">{numPlayers} people in session</Text>
+                                        {(joinedOrStarted === "started") &&
+                                            <Pressable className="ml-5 items-center mr-5 w-[20%] bg-stone-200 py-2 rounded-lg" onPress={() => socket.emit('start_group_game', user.uid)}>
+                                                <Text className="text-stone-600 font-medium mt-1 text-sm">Start</Text>
+                                            </Pressable>
+                                        }
+                                    </View>
+                                </View>  
+                            </View>                    
                         </View>
-                    </View>
+                    }
 
-                    <View className="my-2">
-                        <Text className="text-lg text-gray-400 pl-3 pt-3 font-medium mt-1">Your friends</Text>
-                        <Link className="absolute mt-4 right-[5%] text-gray-600 text-sm" href="/home/social">
-                            <Text className="text-sm font-light mt-3">View all</Text>
-                        </Link>
-                        <View className="mt-1 w-full flex flex-row justify-start ml-2">
-                            {Array.from(friends).map(([key, value]) => (
-                                <FriendButton key={key} friend={value} online />
-                            ))}
+                    {(sessionType === "group" && sessionOn && isGameOn) && 
+                        <View className="my-2 h-[100px] flex flex-col">
+                            <View className="h-[90%] justify-evenly items-start flex flex-row mt-2">
+                            <View className="w-[90%] h-[100px] justify-center items-center rounded-xl bg-stone-200">
+                                <View className="flex flex-row justify-evenly">
+                                    <Text className=" text-stone-600 mt-1 font-semibold text-base mr-2">Step 3: Wait for friends to join</Text>
+                                        <Ionicons name="checkmark-circle" size={28} color="grey" />  
+                                </View>
+                            </View> 
+                            </View>
                         </View>
+                    }
+
+                    {/* STEP 3/4 - PLAY */}
+                    {(isGameOn && joinedOrStarted === "started") &&
+                    <View className="my-4 h-[180px] flex flex-col">
+                        <View className="h-full justify-evenly items-start flex flex-row mt-2">
+                            <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green pt-5">
+                                <View className="flex flex-row justify-evenly pt-1 mb-2">
+                                {(sessionType === "group") ? 
+                                    <Text className=" text-stone-200 font-semibold text-base mr-2">Step 4: Play</Text>
+                                    :
+                                    <Text className=" text-stone-200 font-semibold text-base mr-2">Step 3: Play</Text>
+                                }
+                                </View>
+                                
+                                {(sessionType === "group" && userTurn === user.uid) &&
+                                    <Text className=" text-stone-100 font-semibold text-base mr-2">It's your turn</Text>
+                                }
+
+                                {(sessionType === "group" && userTurn != user.uid) &&
+                                    <Text className=" text-stone-200 font-semibold text-base mr-2">Waiting for {userTurn} to play</Text>
+                                }
+
+                                <View className="flex flex-row justify-evenly mb-2">
+                                    <Pressable className="ml-5 mt-2 items-center mr-5 w-[30%] bg-stone-200 py-3 pt-4 rounded-lg" onPress={() => socket.emit('end_session', user.uid)}>
+                                        <FontAwesome name="pause" size={30} color="grey" />
+                                        <Text className="text-stone-600 font-medium mt-1 text-sm">Stop session</Text>
+                                    </Pressable>
+                                    <Pressable className="ml-5 mt-2 items-center mr-5 w-[30%] bg-stone-200 py-3 rounded-lg" onPress={() => socket.emit('release_ball')}>
+                                        <MaterialIcons name="report-gmailerrorred" size={35} color="grey" />
+                                        <Text className="text-stone-600 font-medium mt-1 text-sm">Release ball</Text>
+                                    </Pressable>
+                                </View>
+                            </View>    
+                        </View>                                       
                     </View>
+                    }
+
+                    {(isGameOn && joinedOrStarted == "joined") &&
+                    <View className="my-4 h-[160px] flex flex-col">
+                        <View className="h-full justify-evenly items-start flex flex-row mt-2">
+                            <View className="w-[90%] h-full justify-center items-center rounded-xl bg-brand-colordark-green pt-5">
+                               <View className="flex flex-row justify-evenly pt-2">
+                                <Text className=" text-stone-200 font-semibold text-base mr-2">Step 4: Play</Text>
+
+                                {(userTurn === user.uid) ?
+                                    <Text className=" text-stone-200 font-semibold text-base mr-2">Your turn</Text>
+                                    :
+                                    <Text className=" text-stone-200 font-semibold text-base mr-2">Waiting for {userTurn} to play</Text>
+                                }
+                               </View>
+                            </View>    
+                        </View>                                       
+                    </View> 
+                    }
                 </ScrollView>
             </View>
         );

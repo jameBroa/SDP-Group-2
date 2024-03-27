@@ -8,6 +8,9 @@
       "expo-router"
     ],
     "name": "IntelliPutt",
-    "slug": "IntelliPutt"
+    "slug": "IntelliPutt",
+    "ios": {
+      "bundleIdentifier": "com.anonymous.IntelliPutt"
+    }
   }
 }

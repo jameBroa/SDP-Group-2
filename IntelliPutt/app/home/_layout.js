@@ -24,7 +24,7 @@ export default function Layout() {
                 title:"Home",
                 tabBarIcon:({color}) => (
                     <AntDesign name="home" size={24} color={color} />
-                )  
+                ),  
             }}
             />
 
@@ -62,6 +62,22 @@ export default function Layout() {
             />
 
             <Tabs.Screen
+            name="privacy"
+            href="/privacy"
+            options={{
+                href:null
+            }}
+            />
+
+            <Tabs.Screen
+            name="achievements"
+            href="/achievements"
+            options={{
+                href:null
+            }}
+            />
+
+            <Tabs.Screen
             name="notifications"
             href="/notifications"
             options={{
@@ -77,13 +93,26 @@ export default function Layout() {
             }}
             />
             <Tabs.Screen
-            name="session"
-            href="/session"
+            name="videos"
+            href="/videos"
             options={{
                 href:null
             }}
             />
-
+            <Tabs.Screen
+            name="playbackBySession"
+            href="/playbackBySession"
+            options={{
+                href:null
+            }}
+            />
+            <Tabs.Screen
+            name="playbackAllTime"
+            href="/playbackAllTime"
+            options={{
+                href:null
+            }}
+            />
         </Tabs>
     );
 }

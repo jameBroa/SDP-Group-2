@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import COLOURS from '../static/design_constants'
 
 
-const StatsButton = ({day, view, numToReview, imgSrc}) => {
+const StatsButton = ({ day, view, numToReview, imgSrc }) => {
     const styles = StyleSheet.create({
         customGold: {
             backgroundColor: COLOURS.MEDIUM_GOLD

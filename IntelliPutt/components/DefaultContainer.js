@@ -1,11 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { Link, Redirect, Stack, router } from 'expo-router'
-import React, { useState, useEffect } from 'react'
-import { Button, Image, Pressable, Text, View } from 'react-native'
-import COLOURS from '../static/design_constants'
+import { Stack, router } from 'expo-router'
+import React  from 'react'
+import { Image, Pressable, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import {session} from '../app/home/session'
-import { AntDesign } from '@expo/vector-icons';
+
 const DefaultContainer = ({subheading, heading, number, session=false}) => {
     return (
     <View className="h-[100%] w-full flex flex-col justify-start">
@@ -35,16 +33,6 @@ const DefaultContainer = ({subheading, heading, number, session=false}) => {
                 <View className="flex flex-col space-y-2 pl-4 top-8 z-50">
                     <Text className="text-3xl text-white ">{subheading}</Text>
                     <Text className="text-4xl text-white font-bold">{heading}</Text>
-                    {session && (
-                        // <Link href="../app/home/session">
-                            <Pressable onPress={() => {router.push("/home/session")}} className="z-50 w-32 h-10 rounded-full bg-brand-colordark-green">
-                                <View className="w-[100%] h-[100%] flex flex-row justify-center items-center"> 
-                                    <AntDesign name="plus" size={16} color="white" />
-                                    <Text className="text-stone-200 text-sm">Start session</Text>
-                                </View>
-                            </Pressable>
-                        // </Link>
-                    )} 
                 </View>
                 <View className="absolute flex flex-row w-full justify-center top-[25%] z-0">
                     <Image

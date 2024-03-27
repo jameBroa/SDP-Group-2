@@ -1,11 +1,12 @@
 import React from 'react'
-import {View, Text, StyleSheet, Pressable} from 'react-native'
+import {View, Text, StyleSheet } from 'react-native'
 import { AntDesign } from '@expo/vector-icons';
 import COLOURS from '../static/design_constants';
 import { Entypo } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
-import {Link} from 'expo-router'
-const Footer = ({home, stats, profile, settings}) => {
+import { Link } from 'expo-router'
+
+const Footer = ({ home, stats }) => {
   const styles = StyleSheet.create({
     customGold: {
         backgroundColor: COLOURS.MEDIUM_GOLD
