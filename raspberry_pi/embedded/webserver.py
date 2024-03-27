@@ -3,6 +3,7 @@ import globals
 import db
 import execute
 import threading
+import masterControlProgram
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 
@@ -32,6 +33,12 @@ def request_solo_session_start(user_id: str):
     else:
         emit('session_denied', {'message': 'Session already in progress'})
 
+
+@socketio.on('release_ball')
+def request_release_ball():
+    lift = masterControlProgram.Lift(solenoid_speed=190,dc_motor_speed=30)
+    lift.release_ball()
+        
 
 @socketio.on('start_group_session')
 def request_group_session_start(user_id: str):

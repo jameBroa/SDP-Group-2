@@ -1,8 +1,8 @@
 import serial
 import time
 import RPi.GPIO as GPIO
-#from motion import Motion
-#from motion import VideoWriter
+from motion import Motion
+from motion import VideoWriter
 from grove.grove_touch_sensor import GroveTouchSensor
 
 code = """from PicoRobotics import KitronikPicoRobotics\n
@@ -69,7 +69,7 @@ class Lift():
 		import utime\r
 		board=KitronikPicoRobotics()\r"""
 		s.solenoid = 4
-		s.solenoid_speed = 200
+		s.solenoid_speed = 100
 		s.dc_motor = 1
 		s.dc_motor_speed = 30
 		s.servo = 5
@@ -88,7 +88,8 @@ class Lift():
 		s.ser.write(b'\x04')
 		s.ser.write(s.setup.encode())
 		
-		#s.camera = Motion(motion_frame_count_thresh=6)	
+		s.camera = Motion(motion_frame_count_thresh=6)	
+		
 		def on_press(t):
 			s.pressed = True
 		
@@ -138,7 +139,8 @@ class Lift():
 		
 	def wait_sensor(s):
 		while not s.pressed:
-			time.sleep(0.01)
+			#continue
+			time.sleep(0.001)
 		print(" PRESSED ")
 		return
 			  
@@ -157,17 +159,34 @@ class Lift():
 		s.push()
 		s.lift_down()
 		time.sleep(1)
+		
+	def release_ball(s):
+		s.spin()
+		time.sleep(4)
+		s.lift_up()
+		time.sleep(1)
+		s.push()
+		s.lift_down()
+		time.sleep(1)
+		
 	# from bottom position
 	def mainloop(s):
+		video_counter = 0
 		while True:
 			try:
 				s.reset_pico()
+				print('cam start')
 				# Record until motion detected, presumably from ball
-				#s.camera.start()
+				try:
+					s.camera.start(f'/home/pi/Desktop/loop-{video_counter}.avi') #need to adjust file name per loop
+				except Exception as ex:
+					print(ex)
+				print('cam end')
 				s.wait_sensor()
 				s.spin()
-				time.sleep(2)
+				time.sleep(4)
 				s.lift_up()
+				time.sleep(1)
 				s.push()
 				s.lift_down()
 				time.sleep(1)
@@ -175,6 +194,7 @@ class Lift():
 			except KeyboardInterrupt:
 				s.flush()
 				break
+			video_counter += 1
 				
 	def close(s):
 		s.ser.close()
@@ -184,7 +204,7 @@ class Lift():
 		flush = """"""
 		s.ser.write(b'\x04')
 
-lift = Lift(solenoid_speed=190,dc_motor_speed=30)
-lift.mainloop()
-lift.flush()
-lift.close()
+#lift = Lift(solenoid_speed=190,dc_motor_speed=30)
+#lift.mainloop()
+#lift.flush()
+#lift.close()

@@ -16,7 +16,6 @@
 # except KeyboardInterrupt:
 # 	GPIO.cleanup()
 
-from grove.grove_touch_sensor import GroveTouchSensor
 import time
 
 # connect to pin 5 (slot D5)

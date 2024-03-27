@@ -4,8 +4,9 @@ import time
 
 class VideoWriter():
     def __init__(self, output_path="/home/pi/Desktop/motion2.avi", output_path_org="/home/pi/Desktop/motion3.avi"):
+        
         self.out_low_res = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*'XVID'), 10, (320, 240))
-        self.out_org_res = cv2.VideoWriter(output_path_org, cv2.VideoWriter_fourcc(*'XVID'), 10, (640, 480))
+        self.out_org_res = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*'XVID'), 10, (640, 480))
         
     def write_from_edges(self, edges):
         self.out_low_res.write(cv2.merge([edges, edges, edges]))
@@ -15,12 +16,12 @@ class Motion():
     
     def __init__(self, motion_thresh=5, motion_frame_count_thresh=10, residual_frame_count_thresh=10):
         # Video capture device by ID (default is 0, webcam is 1)
-        self.cap = cv2.VideoCapture(1)
+        #self.cap = cv2.VideoCapture(1)
         # Reading first frame
-        self.ok, self.frame = self.cap.read()
+        #self.ok, self.frame = self.cap.read()
         # Technical vars for testing / calculations
         self.fps, self.cnt_frame = 0, 0
-        self.writer = VideoWriter()
+        self.video_count = 0
         
         # Controls how sensitive motion detection is
         self.motion_thresh = motion_thresh
@@ -74,7 +75,17 @@ class Motion():
     def check_motion(self, roi, roi_p):
         return self.mse(roi, roi_p) > self.motion_thresh
         
-    def start(self):
+    def start(self, output_path='/home/pi/Desktop/motion.avi'):
+        self.writer = VideoWriter(output_path=output_path)
+        self.cap = cv2.VideoCapture(1)
+        # Reading first frame
+        self.ok, self.frame = self.cap.read()
+        # Technical vars for testing / calculations
+        self.fps, self.cnt_frame = 0, 0
+        self.motion_frame_count = 0
+        self.residual_frame_count = 0
+
+
         while True:
             self.ok, self.frame = self.cap.read()
             start_time = time.time()
@@ -144,18 +155,18 @@ class Motion():
         
             # for displaying mask and normal image
             edges = cv2.Canny(frame_gray,100,200)
-            cv2.imshow('gray', frame_gray)
+            #cv2.imshow('gray', frame_gray)
             #cv2.imshow('mask', cv2.merge([edges, edges, edges]))
         
             # For breaking loop
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+            #if cv2.waitKey(1) & 0xFF == ord('q'):
+                #break
 
         self.cap.release()
-        #self.writer.out_low_res.release()
+        self.writer.out_low_res.release()
         self.writer.out_org_res.release()
         # uncomment if you want to test with cv2.imshow
         cv2.destroyAllWindows()
 
-motion = Motion(motion_frame_count_thresh=6)
-motion.start()
+#motion = Motion(motion_frame_count_thresh=6)
+#motion.start()
