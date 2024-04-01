@@ -38,21 +38,21 @@ def join_session(uid):
     
     print(f"User {uid} joined {globals.session_id}")
 
-def start_session():
+def start_session(uid):
     db = firestore.client()
     sessions_ref = db.collection('sessions').add({
-        "uid": globals.current_user,
+        "uid": uid,
         "sessionStarted": firestore.SERVER_TIMESTAMP,
         "sessionEnded": "",
         "device": globals.device_id
     })
     
     
-    globals.session_id = sessions_ref[1].id
-    for uid in globals.current_user:
-        user_ref = db.collection('users').document(uid)
-        user_ref.update({
-            "sessions": firestore.ArrayUnion([globals.session_id])
-        })
+    session_id = sessions_ref[1].id
+    user_ref = db.collection('users').document(uid)
+    user_ref.update({
+        "sessions": firestore.ArrayUnion([session_id])
+    })
     
-    print(f"- STARTED SESSION {globals.session_id} FOR {globals.current_user[0]}")
+    print(f"- STARTED SESSION {session_id} FOR {uid}")
+    return session_id

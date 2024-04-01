@@ -6,10 +6,11 @@ import subprocess
 import time
 import threading
 import asyncio
-#from tracker import Tracker
 from thresh import Tracker
 from thresh import ROI
 import os
+import masterControlProgram
+
 
 
 async def record():
@@ -19,16 +20,13 @@ async def record():
 		
 		file_path = f'/home/pi/Desktop/videos/{globals.current_user}/{globals.session_id}'
 		if not os.path.exists(file_path):
-			os.makedirs(file_path)
-			
-			
-		tracker = Tracker(output_path=f"{file_path}/{globals.video_count}.avi", encoding="XVID")
-		tracker.start_tracking()		
+			os.makedirs(file_path)		
+		video_path = f"{file_path}/{globals.video_count}.avi"
 		
-		# <--- Below uses tracker.py --->
-		#tracker = Tracker(output_path=f"{file_path}/{globals.video_count}.mp4", encoding="h264")		
-		#(tracker.start_tracking())
-		
+		lift = masterControlProgram.Lift(solenoid_speed=190,dc_motor_speed=30, video_path=video_path)
+		lift.mainloop()
+		lift.flush()
+		lift.close()
 		
 		upload_video(f"{file_path}/{globals.video_count}.avi")
 		globals.uploaded_video = True
@@ -41,7 +39,7 @@ async def record():
 def start():
 	print("\n- RUNNING PROGRAM")	
 	
-	# whil either session is in progress or video has not been uploaded
+	# while either session is in progress or video has not been uploaded
 	while globals.session_in_progress:
 		try:
 			print(f"Trying to record video number: {globals.video_count}")

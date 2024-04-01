@@ -162,36 +162,6 @@ class Lift():
 		time.sleep(1)
 		
 	# from bottom position
-	def mainloop_with_camera(s):
-		video_counter = 0
-		while True:
-			try:
-				s.write_setup()
-				print('cam start')
-				# Record until motion detected, presumably from ball
-				try:
-					#continue
-					s.camera.start(s.video_path) #need to adjust file name per loop
-				except Exception as ex:
-					print(ex)
-				print('cam end')
-				s.wait_sensor()
-				s.spin()
-				time.sleep(3)
-				s.lift_up()
-				time.sleep(2)
-				s.push()
-				time.sleep(1)
-				s.lift_down()
-				s.flush()
-				time.sleep(1)
-
-			except KeyboardInterrupt:
-				s.flush()
-				break
-			video_counter += 1
-			
-	# from bottom position
 	def mainloop(s):
 		video_counter = 0
 		while True:
@@ -222,6 +192,6 @@ class Lift():
 		s.ser.write(b'\x04')
 		
 
-lift = Lift(solenoid_speed=80,lift_down_speed=15,lift_up_speed=30)
+lift = Lift(solenoid_speed=80,lift_down_speed=15,lift_up_speed=25)
 lift.mainloop()
 lift.close()

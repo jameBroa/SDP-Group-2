@@ -18,12 +18,16 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 def request_solo_session_start(user_id: str):
     if not globals.session_in_progress:
         print("\n -- STARTED SOLO SESSION")
+        
+
+        globals.session_id = db.start_session(user_id)
+        print("- EMITTING MESSAGE TO USER")
+        emit('solo_session_started', {'user_id': user_id, 'session_id': globals.session_id})
+        
         globals.session_in_progress = True
         globals.current_user.append(user_id)
         globals.session_type = "solo"
-
-        db.start_session()
-        emit('solo_session_started', {'user_id': user_id, 'session_id': globals.session_id})
+        globals.whose_turn = user_id
         
         def do_in_parallel():
             execute.start()
@@ -36,8 +40,8 @@ def request_solo_session_start(user_id: str):
 
 @socketio.on('release_ball')
 def request_release_ball():
-    lift = masterControlProgram.Lift(solenoid_speed=190,dc_motor_speed=30)
-    lift.release_ball()
+    print("-- USER MANUALLY RELEASED BALL")
+    globals.release_ball = True
         
 
 @socketio.on('start_group_session')
@@ -48,7 +52,7 @@ def request_group_session_start(user_id: str):
         globals.current_user.append(user_id)
         globals.session_type = "group"
 
-        db.start_session()
+        db.start_session(user_id)
 
         emit('group_session_started', {'session_id': globals.session_id, 'user_id': user_id})
     else:
@@ -76,6 +80,7 @@ def request_group_session_join(data):
 def request_group_session_start_game(user_id: str):
     if globals.session_in_progress and user_id in globals.current_user:
         globals.game_started = True
+        globals.whose_turn = globals.current_user[0]
 
         def do_in_parallel():
             execute.start()
@@ -84,7 +89,7 @@ def request_group_session_start_game(user_id: str):
         thread.start()
 
         emit('group_game_started', {'user_id': user_id, 'session_id': globals.session_id}, broadcast=True)
-        emit("group_game_whose_turn", {'user_id': user_id}, broadcast=True)
+        emit("group_game_whose_turn", {'user_id': globals.whose_turn}, broadcast=True)
     else:
         emit('group_game_start_denied', {'message': 'Request denied, session has either ended or is not group'},
              broadcast=True)
