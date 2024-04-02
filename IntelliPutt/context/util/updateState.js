@@ -51,7 +51,6 @@ export function useReduxStateUpdater() {
             await Promise.all(items.items.map(async (item) => {
                 const url = await getDownloadURL(item); // Get download URL for each video
 
-                // If the video is not already in the state, add it
                 let videosMap = new Map(user.videos);
                 let videos = videosMap.get(session);
 
@@ -70,9 +69,7 @@ export function useReduxStateUpdater() {
     const fetchVideos = async () => {
         // fetches videos from database
         // adds ones that aren't in state
-        try {
-            fetchSessions();
-                   
+        try {      
             await Promise.all(user.sessions.map(async (session) => {
                 fetchVideosPerSession({ session: session });
             }));
