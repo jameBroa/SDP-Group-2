@@ -25,7 +25,7 @@ def request_solo_session_start(user_id: str):
         emit('solo_session_started', {'user_id': user_id, 'session_id': globals.session_id})
         
         globals.session_in_progress = True
-        globals.current_user.append(user_id)
+        globals.users.append(user_id)
         globals.session_type = "solo"
         globals.whose_turn = user_id
         
@@ -49,7 +49,7 @@ def request_group_session_start(user_id: str):
     if not globals.session_in_progress:
         print("\n -- STARTED GROUP SESSION")
         globals.session_in_progress = True
-        globals.current_user.append(user_id)
+        globals.users.append(user_id)
         globals.session_type = "group"
 
         db.start_session(user_id)
@@ -66,21 +66,20 @@ def request_group_session_join(data):
 
     if globals.session_in_progress and globals.session_type == "group" and globals.session_id[0:6] == session_id:
         print("\n -- JOINED GROUP SESSION")
-        globals.current_user.append(user_id)
+        globals.users.append(user_id)
 
         db.join_session(user_id)
 
         emit('group_session_joined', {'user_id': user_id, 'session_id': globals.session_id})
-        emit('num_players_updated', {'numPlayers': len(globals.current_user)}, broadcast=True)
+        emit('num_players_updated', {'numPlayers': len(globals.users)}, broadcast=True)
     else:
         emit('group_session_denied', {'message': 'Request denied, session has either ended or is not group'})
 
 
 @socketio.on('start_group_game')
 def request_group_session_start_game(user_id: str):
-    if globals.session_in_progress and user_id in globals.current_user:
+    if globals.session_in_progress and user_id in globals.users:
         globals.game_started = True
-        globals.whose_turn = globals.current_user[0]
 
         def do_in_parallel():
             execute.start()
@@ -89,7 +88,7 @@ def request_group_session_start_game(user_id: str):
         thread.start()
 
         emit('group_game_started', {'user_id': user_id, 'session_id': globals.session_id}, broadcast=True)
-        emit("group_game_whose_turn", {'user_id': globals.whose_turn}, broadcast=True)
+				emit("group_game_whose_turn", {'user_id': globals.users[globals.whose_turn]}, broadcast=True)
     else:
         emit('group_game_start_denied', {'message': 'Request denied, session has either ended or is not group'},
              broadcast=True)
@@ -97,7 +96,7 @@ def request_group_session_start_game(user_id: str):
 
 @socketio.on('end_session')
 def request_session_end(user_id: str):
-    if globals.session_in_progress and user_id in globals.current_user:
+    if globals.session_in_progress and user_id in globals.users:
         print("\n -- ENDED SESSION")
         db.ended_session()
 
@@ -121,7 +120,7 @@ def send_putt_percentage(data):
 @socketio.on('connect_to_frame')
 def request_connect_to_frame(frame_id: str):
     print("Trying to connect to frame")
-    if globals.device_id == frame_id:
+    if globals.FRAME_ID == frame_id:
         emit('frame_connected', {'status': 'success', 'message': 'Server alive'})
     else:
         emit('frame_not_found', {'status': 'failure', 'message': 'Frame ID not found'})

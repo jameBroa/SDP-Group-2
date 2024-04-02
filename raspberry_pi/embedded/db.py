@@ -6,11 +6,10 @@ cred = credentials.Certificate('conf.json')
 initialize_app(cred, {'storageBucket':'intelliputt-2024.appspot.com'})
 
 def upload_video(video_path: str):
-    ### Test -- interacting with storage bucket for images/video
     bucket = storage.bucket()
 
-    # Example: Upload test file to bucket
-    destination_blob = f'videos/{globals.current_user}/{globals.session_id}/{globals.video_count}.avi'
+    # Path in Fb
+    destination_blob = f'videos/{globals.users[globals.whose_turn]}/{globals.session_id}/{globals.video_count}.avi'
 
     try:
         blob = bucket.blob(destination_blob)
@@ -21,16 +20,20 @@ def upload_video(video_path: str):
     
 def ended_session():
     db = firestore.client()
+    
+    # Edit session to say it ended now
     users_ref = db.collection('sessions').document(globals.session_id)
     users_ref.update({
-        "uid": globals.current_user,
+        "uid": globals.users,
         "sessionEnded": firestore.SERVER_TIMESTAMP
     })
     
-    print(f"- UPLOADED SESSION FOR {globals.current_user}")
+    print(f"- UPDATED END OF SESSION FOR {globals.users}")
 
 def join_session(uid):
     db = firestore.client()
+    
+    # Add session id to user's sessions
     user_ref = db.collection('users').document(uid)
     user_ref.update({
         "sessions": firestore.ArrayUnion([globals.session_id])
@@ -47,8 +50,10 @@ def start_session(uid):
         "device": globals.device_id
     })
     
-    
+    # Get session id from doc added
     session_id = sessions_ref[1].id
+    
+    # Add session id to user's sessions
     user_ref = db.collection('users').document(uid)
     user_ref.update({
         "sessions": firestore.ArrayUnion([session_id])

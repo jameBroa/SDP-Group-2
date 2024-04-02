@@ -189,7 +189,9 @@ class Lift():
 			except KeyboardInterrupt:
 				s.flush()
 				break
+			
 			video_counter += 1
+			
 			
 	# from bottom position
 	def mainloop(s):
