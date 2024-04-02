@@ -20,7 +20,7 @@ export default function Index() {
 
     // Redux vars
     const user = useSelector((state) => state.user.user);
-    const { fetchFriends } = useReduxStateUpdater();
+    const { fetchFriends, fetchVideos } = useReduxStateUpdater();
 
     // State management
     const [loaded, setLoaded] = useState(false);
@@ -91,6 +91,8 @@ export default function Index() {
     }
 
     useEffect(() => {
+        fetchVideos();
+
         socket.on('frame_connected', () => {
             console.log("WEBSOCKET: Frame connected");
             alert("Connected to frame successfully.")

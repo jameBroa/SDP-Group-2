@@ -1,15 +1,18 @@
-import { getStorage, ref, listAll, getDownloadURL, deleteObject } from 'firebase/storage';
+import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { useSelector } from 'react-redux';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { View, Dimensions, FlatList, StyleSheet, Pressable, Text, Alert } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import React, { useEffect, useRef, useState } from 'react';
 import { Fontisto } from '@expo/vector-icons';
+import { useReduxStateUpdater } from '../../context/util/updateState';
 
 export default function Playback() {
     const user = useSelector((state) => state.user.user);
     const { session, date } = useLocalSearchParams();
     const [videos, setVideos] = React.useState([]);
+    
+    const { fetchVideosPerSession } = useReduxStateUpdater();
 
     const [currentViewableItemIndex, setCurrentViewableItemIndex] = useState(0);
     const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 }
@@ -20,21 +23,15 @@ export default function Playback() {
     }
     const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }])
     
-    const fetchVideos = async () => {
+    const getVideos = async () => {
       try {
-        const storage = getStorage();
-        const sessionRef = ref(storage, `videos/${user.uid}/${session}`);
-        const items = await listAll(sessionRef); // List all items (videos) in the session directory
-        
-        console.log("Session " + session + "has " + items);
-        await Promise.all(items.items.map(async (item) => {
-            const url = await getDownloadURL(item); // Get download URL for each video
-            if (videos.includes(url) == false) {
-                setVideos(prevVideos => [...prevVideos, url]); // Push URL to videoURLs array
-            }
-        }));
+          fetchVideosPerSession(session);
+
+          let videosMap = new Map(user.videos);
+
+          setVideos(videosMap.get(session));
       } catch (error) {
-        console.error('Error fetching videos:', error);
+          console.error('Error fetching videos:', error);
       }
     };
 
@@ -64,11 +61,14 @@ export default function Playback() {
     }
 
     const downloadVideo =  () => {
-      
     }
 
     const videoOptions = () => {
       Alert.alert('Video options', "", [
+        {
+          text: "SessionID: " + session,
+          onPress: () => console.log('Cancel Pressed'),
+        },
         {
           text: 'Download video',
           onPress: () => console.log('Ask me later pressed'),
@@ -89,7 +89,7 @@ export default function Playback() {
     useEffect(() => {
       setVideos([]);
       setCurrentViewableItemIndex(0);
-      fetchVideos();
+      getVideos();
     }, [session]);
     
     return (
@@ -106,7 +106,7 @@ export default function Playback() {
                 headerRight: () => <Pressable onPress={videoOptions} className="pr-5 mb-1">
                     <Fontisto name="more-v-a" size={22} color="black" />
                 </Pressable>,
-                title: `${currentViewableItemIndex + 1} of ${videos.length} from ${date.slice(0, 5)}`,
+                title: `${currentViewableItemIndex + 1} of ${videos.length} from ${date}`,
                 headerTintColor: '#000000',
                 headerTitleStyle: {
                     fontSize: 18,
@@ -135,13 +135,17 @@ const Item = ({ item, shouldPlay }) => {
     const [status, setStatus] = useState(null);
   
     useEffect(() => {
-      if (!video.current) return;
-  
-      if (shouldPlay) {
-        video.current.playAsync()
-      } else {
-        video.current.pauseAsync()
-        video.current.setPositionAsync(0)
+      try {
+        if (!video.current) return;
+    
+        if (shouldPlay) {
+          video.current.playAsync();
+        } else {
+          video.current.pauseAsync();
+          video.current.setPositionAsync(0);
+        }
+      } catch (error) {
+        console.error('Error playing video:', error);
       }
     }, [shouldPlay])
   

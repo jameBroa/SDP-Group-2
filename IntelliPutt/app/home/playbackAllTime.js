@@ -1,16 +1,15 @@
-import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
-import { getDoc, doc } from 'firebase/firestore';
-import db from '../../config/database';
 import { useSelector } from 'react-redux';
 import { Stack, router } from 'expo-router';
 import { View, Dimensions, FlatList, StyleSheet, Pressable, Text } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import React, { useEffect, useRef, useState } from 'react';
-import ReduxStateUpdater from '../../context/util/updateState';
+import { useReduxStateUpdater } from '../../context/util/updateState';
 
 const Playback = () => {
     const user = useSelector((state) => state.user.user);
     const [videos, setVideos] = React.useState([]);
+
+    const { fetchVideos } = useReduxStateUpdater();
 
     const [currentViewableItemIndex, setCurrentViewableItemIndex] = useState(0);
     const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 }
@@ -21,48 +20,27 @@ const Playback = () => {
     }
     const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }])
     
-    const fetchVideos = async () => {
-      try {
-        ReduxStateUpdater.fetchSessions(user);
-        const storage = getStorage();
-        
-        // For each session
-        let currentVideoURLs = []       
-        await Promise.all(user.sessions.map(async (session) => {
-            const sessionRef = ref(storage, `videos/${user.uid}/${session}`);
+    const getVideos = async () => {
+        try {
+            fetchVideos();
 
-            // List all items (videos) in the session directory
-            const items = await listAll(sessionRef); 
-            
-            // If there are videos in the session
-            if (items.items.length > 0) {
-                await getDoc(doc(db, `sessions`, session))
-                .then(async (d) => {                
-                    
-                    // For each video in the session
-                    await Promise.all(items.items.map(async (item) => {
+            let videoURLs = [];
 
-                        const url = await getDownloadURL(item);
+            let videoMap = new Map(user.videos);
 
-                        // If the URL is not already in the state, add it
-                        if (!videos.includes(url) && !currentVideoURLs.includes(url)) {
-                            currentVideoURLs.push(url);
-                        }
-                    }));
-                }).catch(error => {
-                    console.error('Error sending request: ', error);
-                });
-            };
-        }));
-        console.log("Current video URLs: " + currentVideoURLs);
-        setVideos(prevVideos => [...prevVideos, currentVideoURLs]); // Push URL to videos array
-    } catch (error) {
-        console.error('Error fetching videos:', error);
-    }
+            videoMap.forEach (function(value, _) {
+                if (value.length > 0) {
+                    videoURLs.push(value);
+                }
+            })
+            setVideos(videoURLs);
+        } catch (error) {
+            console.error('Error fetching videos:', error);
+        }
     };
 
     useEffect(() => {
-      fetchVideos(); // Fetch videos for the session when component mounts
+        getVideos(); // Fetch videos for the session when component mounts
     }, []);
 
     return (
@@ -88,9 +66,8 @@ const Playback = () => {
             <FlatList
                 data={videos}
                 renderItem={({ item, index }) => (
-                    <Item item={item} shouldPlay={index === currentViewableItemIndex} />
+                    <Item item={item} shouldPlay={index === currentViewableItemIndex} key={index} />
                 )}
-                keyExtractor={item => item}
                 pagingEnabled
                 horizontal={false}
                 showsVerticalScrollIndicator={false}

@@ -13,46 +13,50 @@ export default function VideosPerSession() {
     const [sessionID, setSessionID] = React.useState(new Map());
     const [refreshing, setRefreshing] = React.useState(false);
 
-    const { fetchSessions } = useReduxStateUpdater();
+    const { fetchSessions, fetchVideos } = useReduxStateUpdater();
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        fetchSessionsWithVideos();
+        fetchVideos();
+        getSessionsWithVideos();
         setTimeout(() => setRefreshing(false), 1000);
     }, [])
 
-    const fetchSessionsWithVideos = async () => {
-        fetchSessions();
+    const getSessionsWithVideos = async () => {
+        console.log("Fetching sessions...");
 
         try {
             const storage = getStorage();
             
-            // Iterate over each session       
-            await Promise.all(user.sessions.map(async (session) => {
-                const sessionRef = ref(storage, `videos/${user.uid}/${session}`);
-                const items = await listAll(sessionRef); // List all items (videos) in the session directory
-                
-                // If there are videos in the session, add the session to the state
-                if (items.items.length > 0) {
-                    getDoc(doc(db, `sessions`, session))
-                    .then((d) => {                
-                        const date = new Date((d.data().sessionStarted.seconds * 1000)).toDateString().split(' ').slice(1).join(' ');
-                        if (!sessionID.has(session)) {
-                            setSessionID(prevSessions => new Map(prevSessions).set(session, date));
-                        }
-                    }).catch(error => {
-                        console.error('Error sending request: ', error);
-                    });
-                };
-            }));
+            // Iterate over each session
+            try {
+                let videoMap = new Map(user.videos);
+    
+                videoMap.forEach (function(value, key) {
+                    if (value.length > 0) {
+                        getDoc(doc(db, `sessions`, key))
+                        .then((d) => {                
+                            const date = d.data().sessionStarted.seconds * 1000;
+                            if (!sessionID.has(key)) {
+                                setSessionID(prevSessions => new Map(prevSessions).set(key, date));
+                            }
+                        }).catch(error => {
+                            console.error('Error sending request: ', error);
+                        });
+                    }
+                })
+            } catch (error) {
+                console.error('Error fetching videos:', error);
+            }
         } catch (error) {
             console.error('Error fetching videos:', error);
         }
     };
 
     React.useEffect(() => {
-        console.log("Fetching sessions with videos");
-        fetchSessionsWithVideos(); // Fetch videos for the session when component mounts
+        fetchSessions();
+        console.log("Getting sessions with videos");
+        getSessionsWithVideos(); // Fetch videos for the session when component mounts
     }, []);
 
     return (
@@ -85,16 +89,16 @@ export default function VideosPerSession() {
                     <Text className="text-lg text-gray-400 pl-4 pt-3 font-medium mt-1 mb-2">Per session</Text>
                     {Array
                     .from(sessionID.entries())
-                    .sort((a, b) => new Date(b[1].split('/').reverse().join('-')) - new Date(a[1].split('/').reverse().join('-')))
+                    .sort((a, b) => new Date(b[1]) - new Date(a[1]))
                     .map(([id, started]) => (
                         <View key={id} 
                             className="items-center justify-evenlyh-full bg-stone-200 rounded-2xl py-5 mx-3 mb-3">
-                            <Text className="text-base text-brand-colordark-green font-semibold">Session on {started}</Text>
+                            <Text className="text-base text-brand-colordark-green font-semibold">Session on {new Date(started).toLocaleString()}</Text>
                             <Text className="text-base text-brand-colordark-green font-light mb-1">{id}</Text>
                             
                             <Link href={{
                                 pathname: "/home/playbackBySession",
-                                params: { session: id, date: started },
+                                params: { session: id, date: new Date(started).toLocaleString() },
                             }}>
                                 <Text className="text-brand-colordark-green font-semibold">View videos</Text>
                             </Link>

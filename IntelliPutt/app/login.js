@@ -15,13 +15,7 @@
 */
 }
 
-import {
-  ImageBackground,
-  ScrollView,
-  Text,
-  View,
-  Pressable,
-} from "react-native";
+import { ImageBackground, ScrollView, Text, View, Pressable } from "react-native";
 import Modal from "react-native-modal";
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
@@ -72,7 +66,7 @@ export default function Login() {
             // Get rest of user data from the database
             fetchUserData(user.uid)
             .then((userData) => {                        // Data found
-                console.log(user);
+                console.log(userData);
                 console.log(user.uid);
 
                 dispatch(login(
